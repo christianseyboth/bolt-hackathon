@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { IconSearch, IconFilter, IconChevronRight, IconShieldCheck, IconAlertTriangle, IconAlertOctagon } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import Link from "next/link";
 
 // Mock data for email list
 const mockEmails = [
@@ -193,25 +194,28 @@ export function EmailList() {
           <div className="divide-y divide-neutral-800">
             {filteredEmails.length > 0 ? (
               filteredEmails.map((email) => (
-                <div 
-                  key={email.id} 
-                  className="px-4 py-3 grid grid-cols-12 gap-4 hover:bg-neutral-800/50 transition-colors cursor-pointer"
+                <Link 
+                  key={email.id}
+                  href={`/emails/${email.id}`}
+                  className="block"
                 >
-                  <div className="col-span-5 md:col-span-4 flex flex-col">
-                    <span className="text-sm font-medium truncate">{email.sender}</span>
-                    <span className="text-xs text-neutral-400 truncate md:hidden">{email.subject}</span>
+                  <div className="px-4 py-3 grid grid-cols-12 gap-4 hover:bg-neutral-800/50 transition-colors cursor-pointer">
+                    <div className="col-span-5 md:col-span-4 flex flex-col">
+                      <span className="text-sm font-medium truncate">{email.sender}</span>
+                      <span className="text-xs text-neutral-400 truncate md:hidden">{email.subject}</span>
+                    </div>
+                    <div className="hidden md:block md:col-span-4">
+                      <span className="text-sm truncate block">{email.subject}</span>
+                    </div>
+                    <div className="col-span-4 md:col-span-2 flex items-center">
+                      <span className="text-xs text-neutral-400">{formatDate(email.receivedAt)}</span>
+                    </div>
+                    <div className="col-span-3 md:col-span-2 flex items-center justify-between">
+                      {renderStatusBadge(email.status, email.threatLevel)}
+                      <IconChevronRight className="h-4 w-4 text-neutral-500" />
+                    </div>
                   </div>
-                  <div className="hidden md:block md:col-span-4">
-                    <span className="text-sm truncate block">{email.subject}</span>
-                  </div>
-                  <div className="col-span-4 md:col-span-2 flex items-center">
-                    <span className="text-xs text-neutral-400">{formatDate(email.receivedAt)}</span>
-                  </div>
-                  <div className="col-span-3 md:col-span-2 flex items-center justify-between">
-                    {renderStatusBadge(email.status, email.threatLevel)}
-                    <IconChevronRight className="h-4 w-4 text-neutral-500" />
-                  </div>
-                </div>
+                </Link>
               ))
             ) : (
               <div className="px-4 py-8 text-center text-neutral-400">
