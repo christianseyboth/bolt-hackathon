@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconShieldOff, IconSpam, IconBug, IconPhishing, IconAlertTriangle } from "@tabler/icons-react";
+import { IconShieldOff, IconMailOff, IconBug, IconFishHook, IconAlertTriangle } from "@tabler/icons-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ export function AttackTypes() {
       name: "Phishing",
       count: 156,
       percentage: 45,
-      icon: <IconPhishing className="h-5 w-5" />,
+      icon: <IconFishHook className="h-5 w-5" />,
       color: "purple",
     },
     {
@@ -22,7 +22,7 @@ export function AttackTypes() {
       name: "Spam",
       count: 98,
       percentage: 28,
-      icon: <IconSpam className="h-5 w-5" />,
+      icon: <IconMailOff className="h-5 w-5" />,
       color: "blue",
     },
     {
