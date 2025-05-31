@@ -10,11 +10,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="h-full flex dark:bg-neutral-950">
+    <div className="h-screen flex dark:bg-neutral-950">
       <Sidebar className="hidden md:flex" />
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col h-screen">
         <MobileHeader />
-        <main className="flex-1 px-4 md:px-8 pt-4 pb-12">
+        <main className="flex-1 px-4 md:px-8 pt-4 pb-12 overflow-y-auto">
           {children}
         </main>
         <Toaster />
