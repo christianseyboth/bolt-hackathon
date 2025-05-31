@@ -177,7 +177,7 @@ export function TeamManagement() {
                 <IconAlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
                   You've reached the maximum number of team members for your current plan. 
-                  <a href="/dashboard/billing" className="underline ml-1 hover:text-amber-300">
+                  <a href="/dashboard/billing\" className="underline ml-1 hover:text-amber-300">
                     Upgrade your plan
                   </a> to add more team members.
                 </div>
