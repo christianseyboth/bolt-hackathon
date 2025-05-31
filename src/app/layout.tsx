@@ -6,7 +6,6 @@ import { ViewTransitions } from "next-view-transitions";
 import type { Viewport } from "next";
 import { NavBar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { usePathname } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Proactiv - Social Media Automation | Aceternity Templates",
@@ -35,9 +34,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isDashboardRoute = pathname?.startsWith('/dashboard');
-  
   return (
     <ViewTransitions>
       <html lang="en" className="dark">
@@ -46,9 +42,7 @@ export default function RootLayout({
             "bg-charcoal antialiased h-full w-full"
           )}
         >
-          {!isDashboardRoute && <NavBar />}
           {children}
-          {!isDashboardRoute && <Footer />}
         </body>
       </html>
     </ViewTransitions>

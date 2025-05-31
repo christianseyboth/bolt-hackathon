@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import * as ToastPrimitives from "@radix-ui/react-toast"
+import * as ToastPrimitives from "radix-ui/react-toast"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -119,4 +119,3 @@ export {
   ToastAction,
 }
 
-export { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport }
