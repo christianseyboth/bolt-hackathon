@@ -1,12 +1,28 @@
 import React from "react";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { EmailAnalytics } from "@/components/dashboard/email-analytics";
+import { SubscriptionInfo } from "@/components/dashboard/subscription-info";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { RecentActivity } from "@/components/dashboard/recent-activity";
+import { SecurityScore } from "@/components/dashboard/security-score";
+import { PhishingAttempts } from "@/components/dashboard/phishing-attempts";
 
 export default function DashboardPage() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-      <p className="text-gray-400 mt-4">
-        Welcome to your dashboard. This is where you'll manage your email security.
-      </p>
-    </div>
+    <DashboardShell>
+      <DashboardHeader
+        heading="Dashboard"
+        subheading="Monitor your email security and subscription status"
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+        <EmailAnalytics />
+        <SubscriptionInfo />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <SecurityScore />
+        <PhishingAttempts />
+        <RecentActivity />
+      </div>
+    </DashboardShell>
   );
 }
