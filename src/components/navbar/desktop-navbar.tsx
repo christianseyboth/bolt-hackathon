@@ -72,7 +72,9 @@ export const DesktopNavbar = ({ navItems }: Props) => {
         <Button variant="simple" as={Link} href="/register">
           Register
         </Button>
-        <Button variant="primary">Dashboard</Button>
+        <Button variant="primary" as={Link} href="/dashboard">
+          Dashboard
+        </Button>
       </div>
     </motion.div>
   );
