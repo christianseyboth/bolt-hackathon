@@ -120,11 +120,12 @@ export function TopAttackTargetsChart() {
             </TabsList>
           </div>
 
-          <TabsContent value="pie" className="h-[400px]">
+          <TabsContent value="pie" className="h-[400px] relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   activeIndex={activeIndex}
+                  activeShape={renderActiveShape}
                   data={data}
                   cx="50%"
                   cy="50%"
@@ -143,7 +144,7 @@ export function TopAttackTargetsChart() {
             </ResponsiveContainer>
           </TabsContent>
 
-          <TabsContent value="bar" className="h-[400px]">
+          <TabsContent value="bar" className="h-[400px] relative">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={data}
