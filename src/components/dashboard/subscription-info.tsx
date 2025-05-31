@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
 import { IconCrown } from "@tabler/icons-react";
+import Link from "next/link";
 
 export function SubscriptionInfo() {
   return (
@@ -23,8 +24,10 @@ export function SubscriptionInfo() {
               </div>
             </div>
           </div>
-          <Button variant="outline" size="sm">
-            Manage
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/dashboard/settings">
+              Manage
+            </Link>
           </Button>
         </div>
 
@@ -51,7 +54,11 @@ export function SubscriptionInfo() {
         <div className="mt-6 pt-6 border-t border-neutral-800">
           <div className="flex justify-between items-center">
             <div className="text-sm">Need more capacity?</div>
-            <Button size="sm">Upgrade</Button>
+            <Button size="sm" asChild>
+              <Link href="/dashboard/settings">
+                Upgrade
+              </Link>
+            </Button>
           </div>
         </div>
       </CardContent>
