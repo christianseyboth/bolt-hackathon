@@ -36,15 +36,13 @@ export default function RootLayout({
 }>) {
   return (
     <ViewTransitions>
-      <html lang="en" className="dark">
+      <html lang="en\" className="dark">
         <body
           className={cn(
             "bg-charcoal antialiased h-full w-full"
           )}
         >
-          <NavBar />
           {children}
-          <Footer />
         </body>
       </html>
     </ViewTransitions>
