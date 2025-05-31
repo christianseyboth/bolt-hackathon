@@ -125,7 +125,6 @@ export function TopAttackTargetsChart() {
               <PieChart>
                 <Pie
                   activeIndex={activeIndex}
-                  activeShape={renderActiveShape}
                   data={data}
                   cx="50%"
                   cy="50%"
