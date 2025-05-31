@@ -1,5 +1,4 @@
 import React from "react";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { EmailAnalytics } from "@/components/dashboard/email-analytics";
 import { SubscriptionInfo } from "@/components/dashboard/subscription-info";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -9,7 +8,7 @@ import { PhishingAttempts } from "@/components/dashboard/phishing-attempts";
 
 export default function DashboardPage() {
   return (
-    <DashboardShell>
+    <>
       <DashboardHeader
         heading="Dashboard"
         subheading="Monitor your email security and subscription status"
@@ -23,6 +22,6 @@ export default function DashboardPage() {
         <PhishingAttempts />
         <RecentActivity />
       </div>
-    </DashboardShell>
+    </>
   );
 }

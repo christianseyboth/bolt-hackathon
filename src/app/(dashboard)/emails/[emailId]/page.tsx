@@ -1,5 +1,4 @@
 import React from "react";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmailDetail, EmailAnalysisData } from "@/components/dashboard/email-detail";
 import { Button } from "@/components/ui/button";
@@ -68,22 +67,27 @@ export default async function EmailDetailPage({ params }: { params: { emailId: s
   const emailAnalysis = getMockEmailAnalysis(emailId);
   
   return (
-    <DashboardShell>
+    <>
+      <Button 
+        variant="outline" 
+        size="sm" 
+        asChild 
+        className="mb-4 w-fit"
+      >
+        <Link href="/dashboard/emails">
+          <IconArrowLeft className="mr-2 h-4 w-4" />
+          Back to Email List
+        </Link>
+      </Button>
+      
       <DashboardHeader
         heading="Email Analysis"
         subheading="Detailed security analysis of the selected email"
-      >
-        <Button variant="outline" size="sm" asChild className="mt-4 md:mt-0">
-          <Link href="/dashboard/emails">
-            <IconArrowLeft className="mr-2 h-4 w-4" />
-            Back to Email List
-          </Link>
-        </Button>
-      </DashboardHeader>
+      />
       
       <div className="mt-8">
         <EmailDetail data={emailAnalysis} />
       </div>
-    </DashboardShell>
+    </>
   );
 }

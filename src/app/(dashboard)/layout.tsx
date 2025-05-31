@@ -14,7 +14,7 @@ export default function DashboardLayout({
       <Sidebar className="hidden md:flex" />
       <div className="flex-1 flex flex-col h-screen">
         <MobileHeader />
-        <main className="flex-1 px-4 md:px-8 pt-4 pb-12 overflow-y-auto">
+        <main className="flex-1 flex flex-col space-y-4 px-4 md:px-8 pt-4 pb-12 overflow-y-auto">
           {children}
         </main>
         <Toaster />
