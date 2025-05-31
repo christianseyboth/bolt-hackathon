@@ -1,5 +1,5 @@
 import React from "react";
-import "../../globals.css";
+import "../globals.css";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { MobileHeader } from "@/components/dashboard/mobile-header";

@@ -36,7 +36,6 @@
         "mini-svg-data-uri": "^1.4.4",
         "motion": "12.12.2",
         "next": "^15.3.2",
-        "next-view-transitions": "^0.3.4",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-fast-marquee": "^1.6.5",
