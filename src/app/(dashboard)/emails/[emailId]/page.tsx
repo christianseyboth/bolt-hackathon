@@ -60,9 +60,9 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-export default function EmailDetailPage({ params }: { params: { emailId: string } }) {
+export default async function EmailDetailPage({ params }: { params: { emailId: string } }) {
   // In a real app, you'd fetch this data from an API
-  const emailAnalysis = getMockEmailAnalysis(params.emailId);
+  const emailAnalysis = getMockEmailAnalysis(await params.emailId);
   
   return (
     <DashboardShell>
