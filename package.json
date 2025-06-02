@@ -65,9 +65,9 @@
         "typescript": "^5"
     },
   "overrides": {
-    "react": "18.2.0",      // Erzwingt React 18 für alle Sub-Dependencies
+    "react": "18.2.0", 
     "next-view-transitions": {
-      "react": "18.2.0"    // Spezifisch für dieses Paket
+      "react": "18.2.0"
     }
   }
 }
