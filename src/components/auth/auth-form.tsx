@@ -110,15 +110,13 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         title: "Login successful",
         description: "Welcome back!",
       });
-      router.push('/dashboard');
-      router.refresh();
+      // Removed router.push('/dashboard') - the server action now handles redirect
     } else if (isRegisterMode) {
       toast({
         title: "Registration successful",
         description: "Your account has been created.",
       });
-      router.push('/dashboard');
-      router.refresh();
+      // Removed router.push('/dashboard') - the server action now handles redirect
     }
   };
 

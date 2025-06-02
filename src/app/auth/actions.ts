@@ -1,8 +1,8 @@
-// app/auth/actions.ts
 "use server";
 
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export type AuthError = { message: string };
 
@@ -22,7 +22,9 @@ export async function signIn(
   if (error) {
     return { user: null, error: { message: error.message } };
   }
-  return { user: data.user, error: null };
+
+  // Redirect to dashboard instead of returning user
+  redirect('/dashboard');
 }
 
 export async function signUp(
@@ -49,7 +51,9 @@ export async function signUp(
   if (error) {
     return { user: null, error: { message: error.message } };
   }
-  return { user: data.user, error: null };
+
+  // Redirect to dashboard instead of returning user
+  redirect('/dashboard');
 }
 
 export async function signOutUser(): Promise<{ error: AuthError | null }> {
