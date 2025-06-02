@@ -59,12 +59,12 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-type PageProps = {
+// Fixed type definition by removing custom PageProps type
+export default async function EmailDetailPage({
+  params,
+}: {
   params: { emailId: string }
-};
-
-// Removed FC type annotation as it conflicts with Next.js Page component type expectations
-export default async function EmailDetailPage({ params }: PageProps) {
+}) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
