@@ -6,38 +6,11 @@ import { redirect } from 'next/navigation'
 
 export type AuthError = { message: string };
 
-export async function signIn(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
-  const cookieStore = cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options: any) {
-          cookieStore.set(name, value, options);
-        },
-        remove(name: string, options: any) {
-          cookieStore.delete(name, options);
-        },
-      },
-    }
-  );
-
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    return { user: null, error: { message: error.message } };
-  }
-  return { user: data.user, error: null };
-}
-
-export async function signUp(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
-  // Only create the client when the function is executed (within request scope)
+// Helper function to create Supabase server client
+async function createSupabaseServerClient() {
   const cookieStore = cookies()
   
-  const supabase = createServerClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -54,6 +27,22 @@ export async function signUp(email: string, password: string): Promise<{ user: a
       },
     }
   )
+}
+
+export async function signIn(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  
+  if (error) {
+    return { user: null, error: { message: error.message } }
+  }
+  
+  return { user: data.user, error: null }
+}
+
+export async function signUp(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
+  const supabase = await createSupabaseServerClient()
   
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -71,26 +60,7 @@ export async function signUp(email: string, password: string): Promise<{ user: a
 }
 
 export async function signOutUser(): Promise<{ error: AuthError | null }> {
-  // Only create the client when the function is executed (within request scope)
-  const cookieStore = cookies()
-  
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          cookieStore.set(name, value, options)
-        },
-        remove(name: string, options: any) {
-          cookieStore.delete(name, options)
-        },
-      },
-    }
-  )
+  const supabase = await createSupabaseServerClient()
   
   const { error } = await supabase.auth.signOut()
   
@@ -102,26 +72,7 @@ export async function signOutUser(): Promise<{ error: AuthError | null }> {
 }
 
 export async function getServerSession() {
-  // Only create the client when the function is executed (within request scope)
-  const cookieStore = cookies()
-  
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          cookieStore.set(name, value, options)
-        },
-        remove(name: string, options: any) {
-          cookieStore.delete(name, options)
-        },
-      },
-    }
-  )
+  const supabase = await createSupabaseServerClient()
   
   return await supabase.auth.getSession()
 }
