@@ -203,7 +203,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                 <Label htmlFor="password">Password</Label>
                 {isLoginMode && (
                   <Link
-                    href="/auth/reset-password"
+                    href="/reset-password"
                     className="text-xs text-neutral-400 hover:text-white"
                   >
                     Forgot password?
@@ -295,7 +295,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         {isLoginMode && (
           <>
             Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="text-cyan-500 hover:text-cyan-400">
+            <Link href="/register" className="text-cyan-500 hover:text-cyan-400">
               Sign up
             </Link>
           </>
@@ -303,7 +303,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         {isRegisterMode && (
           <>
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-cyan-500 hover:text-cyan-400">
+            <Link href="/login" className="text-cyan-500 hover:text-cyan-400">
               Sign in
             </Link>
           </>
@@ -311,7 +311,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         {isResetMode && (
           <>
             Remember your password?{" "}
-            <Link href="/auth/login" className="text-cyan-500 hover:text-cyan-400">
+            <Link href="/login" className="text-cyan-500 hover:text-cyan-400">
               Sign in
             </Link>
           </>

@@ -28,14 +28,13 @@ export async function middleware(request: NextRequest) {
   // Check if the request is for a protected route
   const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
   const isAuthRoute = 
-    request.nextUrl.pathname.startsWith("/auth") || 
     request.nextUrl.pathname.startsWith("/login") || 
     request.nextUrl.pathname.startsWith("/register") ||
     request.nextUrl.pathname.startsWith("/reset-password");
 
   // If accessing a protected route without a session, redirect to login
   if (isProtectedRoute && !session) {
-    const redirectUrl = new URL("/auth/login", request.url);
+    const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("redirectedFrom", request.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
   }
@@ -54,7 +53,6 @@ export const config = {
     // Protect dashboard routes
     "/dashboard/:path*",
     // Handle auth routes
-    "/auth/:path*",
     "/login",
     "/register",
     "/reset-password",
