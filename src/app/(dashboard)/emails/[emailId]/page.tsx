@@ -4,7 +4,6 @@ import { EmailDetail, EmailAnalysisData } from "@/components/dashboard/email-det
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { FC } from "react";
 
 // This would normally come from an API or database
 // Using mock data for demonstration
@@ -64,7 +63,8 @@ type PageProps = {
   params: { emailId: string }
 };
 
-const EmailDetailPage: FC<PageProps> = async ({ params }) => {
+// Removed FC type annotation as it conflicts with Next.js Page component type expectations
+export default async function EmailDetailPage({ params }: PageProps) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
