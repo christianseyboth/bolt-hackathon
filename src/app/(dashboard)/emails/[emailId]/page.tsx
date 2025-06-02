@@ -59,14 +59,11 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-// Define specific props interface for this page component
-interface EmailDetailPageProps {
-  params: {
-    emailId: string;
-  };
-}
-
-export default function EmailDetailPage({ params }: EmailDetailPageProps) {
+export default function EmailDetailPage({ 
+  params 
+}: { 
+  params: { emailId: string } 
+}) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
