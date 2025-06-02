@@ -6,9 +6,19 @@ import { IconShieldOff, IconMailOff, IconBug, IconFishHook, IconAlertTriangle } 
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
+// Define an interface for the attack type items
+interface AttackType {
+  id: number;
+  name: string;
+  count: number;
+  percentage: number;
+  icon: React.ReactElement;
+  color: string;
+}
+
 export function AttackTypes() {
   // Mock data for attack types
-  const attackTypes = [
+  const attackTypes: AttackType[] = [
     {
       id: 1,
       name: "Phishing",
@@ -102,13 +112,12 @@ export function AttackTypes() {
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
                   <div className={cn("p-2 rounded-md mr-2", getBgColorClass(attack.color))}>
-                    {React.cloneElement(attack.icon as React.ReactElement, {
-                      ...(attack.icon as React.ReactElement).props,
+                    {React.cloneElement(attack.icon, {
                       className: cn(
-                        (attack.icon as React.ReactElement).props.className,
+                        attack.icon.props.className,
                         getTextColorClass(attack.color)
-                      ),
-                    } as React.HTMLAttributes<HTMLElement>)}
+                      )
+                    })}
                   </div>
                   <div>
                     <span className="font-medium">{attack.name}</span>
