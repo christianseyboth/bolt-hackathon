@@ -12,10 +12,11 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Cell, // ← Wichtig: Cell importieren
 } from "recharts";
 
 export function ThreatCategoryChart() {
-  // Mock data for threat categories
+  // 1) Mock-Daten
   const weeklyData = [
     { category: "Phishing", count: 48 },
     { category: "Malware", count: 32 },
@@ -34,16 +35,17 @@ export function ThreatCategoryChart() {
     { category: "Ransomware", count: 21 },
   ];
 
-  // Color mapping for different categories
+  // 2) Farb-Mapping
   const categoryColors: Record<string, string> = {
-    Phishing: "#9333ea", // purple-600
-    Malware: "#ef4444", // red-500
-    Spam: "#3b82f6", // blue-500
-    Scam: "#f97316", // orange-500
+    Phishing: "#9333ea",      // purple-600
+    Malware: "#ef4444",       // red-500
+    Spam: "#3b82f6",          // blue-500
+    Scam: "#f97316",          // orange-500
     Impersonation: "#06b6d4", // cyan-500
-    Ransomware: "#14b8a6", // teal-500
+    Ransomware: "#14b8a6",    // teal-500
   };
 
+  // 3) Custom Tooltip-Komponente
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -79,57 +81,77 @@ export function ThreatCategoryChart() {
             </TabsList>
           </div>
 
+          {/* ─── Weekly Chart ────────────────────────────────────────────── */}
           <TabsContent value="weekly" className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={weeklyData}
                 margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#333"
+                  vertical={false}
+                />
                 <XAxis dataKey="category" stroke="#666" fontSize={12} />
                 <YAxis stroke="#666" fontSize={12} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar 
-                  dataKey="count" 
+
+                {/* ─── Hier liegt der Unterschied: nur eine übergeordnete Bar mit dataKey="count" ─── */}
+                <Bar
+                  dataKey="count"
                   name="Threat Count"
                   radius={[4, 4, 0, 0]}
                   barSize={40}
+                  // fill: Default-Farbe, wird durch Cells überschrieben
                   fill="#8884d8"
-                  // Use different colors for each bar based on category
                   isAnimationActive={true}
                   animationDuration={1000}
                 >
+                  {/* ─── Für jede Datenzeile genau ein <Cell> erzeugen und die Farbe setzen ─── */}
                   {weeklyData.map((entry, index) => (
-                    <Bar key={index} fill={categoryColors[entry.category] || "#8884d8"} />
+                    <Cell
+                      key={index}
+                      fill={categoryColors[entry.category] || "#8884d8"}
+                    />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </TabsContent>
 
+          {/* ─── Monthly Chart ───────────────────────────────────────────── */}
           <TabsContent value="monthly" className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={monthlyData}
                 margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#333"
+                  vertical={false}
+                />
                 <XAxis dataKey="category" stroke="#666" fontSize={12} />
                 <YAxis stroke="#666" fontSize={12} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar 
-                  dataKey="count" 
-                  name="Threat Count" 
-                  fill="#8884d8"
+
+                <Bar
+                  dataKey="count"
+                  name="Threat Count"
                   radius={[4, 4, 0, 0]}
                   barSize={40}
+                  fill="#8884d8"
                   isAnimationActive={true}
                   animationDuration={1000}
                 >
                   {monthlyData.map((entry, index) => (
-                    <Bar key={index} fill={categoryColors[entry.category] || "#8884d8"} />
+                    <Cell
+                      key={index}
+                      fill={categoryColors[entry.category] || "#8884d8"}
+                    />
                   ))}
                 </Bar>
               </BarChart>
