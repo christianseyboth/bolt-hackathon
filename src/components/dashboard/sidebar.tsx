@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,6 +14,8 @@ import {
   IconLogout,
   IconDeviceLaptop,
 } from "@tabler/icons-react";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SidebarProps {
   className?: string;
@@ -21,6 +23,16 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
+  const { signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    await signOut();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out."
+    });
+  };
 
   return (
     <div
@@ -45,7 +57,7 @@ export function Sidebar({ className }: SidebarProps) {
         <SidebarItem 
           href="/dashboard/emails" 
           icon={<IconMail className="h-5 w-5" />} 
-          isActive={pathname === "/dashboard/emails"}
+          isActive={pathname === "/dashboard/emails" || pathname.startsWith("/dashboard/emails/")}
         >
           Email Analysis
         </SidebarItem>
@@ -56,14 +68,6 @@ export function Sidebar({ className }: SidebarProps) {
           isActive={pathname === "/dashboard/security"}
         >
           Security
-        </SidebarItem>
-        
-        <SidebarItem 
-          href="/dashboard/devices" 
-          icon={<IconDeviceLaptop className="h-5 w-5" />} 
-          isActive={pathname === "/dashboard/devices"}
-        >
-          Devices
         </SidebarItem>
         
         <SidebarItem 
@@ -84,13 +88,13 @@ export function Sidebar({ className }: SidebarProps) {
           Settings
         </SidebarItem>
         
-        <SidebarItem 
-          href="/logout" 
-          icon={<IconLogout className="h-5 w-5" />} 
-          isActive={false}
+        <button
+          onClick={handleLogout}
+          className="flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors w-full text-neutral-400 hover:text-white hover:bg-neutral-900"
         >
-          Logout
-        </SidebarItem>
+          <IconLogout className="h-5 w-5" />
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   );

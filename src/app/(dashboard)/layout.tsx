@@ -3,6 +3,7 @@ import "../globals.css";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { MobileHeader } from "@/components/dashboard/mobile-header";
+import { AuthProvider } from "@/components/auth/auth-provider";
 
 export default function DashboardLayout({
   children,
@@ -10,15 +11,17 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="h-screen flex dark:bg-neutral-950">
-      <Sidebar className="hidden md:flex" />
-      <div className="flex-1 flex flex-col h-screen">
-        <MobileHeader />
-        <main className="flex-1 flex flex-col space-y-4 px-4 md:px-8 pt-4 pb-12 overflow-y-auto">
-          {children}
-        </main>
-        <Toaster />
+    <AuthProvider>
+      <div className="h-screen flex dark:bg-neutral-950">
+        <Sidebar className="hidden md:flex" />
+        <div className="flex-1 flex flex-col h-screen">
+          <MobileHeader />
+          <main className="flex-1 flex flex-col space-y-4 px-4 md:px-8 pt-4 pb-12 overflow-y-auto">
+            {children}
+          </main>
+          <Toaster />
+        </div>
       </div>
-    </div>
+    </AuthProvider>
   );
 }

@@ -6,11 +6,11 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Register | SecPilot | AI-Powered Email Security",
-  description: "Create a SecPilot account to start securing your emails against threats with AI-powered analysis.",
+  title: "Reset Password | SecPilot | AI-Powered Email Security",
+  description: "Reset your SecPilot account password to regain access to your email security dashboard.",
 };
 
-export default function RegisterPage() {
+export default function ResetPasswordPage() {
   return (
     <div className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center">
       <AmbientColor />
@@ -19,7 +19,7 @@ export default function RegisterPage() {
           <Logo />
         </div>
         <div className="w-full max-w-md bg-neutral-900/80 border border-neutral-800 rounded-xl p-8 backdrop-blur-sm">
-          <AuthForm mode="register" />
+          <AuthForm mode="reset" />
         </div>
       </Container>
     </div>
