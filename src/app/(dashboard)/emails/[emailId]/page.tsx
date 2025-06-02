@@ -60,8 +60,8 @@ Klicken Sie hier für weitere Informationen:
 };
 
 export default async function EmailDetailPage({ params }: { params: { emailId: string } }) {
-  // Await the params object before accessing its properties
-  const { emailId } = await params;
+  // Fixed: Removed the await from params as it's not a Promise
+  const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
   const emailAnalysis = getMockEmailAnalysis(emailId);
