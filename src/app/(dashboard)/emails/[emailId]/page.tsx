@@ -59,7 +59,7 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-// Fixed type definition by removing custom PageProps type
+// Fix: Removed any reference to PageProps type constraint
 export default async function EmailDetailPage({
   params,
 }: {
@@ -78,7 +78,7 @@ export default async function EmailDetailPage({
         asChild 
         className="mb-4 w-fit"
       >
-        <Link href="/dashboard/emails">
+        <Link href="/emails">
           <IconArrowLeft className="mr-2 h-4 w-4" />
           Back to Email List
         </Link>
