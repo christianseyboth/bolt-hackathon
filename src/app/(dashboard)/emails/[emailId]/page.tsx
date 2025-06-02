@@ -61,8 +61,6 @@ Klicken Sie hier für weitere Informationen:
 
 export default async function EmailDetailPage({
   params,
-}: {
-  params: { emailId: string }
 }) {
   const { emailId } = await params;
   
