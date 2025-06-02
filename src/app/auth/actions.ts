@@ -9,19 +9,22 @@ export type AuthError = {
 };
 
 export async function signIn(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
+  // Only create the client when the function is executed (within request scope)
+  const cookieStore = cookies()
+  
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies().get(name)?.value
+          return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookies().set(name, value, options)
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookies().delete(name, options)
+          cookieStore.delete(name, options)
         },
       },
     }
@@ -40,19 +43,22 @@ export async function signIn(email: string, password: string): Promise<{ user: a
 }
 
 export async function signUp(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
+  // Only create the client when the function is executed (within request scope)
+  const cookieStore = cookies()
+  
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies().get(name)?.value
+          return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookies().set(name, value, options)
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookies().delete(name, options)
+          cookieStore.delete(name, options)
         },
       },
     }
@@ -74,19 +80,22 @@ export async function signUp(email: string, password: string): Promise<{ user: a
 }
 
 export async function signOutUser(): Promise<{ error: AuthError | null }> {
+  // Only create the client when the function is executed (within request scope)
+  const cookieStore = cookies()
+  
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies().get(name)?.value
+          return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookies().set(name, value, options)
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookies().delete(name, options)
+          cookieStore.delete(name, options)
         },
       },
     }
@@ -102,19 +111,22 @@ export async function signOutUser(): Promise<{ error: AuthError | null }> {
 }
 
 export async function getServerSession() {
+  // Only create the client when the function is executed (within request scope)
+  const cookieStore = cookies()
+  
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookies().get(name)?.value
+          return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookies().set(name, value, options)
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookies().delete(name, options)
+          cookieStore.delete(name, options)
         },
       },
     }
