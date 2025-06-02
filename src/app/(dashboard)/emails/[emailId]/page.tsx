@@ -59,13 +59,12 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-// Fix: Removed any reference to PageProps type constraint
 export default async function EmailDetailPage({
   params,
 }: {
-  params: { emailId: Promise<any> }
+  params: { emailId: string }
 }) {
-  const { emailId } = await params;
+  const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
   const emailAnalysis = getMockEmailAnalysis(emailId);
