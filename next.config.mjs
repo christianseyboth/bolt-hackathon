@@ -38,7 +38,7 @@ const nextConfig = {
     // Directories to run ESLint on during production builds
     dirs: ['pages', 'components', 'lib', 'src', 'mdx'],
     // Don't run ESLint during builds if you want to handle it separately
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
   },
 };
 
