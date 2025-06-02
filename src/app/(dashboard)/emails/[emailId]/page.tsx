@@ -61,13 +61,14 @@ Klicken Sie hier für weitere Informationen:
 };
 
 type EmailDetailPageProps = {
-  params: {
+  params: Promise<{
     emailId: string;
-  };
+  }>;
 };
 
 export default async function EmailDetailPage({ params }: EmailDetailPageProps) {
-  const { emailId } = params;
+  // 1. `await params` → erst jetzt haben wir `{ emailId: string }`
+  const { emailId } = await params;
   
   // In a real app, you'd fetch this data from an API
   const emailAnalysis = getMockEmailAnalysis(emailId);
