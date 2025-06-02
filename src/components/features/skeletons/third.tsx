@@ -1,48 +1,51 @@
 "use client";
+
 import React, { useEffect } from "react";
-// Wichtig: animate aus "motion", nicht aus "motion/react"
-import { animate, stagger } from "motion";
+// 1) animate + Typen aus motion (nicht aus "motion/react"!)
+import { animate } from "motion";
+import type { SequenceDefinition } from "motion";
 import { GoCopilot } from "react-icons/go";
-import { ClaudeLogo, OpenAILogo, MetaIconOutline, GeminiLogo } from "@/components/icons/illustrations";
+import {
+  ClaudeLogo,
+  GeminiLogo,
+  MetaIconOutline,
+  OpenAILogo,
+} from "@/components/icons/illustrations";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { cn } from "@/lib/utils";
 
 export const SkeletonThree = () => {
-  // Keyframe-Daten (skaliert + verschiebt Y-Position)
-  const scale = [1, 1.1, 1];
-  const transform = ["translateY(0px)", "translateY(-4px)", "translateY(0px)"];
-  
-  // Jedes Sub-Array: [CSS-Selector, Keyframes, individuelle Options]
-  const sequence = [
+  // 2) Deklariere sequence mit dem korrekten Typ
+  const sequence: SequenceDefinition[] = [
     [
       ".circle-1",
-      { scale, transform },
+      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
       { duration: 0.8 },
     ],
     [
       ".circle-2",
-      { scale, transform },
+      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
       { duration: 0.8 },
     ],
     [
       ".circle-3",
-      { scale, transform },
+      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
       { duration: 0.8 },
     ],
     [
       ".circle-4",
-      { scale, transform },
+      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
       { duration: 0.8 },
     ],
     [
       ".circle-5",
-      { scale, transform },
+      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
       { duration: 0.8 },
     ],
   ];
 
   useEffect(() => {
-    // ↓ animate() ist jetzt aus "motion"
+    // 3) Jetzt passt animate’s Signatur: Sequenz-Array + Options
     animate(sequence, {
       repeat: Infinity,
       repeatDelay: 1,
@@ -95,7 +98,7 @@ const Container = ({
   <div
     className={cn(
       `h-16 w-16 rounded-full flex items-center justify-center bg-[rgba(248,248,248,0.01)]
-      shadow-[0px_0px_8px_0px_rgba(248,248,248,0.25)_inset,0px_32px_24px_-16px_rgba(0,0,0,0.40)]`,
+        shadow-[0px_0px_8px_0px_rgba(248,248,248,0.25)_inset,0px_32px_24px_-16px_rgba(0,0,0,0.40)]`,
       className
     )}
   >
