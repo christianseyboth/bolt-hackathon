@@ -62,9 +62,7 @@ Klicken Sie hier für weitere Informationen:
 
 export default async function EmailDetailPage({
   params,
-}: {
-  params: { emailId: string }
-}) {
+}: PageProps<{ emailId: string }>) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
