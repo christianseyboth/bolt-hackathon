@@ -12,7 +12,7 @@ export const Clients = () => {
     },
     {
       title: "google",
-      src: "/logos/google.webp",
+      src: "https://i.pravatar.cc/150?img=1",
     },
     {
       title: "meta",
@@ -28,7 +28,7 @@ export const Clients = () => {
     },
     {
       title: "google second",
-      src: "/logos/google.webp",
+      src: "https://i.pravatar.cc/150?img=1",
     },
     {
       title: "meta second",

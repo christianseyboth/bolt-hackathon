@@ -1,16 +1,13 @@
 import { BlogLayout } from "@/components/blog-layout";
 
-// Import the thumbnail from the current directory instead of another blog post
-import Thumbnail from "./thumbnail.jpeg";
-
 export const blog = {
   author: { name: "Manu Arora", src: "/avatar.jpeg" },
   date: "2024-07-14",
   title: "Changelog for 2024",
   description:
     "Explore the latest updates and enhancements in our 2024 changelog. Discover new features and improvements that enhance user experience.",
-  // Use the local thumbnail instead of the remote URL
-  image: Thumbnail,
+  // Use a remote image URL instead of the local thumbnail
+  image: 'https://images.unsplash.com/photo-1504384308090-c894fd248f53?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 };
 
 export const metadata = {
