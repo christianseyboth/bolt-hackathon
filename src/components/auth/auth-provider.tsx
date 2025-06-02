@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session - client side only
     const getInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -57,13 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      const { error } = await signOutUser();
-      
-      if (error) {
-        console.error("Error signing out:", error);
-        return;
-      }
-      
+      await signOutUser();
       router.push("/");
       router.refresh();
     } catch (error) {
