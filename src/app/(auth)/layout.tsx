@@ -11,7 +11,7 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }>) {
   // Check if user is already logged in, redirect to dashboard if true
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
