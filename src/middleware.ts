@@ -1,12 +1,15 @@
-import { createServerClient } from '@supabase/ssr'
+// middleware.ts
+export const runtime = "edge"; // explizit Edge-Runtime erzwingen
+
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  // Create a response object to modify
+  // 1) Lege ein NextResponse.next() an, um Cookies in der Antwort zu setzen
   const response = NextResponse.next();
-  
-  // Create a Supabase client configured to use cookies
+
+  // 2) Supabase-Client mit Cookie-Handler für Edge
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -14,48 +17,65 @@ export async function middleware(request: NextRequest) {
       cookies: {
         get: (name) => request.cookies.get(name)?.value,
         set: (name, value, options) => {
-          response.cookies.set({ name, value, ...options });
+          // Übergebe hier alle Optionen, damit HttpOnly, SameSite, etc. erhalten bleiben
+          response.cookies.set({
+            name,
+            value,
+            // options könnte Typ: { path: string; maxAge: number; sameSite: "lax"|"strict", secure: boolean, httpOnly: boolean }
+            httpOnly: options.httpOnly,
+            maxAge: options.maxAge,
+            path: options.path,
+            sameSite: options.sameSite,
+            secure: options.secure,
+          });
         },
         remove: (name, options) => {
-          response.cookies.set({ name, value: "", ...options });
+          // Um einen Cookie zu löschen, setze ihn auf leeren Wert und maxAge=0
+          response.cookies.set({
+            name,
+            value: "",
+            maxAge: 0,
+            path: options?.path || "/",
+          });
         },
       },
     }
   );
-  
-  // Refresh session if expired - required for Server Components
-  const { data: { session } } = await supabase.auth.getSession();
 
-  // Check if the request is for a protected route
-  const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
-  const isAuthRoute = 
-    request.nextUrl.pathname.startsWith("/login") || 
-    request.nextUrl.pathname.startsWith("/register") ||
-    request.nextUrl.pathname.startsWith("/reset-password");
+  // 3) Session abrufen (ggf. automatisch refresht Supabase intern den Token)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  // If accessing a protected route without a session, redirect to login
+  // 4) Pfade checken
+  const pathname = request.nextUrl.pathname;
+  const isProtectedRoute = pathname.startsWith("/dashboard");
+  const isAuthRoute =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/reset-password");
+
+  // 5) Umleitung, falls nicht eingeloggt und auf Dashboard
   if (isProtectedRoute && !session) {
     const redirectUrl = new URL("/login", request.url);
-    redirectUrl.searchParams.set("redirectedFrom", request.nextUrl.pathname);
+    redirectUrl.searchParams.set("redirectedFrom", pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // If accessing an auth route with a session, redirect to dashboard
+  // 6) Wenn eingeloggt und auf /login|/register|/reset-password -> /dashboard
   if (isAuthRoute && session) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  // 7) Gib das Response-Objekt zurück, damit ggf. Cookies gesetzt werden
   return response;
 }
 
-// Specify which routes this middleware should run on
 export const config = {
   matcher: [
-    // Protect dashboard routes
     "/dashboard/:path*",
-    // Handle auth routes
-    "/login",
-    "/register",
-    "/reset-password",
+    "/login/:path*",
+    "/register/:path*",
+    "/reset-password/:path*",
   ],
 };
