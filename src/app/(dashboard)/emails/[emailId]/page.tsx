@@ -65,7 +65,7 @@ export default async function EmailDetailPage({
 }: {
   params: { emailId: string }
 }) {
-  const { emailId } = params;
+  const { emailId } = await params;
   
   // In a real app, you'd fetch this data from an API
   const emailAnalysis = getMockEmailAnalysis(emailId);
