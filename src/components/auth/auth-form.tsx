@@ -70,8 +70,11 @@ export function AuthForm({ mode, className }: AuthFormProps) {
             title: "Login successful",
             description: "Welcome back!",
           });
-          // Use window.location.href instead of router.push for a full page reload
-          window.location.href = "/dashboard";
+          // Force a refresh of server components to update auth state
+          router.refresh();
+          // Then navigate to dashboard
+          router.replace("/dashboard");
+          // Note: Not setting isLoading to false here because we're navigating away
         }
       } else if (isRegisterMode) {
         const { user, error } = await signUpWithEmail(email, password);
@@ -87,8 +90,11 @@ export function AuthForm({ mode, className }: AuthFormProps) {
             title: "Registration successful",
             description: "Please check your email to confirm your account.",
           });
-          // Use window.location.href instead of router.push for a full page reload
-          window.location.href = "/";
+          // Force a refresh of server components to update auth state
+          router.refresh();
+          // Then navigate to home
+          router.replace("/");
+          // Note: Not setting isLoading to false here because we're navigating away
         }
       } else if (isResetMode) {
         const { error } = await resetPassword(email);
@@ -110,8 +116,6 @@ export function AuthForm({ mode, className }: AuthFormProps) {
       setFormError("An unexpected error occurred. Please try again later.");
       setIsLoading(false);
     }
-    // Note: We don't call setIsLoading(false) here in the finally block
-    // because we want the loading state to persist during page navigation
   };
 
   const handleSocialAuth = async (provider: "github" | "google") => {
@@ -134,8 +138,6 @@ export function AuthForm({ mode, className }: AuthFormProps) {
       setFormError("An unexpected error occurred with social login.");
       setIsLoading(false);
     }
-    // Note: We don't call setIsLoading(false) in the finally block
-    // because we want the loading state to persist during redirection
   };
 
   return (
