@@ -9,10 +9,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { MobileHeader } from "@/components/dashboard/mobile-header";
 import { AuthProvider } from "@/components/auth/auth-provider";
 
-// Supabase server client helper function
-async function createSupabaseServerClient() {
+export default async function DashboardLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  // Server-side authentication check
   const cookieStore = cookies();
-  return createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -29,15 +33,7 @@ async function createSupabaseServerClient() {
       },
     }
   );
-}
 
-export default async function DashboardLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  // Server-side authentication check
-  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   // If no session, redirect to login

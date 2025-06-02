@@ -5,10 +5,14 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-// Supabase server client helper function
-async function createSupabaseServerClient() {
+export default async function AuthLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  // Check if user is already logged in, redirect to dashboard if true
   const cookieStore = cookies();
-  return createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -25,15 +29,7 @@ async function createSupabaseServerClient() {
       },
     }
   );
-}
 
-export default async function AuthLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  // Check if user is already logged in, redirect to dashboard if true
-  const supabase = await createSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
 
   if (session) {
