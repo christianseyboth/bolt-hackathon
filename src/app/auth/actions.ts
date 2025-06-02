@@ -1,78 +1,74 @@
-'use server'
+// app/auth/actions.ts
+"use server";
 
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export type AuthError = { message: string };
 
-// Helper function to create Supabase server client
 async function createSupabaseServerClient() {
-  const cookieStore = cookies()
-  
+  const cookieStore = cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
+          return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: any) {
-          cookieStore.set(name, value, options)
+          cookieStore.set(name, value, options);
         },
         remove(name: string, options: any) {
-          cookieStore.delete(name, options)
+          cookieStore.delete(name, options);
         },
       },
     }
-  )
+  );
 }
 
-export async function signIn(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
-  const supabase = await createSupabaseServerClient()
-
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  
+export async function signIn(
+  email: string,
+  password: string
+): Promise<{ user: any | null; error: AuthError | null }> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
-    return { user: null, error: { message: error.message } }
+    return { user: null, error: { message: error.message } };
   }
-  
-  return { user: data.user, error: null }
+  return { user: data.user, error: null };
 }
 
-export async function signUp(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
-  const supabase = await createSupabaseServerClient()
-  
+export async function signUp(
+  email: string,
+  password: string
+): Promise<{ user: any | null; error: AuthError | null }> {
+  const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
-    }
-  })
-  
+      emailRedirectTo: `${
+        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+      }/auth/callback`,
+    },
+  });
   if (error) {
-    return { user: null, error: { message: error.message } }
+    return { user: null, error: { message: error.message } };
   }
-
-  return { user: data.user, error: null }
+  return { user: data.user, error: null };
 }
 
 export async function signOutUser(): Promise<{ error: AuthError | null }> {
-  const supabase = await createSupabaseServerClient()
-  
-  const { error } = await supabase.auth.signOut()
-  
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signOut();
   if (error) {
-    return { error: { message: error.message } }
+    return { error: { message: error.message } };
   }
-
-  return { error: null }
+  return { error: null };
 }
 
 export async function getServerSession() {
-  const supabase = await createSupabaseServerClient()
-  
-  return await supabase.auth.getSession()
+  const supabase = await createSupabaseServerClient();
+  return await supabase.auth.getSession();
 }
