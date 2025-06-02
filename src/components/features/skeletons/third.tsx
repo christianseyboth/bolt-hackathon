@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 // 1) animate + Typen aus motion (nicht aus "motion/react"!)
 import { animate } from "motion";
-import type { SequenceDefinition } from "motion";
+import type { SequenceDefinition } from "@motionone/types";
 import { GoCopilot } from "react-icons/go";
 import {
   ClaudeLogo,
