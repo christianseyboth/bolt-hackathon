@@ -64,13 +64,7 @@ type PageProps = {
   params: { emailId: string }
 };
 
-export default async function EmailDetailPage({
-  params,
-  searchParams,
-}: {
-  params: { emailId: string };
-  searchParams?: Record<string, string | string[] | undefined>;
-}) {
+const EmailDetailPage: FC<PageProps> = async ({ params }) => {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
