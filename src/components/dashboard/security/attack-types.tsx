@@ -64,6 +64,32 @@ export function AttackTypes() {
     return colors[color] || "bg-neutral-500/80";
   };
 
+  // Get background color class for icon container
+  const getBgColorClass = (color: string) => {
+    const colors: Record<string, string> = {
+      purple: "bg-purple-900/30",
+      blue: "bg-blue-900/30",
+      red: "bg-red-900/30",
+      orange: "bg-orange-900/30",
+      neutral: "bg-neutral-900/30",
+    };
+    
+    return colors[color] || "bg-neutral-900/30";
+  };
+
+  // Get text color class for icons
+  const getTextColorClass = (color: string) => {
+    const colors: Record<string, string> = {
+      purple: "text-purple-400",
+      blue: "text-blue-400",
+      red: "text-red-400",
+      orange: "text-orange-400",
+      neutral: "text-neutral-400",
+    };
+    
+    return colors[color] || "text-neutral-400";
+  };
+
   return (
     <Card className="border-neutral-800 bg-neutral-900">
       <CardHeader className="pb-2">
@@ -75,10 +101,14 @@ export function AttackTypes() {
             <div key={attack.id} className="space-y-2">
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
-                  <div className={`p-2 rounded-md bg-${attack.color}-900/30 mr-2`}>
+                  <div className={cn("p-2 rounded-md mr-2", getBgColorClass(attack.color))}>
                     {React.cloneElement(attack.icon as React.ReactElement, {
-                      className: cn((attack.icon as React.ReactElement).props.className, `text-${attack.color}-400`),
-                    })}
+                      ...(attack.icon as React.ReactElement).props,
+                      className: cn(
+                        (attack.icon as React.ReactElement).props.className,
+                        getTextColorClass(attack.color)
+                      ),
+                    } as React.HTMLAttributes<HTMLElement>)}
                   </div>
                   <div>
                     <span className="font-medium">{attack.name}</span>
