@@ -4,7 +4,7 @@ import { EmailDetail, EmailAnalysisData } from "@/components/dashboard/email-det
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { IconArrowLeft } from "@tabler/icons-react";
-import PageProps from "next";
+
 
 // This would normally come from an API or database
 // Using mock data for demonstration
@@ -60,9 +60,13 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-export default async function EmailDetailPage({
-  params,
-}: PageProps<{ emailId: string }>) {
+type EmailDetailPageProps = {
+  params: {
+    emailId: string;
+  };
+};
+
+export default async function EmailDetailPage({ params }: EmailDetailPageProps) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
