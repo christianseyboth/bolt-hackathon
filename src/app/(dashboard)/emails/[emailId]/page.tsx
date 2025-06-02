@@ -59,11 +59,14 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-type Props = {
-  params: { emailId: string }
+interface PageProps {
+  params: {
+    emailId: string;
+  };
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
-export default function EmailDetailPage({ params }: Props) {
+export default async function EmailDetailPage({ params, searchParams }: PageProps) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
