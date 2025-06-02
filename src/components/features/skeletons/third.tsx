@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect } from "react";
-// 1) animate + Typen aus motion (nicht aus "motion/react"!)
+// Nur `animate` aus motion holen, keinen Typ mehr:
 import { animate } from "motion";
-import type { SequenceDefinition } from "@motionone/types";
+
 import { GoCopilot } from "react-icons/go";
 import {
   ClaudeLogo,
@@ -15,37 +15,73 @@ import { SparklesCore } from "@/components/ui/sparkles";
 import { cn } from "@/lib/utils";
 
 export const SkeletonThree = () => {
-  // 2) Deklariere sequence mit dem korrekten Typ
-  const sequence: SequenceDefinition[] = [
+  // 1) Sequenz ohne strikten Typ – wir lassen TS hier einfach inferieren 
+  //    oder tippen es als any[], um sicherzugehen, dass kein Typ-Error kommt.
+  const sequence: any[] = [
     [
       ".circle-1",
-      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
+      {
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
+      },
       { duration: 0.8 },
     ],
     [
       ".circle-2",
-      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
+      {
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
+      },
       { duration: 0.8 },
     ],
     [
       ".circle-3",
-      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
+      {
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
+      },
       { duration: 0.8 },
     ],
     [
       ".circle-4",
-      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
+      {
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
+      },
       { duration: 0.8 },
     ],
     [
       ".circle-5",
-      { scale: [1, 1.1, 1], transform: ["translateY(0px)", "translateY(-4px)", "translateY(0px)"] },
+      {
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
+      },
       { duration: 0.8 },
     ],
   ];
 
   useEffect(() => {
-    // 3) Jetzt passt animate’s Signatur: Sequenz-Array + Options
+    // 2) Da `sequence` jetzt `any[]` ist, passt der Aufruf in beide animate-Overloads.
     animate(sequence, {
       repeat: Infinity,
       repeatDelay: 1,
@@ -98,7 +134,7 @@ const Container = ({
   <div
     className={cn(
       `h-16 w-16 rounded-full flex items-center justify-center bg-[rgba(248,248,248,0.01)]
-        shadow-[0px_0px_8px_0px_rgba(248,248,248,0.25)_inset,0px_32px_24px_-16px_rgba(0,0,0,0.40)]`,
+       shadow-[0px_0px_8px_0px_rgba(248,248,248,0.25)_inset,0px_32px_24px_-16px_rgba(0,0,0,0.40)]`,
       className
     )}
   >
