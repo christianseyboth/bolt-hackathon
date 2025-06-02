@@ -64,10 +64,5 @@
         "tw-animate-css": "^1.3.0",
         "typescript": "^5"
     },
-  "overrides": {
-    "react": "18.2.0", 
-    "next-view-transitions": {
-      "react": "18.2.0"
-    }
   }
 }
