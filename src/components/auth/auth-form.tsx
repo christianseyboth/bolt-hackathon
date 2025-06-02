@@ -72,8 +72,8 @@ export function AuthForm({ mode, className }: AuthFormProps) {
           });
           // Force a refresh of server components to update auth state
           router.refresh();
-          // Removed explicit router.replace("/dashboard") call
-          // Now relying on middleware for redirection
+          // Explicitly navigate to dashboard
+          router.push("/dashboard");
         }
       } else if (isRegisterMode) {
         const { user, error } = await signUpWithEmail(email, password);
@@ -91,8 +91,8 @@ export function AuthForm({ mode, className }: AuthFormProps) {
           });
           // Force a refresh of server components to update auth state
           router.refresh();
-          // Removed explicit router.replace("/") call
-          // Now relying on middleware for redirection
+          // Explicitly navigate to dashboard
+          router.push("/dashboard");
         }
       } else if (isResetMode) {
         const { error } = await resetPassword(email);
