@@ -19,10 +19,10 @@ export async function signIn(email: string, password: string): Promise<{ user: a
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options })
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookieStore.delete({ name, ...options })
+          cookieStore.delete(name, options)
         },
       },
     }
@@ -51,10 +51,10 @@ export async function signUp(email: string, password: string): Promise<{ user: a
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options })
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookieStore.delete({ name, ...options })
+          cookieStore.delete(name, options)
         },
       },
     }
@@ -86,10 +86,10 @@ export async function signOutUser(): Promise<{ error: AuthError | null }> {
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options })
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookieStore.delete({ name, ...options })
+          cookieStore.delete(name, options)
         },
       },
     }
@@ -115,10 +115,10 @@ export async function getServerSession() {
           return cookieStore.get(name)?.value
         },
         set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options })
+          cookieStore.set(name, value, options)
         },
         remove(name: string, options: any) {
-          cookieStore.delete({ name, ...options })
+          cookieStore.delete(name, options)
         },
       },
     }
