@@ -1,24 +1,22 @@
 import { BlogLayout } from "@/components/blog-layout";
 
+// Import the thumbnail from the current directory instead of another blog post
+import Thumbnail from "./thumbnail.jpeg";
+
 export const blog = {
   author: { name: "Manu Arora", src: "/avatar.jpeg" },
   date: "2024-07-14",
   title: "Changelog for 2024",
   description:
     "Explore the latest updates and enhancements in our 2024 changelog. Discover new features and improvements that enhance user experience.",
-  image:
-    "https://images.unsplash.com/photo-1696429175928-793a1cdef1d3?q=80&w=3000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  // Use the local thumbnail instead of the remote URL
+  image: Thumbnail,
 };
-
-// Import a local image to satisfy the build process
-// This ensures Next.js has a real image file to process
-import Thumbnail from "../top-5-llm-of-all-time/thumbnail.jpeg";
 
 export const metadata = {
   title: blog.title,
   description: blog.description,
   openGraph: {
-    // Use the existing remote URL for OpenGraph
     images: [blog.image],
   },
 };
