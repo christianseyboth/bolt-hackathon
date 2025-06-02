@@ -1,0 +1,128 @@
+'use server'
+
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+
+export type AuthError = {
+  message: string;
+};
+
+export async function signIn(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
+  const cookieStore = cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: any) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: any) {
+          cookieStore.delete({ name, ...options })
+        },
+      },
+    }
+  )
+  
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  })
+  
+  if (error) {
+    return { user: null, error: { message: error.message } }
+  }
+
+  return { user: data.user, error: null }
+}
+
+export async function signUp(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
+  const cookieStore = cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: any) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: any) {
+          cookieStore.delete({ name, ...options })
+        },
+      },
+    }
+  )
+  
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+    }
+  })
+  
+  if (error) {
+    return { user: null, error: { message: error.message } }
+  }
+
+  return { user: data.user, error: null }
+}
+
+export async function signOutUser(): Promise<{ error: AuthError | null }> {
+  const cookieStore = cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: any) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: any) {
+          cookieStore.delete({ name, ...options })
+        },
+      },
+    }
+  )
+  
+  const { error } = await supabase.auth.signOut()
+  
+  if (error) {
+    return { error: { message: error.message } }
+  }
+
+  return { error: null }
+}
+
+export async function getServerSession() {
+  const cookieStore = cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: any) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: any) {
+          cookieStore.delete({ name, ...options })
+        },
+      },
+    }
+  )
+  
+  return await supabase.auth.getSession()
+}

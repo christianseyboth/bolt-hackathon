@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import { NavBar } from "@/components/navbar";
-import { cn } from "@/lib/utils";
 import { Footer } from "@/components/footer";
+import { Toaster } from "@/components/ui/toaster";
 
-export default function RootLayout({
+export default function MarketingLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <>
-    <NavBar />
-    <main>    
-      {children}      
-    </main>
-    <Footer />
+      <NavBar />
+      <main>{children}</main>
+      <Footer />
+      <Toaster />
     </>
-    );
+  );
 }

@@ -4,15 +4,13 @@ import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ViewTransitions } from "next-view-transitions";
 import type { Viewport } from "next";
-import { NavBar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "Proactiv - Social Media Automation | Aceternity Templates",
+  title: "SecPilot - AI-Powered Email Security",
   description:
-    "Proactiv is an all in on marketing automation platform that handles emails, tasks tracking, social media management and everything in between.",
+    "SecPilot is an AI-powered email security platform that scans, classifies, and reports on potential email threats such as phishing, malware, and spam.",
   openGraph: {
-    images: ["https://proactiv-aceternity.vercel.app/banner.png"],
+    images: ["/banner.png"],
   },
 };
 
@@ -36,7 +34,7 @@ export default function RootLayout({
 }>) {
   return (
     <ViewTransitions>
-      <html lang="en\" className="dark">
+      <html lang="en" className="dark">
         <body
           className={cn(
             "bg-charcoal antialiased h-full w-full"

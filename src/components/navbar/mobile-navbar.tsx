@@ -7,10 +7,11 @@ import { IoIosClose } from "react-icons/io";
 import { Button } from "@/components/button";
 import { Logo } from "@/components/logo";
 import { useMotionValueEvent, useScroll } from "motion/react";
+import { useAuth } from "@/components/auth/auth-provider";
 
 export const MobileNavbar = ({ navItems }: any) => {
   const [open, setOpen] = useState(false);
-
+  const { user } = useAuth();
   const { scrollY } = useScroll();
 
   const [showBackground, setShowBackground] = useState(false);
@@ -81,25 +82,39 @@ export const MobileNavbar = ({ navItems }: any) => {
             ))}
           </div>
           <div className="flex flex-row w-full items-start gap-2.5  px-8 py-4 ">
-            <Button
-              as={Link}
-              href="/dashboard"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Dashboard
-            </Button>
-            <Button
-              variant="simple"
-              as={Link}
-              href="/register"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Register
-            </Button>
+            {user ? (
+              <Button
+                as={Link}
+                href="/dashboard"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button
+                  as={Link}
+                  href="/login"
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="simple"
+                  as={Link}
+                  href="/register"
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                >
+                  Register
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}

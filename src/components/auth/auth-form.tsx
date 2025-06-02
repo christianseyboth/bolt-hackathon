@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { IconBrandGithub, IconBrandGoogle, IconEye, IconEyeOff, IconLoader2 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { signInWithEmail, signUpWithEmail, signInWithOAuth, resetPassword } from "@/services/auth";
+import { signIn, signUp } from "@/app/auth/actions";
+import { signInWithOAuth, resetPassword } from "@/services/auth";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -20,11 +21,11 @@ export function AuthForm({ mode, className }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
   const isLoginMode = mode === "login";
   const isRegisterMode = mode === "register";
@@ -33,106 +34,97 @@ export function AuthForm({ mode, className }: AuthFormProps) {
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
-    setIsLoading(true);
 
     try {
       // Validation
       if (!email.trim()) {
         setFormError("Please enter your email address");
-        setIsLoading(false);
         return;
       }
 
       if (!isResetMode && !password.trim()) {
         setFormError("Please enter your password");
-        setIsLoading(false);
         return;
       }
 
       if (isRegisterMode && password !== confirmPassword) {
         setFormError("Passwords don't match");
-        setIsLoading(false);
         return;
       }
 
       // Authentication logic
       if (isLoginMode) {
-        const { user, error } = await signInWithEmail(email, password);
-        
-        if (error) {
-          setFormError(error.message);
-          setIsLoading(false);
-          return;
-        }
+        startTransition(async () => {
+          const { user, error } = await signIn(email, password);
+          
+          if (error) {
+            setFormError(error.message);
+            return;
+          }
 
-        if (user) {
-          toast({
-            title: "Login successful",
-            description: "Welcome back!",
-          });
-          // Force a refresh of server components to update auth state
-          router.refresh();
-          // Let middleware handle redirection after refresh
-        }
-      } else if (isRegisterMode) {
-        const { user, error } = await signUpWithEmail(email, password);
-        
-        if (error) {
-          setFormError(error.message);
-          setIsLoading(false);
-          return;
-        }
-
-        if (user) {
-          toast({
-            title: "Registration successful",
-            description: "Please check your email to confirm your account.",
-          });
-          // Force a refresh of server components to update auth state
-          router.refresh();
-          // Let middleware handle redirection after refresh
-        }
-      } else if (isResetMode) {
-        const { error } = await resetPassword(email);
-        
-        if (error) {
-          setFormError(error.message);
-          setIsLoading(false);
-          return;
-        }
-
-        toast({
-          title: "Password reset email sent",
-          description: "Please check your email for password reset instructions.",
+          if (user) {
+            toast({
+              title: "Login successful",
+              description: "Welcome back!",
+            });
+            router.push('/dashboard');
+            router.refresh();
+          }
         });
-        setIsLoading(false);
+      } else if (isRegisterMode) {
+        startTransition(async () => {
+          const { user, error } = await signUp(email, password);
+          
+          if (error) {
+            setFormError(error.message);
+            return;
+          }
+
+          if (user) {
+            toast({
+              title: "Registration successful",
+              description: "Please check your email to confirm your account.",
+            });
+            router.push('/dashboard');
+            router.refresh();
+          }
+        });
+      } else if (isResetMode) {
+        startTransition(async () => {
+          const { error } = await resetPassword(email);
+          
+          if (error) {
+            setFormError(error.message);
+            return;
+          }
+
+          toast({
+            title: "Password reset email sent",
+            description: "Please check your email for password reset instructions.",
+          });
+        });
       }
     } catch (error) {
       console.error("Auth error:", error);
       setFormError("An unexpected error occurred. Please try again later.");
-      setIsLoading(false);
     }
   };
 
   const handleSocialAuth = async (provider: "github" | "google") => {
     setFormError(null);
-    setIsLoading(true);
     
     try {
       const { error } = await signInWithOAuth(provider);
       
       if (error) {
         setFormError(error.message);
-        setIsLoading(false);
         return;
       }
 
       // The redirect happens in the signInWithOAuth function
-      // We don't reset isLoading here since we're navigating away
     } catch (error) {
       console.error(`Error with ${provider} auth:`, error);
       setFormError("An unexpected error occurred with social login.");
-      setIsLoading(false);
     }
   };
 
@@ -158,7 +150,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
             variant="outline"
             className="bg-neutral-800 hover:bg-neutral-700 text-white border-neutral-700"
             onClick={() => handleSocialAuth("github")}
-            disabled={isLoading}
+            disabled={isPending}
           >
             <IconBrandGithub className="mr-2 h-4 w-4" />
             GitHub
@@ -167,7 +159,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
             variant="outline"
             className="bg-neutral-800 hover:bg-neutral-700 text-white border-neutral-700"
             onClick={() => handleSocialAuth("google")}
-            disabled={isLoading}
+            disabled={isPending}
           >
             <IconBrandGoogle className="mr-2 h-4 w-4" />
             Google
@@ -206,7 +198,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={isLoading}
+              disabled={isPending}
               className="bg-neutral-800 border-neutral-700 text-white"
             />
           </div>
@@ -232,7 +224,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="bg-neutral-800 border-neutral-700 text-white pr-10"
                 />
                 <Button
@@ -262,7 +254,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  disabled={isLoading}
+                  disabled={isPending}
                   className="bg-neutral-800 border-neutral-700 text-white pr-10"
                 />
                 <Button
@@ -284,9 +276,9 @@ export function AuthForm({ mode, className }: AuthFormProps) {
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading}
+            disabled={isPending}
           >
-            {isLoading ? (
+            {isPending ? (
               <>
                 <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
                 {isLoginMode && "Logging in..."}

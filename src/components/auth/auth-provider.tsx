@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { signOutUser } from "@/app/auth/actions";
 
 type AuthContextType = {
   user: User | null;
@@ -56,8 +57,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      await supabase.auth.signOut();
+      const { error } = await signOutUser();
+      
+      if (error) {
+        console.error("Error signing out:", error);
+        return;
+      }
+      
       router.push("/");
+      router.refresh();
     } catch (error) {
       console.error("Error signing out:", error);
     } finally {

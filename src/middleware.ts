@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Create a response object to modify
   const response = NextResponse.next();
   
   // Create a Supabase client configured to use cookies

@@ -11,6 +11,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Link } from "next-view-transitions";
+import { useAuth } from "@/components/auth/auth-provider";
 
 type Props = {
   navItems: {
@@ -22,7 +23,7 @@ type Props = {
 
 export const DesktopNavbar = ({ navItems }: Props) => {
   const { scrollY } = useScroll();
-
+  const { user } = useAuth();
   const [showBackground, setShowBackground] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (value) => {
@@ -69,12 +70,20 @@ export const DesktopNavbar = ({ navItems }: Props) => {
         </div>
       </div>
       <div className="flex space-x-2 items-center">
-        <Button variant="simple" as={Link} href="/register">
-          Register
-        </Button>
-        <Button variant="primary" as={Link} href="/dashboard">
-          Dashboard
-        </Button>
+        {user ? (
+          <Button variant="primary" as={Link} href="/dashboard">
+            Dashboard
+          </Button>
+        ) : (
+          <>
+            <Button variant="simple" as={Link} href="/register">
+              Register
+            </Button>
+            <Button variant="primary" as={Link} href="/login">
+              Login
+            </Button>
+          </>
+        )}
       </div>
     </motion.div>
   );
