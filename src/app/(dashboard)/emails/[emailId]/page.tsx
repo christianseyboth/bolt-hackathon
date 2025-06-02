@@ -59,8 +59,14 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-export default async function EmailDetailPage({ params }: { params: { emailId: string } }) {
-  // Fixed: Removed the await from params as it's not a Promise
+// Define specific props interface for this page component
+interface EmailDetailPageProps {
+  params: {
+    emailId: string;
+  };
+}
+
+export default function EmailDetailPage({ params }: EmailDetailPageProps) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
