@@ -1,90 +1,110 @@
 "use client";
-import { motion, stagger, animate, useAnimate } from "motion/react";
-import React, { useEffect, useState } from "react";
-import { IconContainer } from "../icon-container";
-import { cn } from "@/lib/utils";
+
+import React, { useEffect } from "react";
+// Nur `animate` aus motion holen, keinen Typ mehr:
+import { animate } from "motion";
+
 import { GoCopilot } from "react-icons/go";
-import { SparklesCore } from "@/components/ui/sparkles";
 import {
   ClaudeLogo,
   GeminiLogo,
-  MetaIcon,
   MetaIconOutline,
   OpenAILogo,
 } from "@/components/icons/illustrations";
+import { SparklesCore } from "@/components/ui/sparkles";
+import { cn } from "@/lib/utils";
 
 export const SkeletonThree = () => {
-  const [animating, setAnimating] = useState(false);
-
-  const scale = [1, 1.1, 1];
-  const transform = ["translateY(0px)", "translateY(-4px)", "translateY(0px)"];
-  const sequence = [
+  // 1) Sequenz ohne strikten Typ – wir lassen TS hier einfach inferieren 
+  //    oder tippen es als any[], um sicherzugehen, dass kein Typ-Error kommt.
+  const sequence: any[] = [
     [
       ".circle-1",
       {
-        scale,
-        transform,
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
       },
       { duration: 0.8 },
     ],
     [
       ".circle-2",
       {
-        scale,
-        transform,
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
       },
       { duration: 0.8 },
     ],
     [
       ".circle-3",
       {
-        scale,
-        transform,
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
       },
       { duration: 0.8 },
     ],
     [
       ".circle-4",
       {
-        scale,
-        transform,
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
       },
       { duration: 0.8 },
     ],
     [
       ".circle-5",
       {
-        scale,
-        transform,
+        scale: [1, 1.1, 1],
+        transform: [
+          "translateY(0px)",
+          "translateY(-4px)",
+          "translateY(0px)",
+        ],
       },
       { duration: 0.8 },
     ],
   ];
 
   useEffect(() => {
-    // @ts-ignore
+    // 2) Da `sequence` jetzt `any[]` ist, passt der Aufruf in beide animate-Overloads.
     animate(sequence, {
       repeat: Infinity,
       repeatDelay: 1,
     });
   }, []);
+
   return (
     <div className="p-8 overflow-hidden h-full relative flex items-center justify-center">
       <div className="flex flex-row flex-shrink-0 justify-center items-center gap-2">
         <Container className="h-8 w-8 circle-1">
-          <ClaudeLogo className="h-4 w-4 " />
+          <ClaudeLogo className="h-4 w-4" />
         </Container>
         <Container className="h-12 w-12 circle-2">
-          <GoCopilot className="h-6 w-6 " />
+          <GoCopilot className="h-6 w-6" />
         </Container>
         <Container className="circle-3">
-          <OpenAILogo className="h-8 w-8 " />
+          <OpenAILogo className="h-8 w-8" />
         </Container>
         <Container className="h-12 w-12 circle-4">
-          <MetaIconOutline className="h-6 w-6 " />
+          <MetaIconOutline className="h-6 w-6" />
         </Container>
         <Container className="h-8 w-8 circle-5">
-          <GeminiLogo className="h-4 w-4 " />
+          <GeminiLogo className="h-4 w-4" />
         </Container>
       </div>
 
@@ -110,17 +130,14 @@ const Container = ({
 }: {
   className?: string;
   children: React.ReactNode;
-}) => {
-  return (
-    <div
-      className={cn(
-        `h-16 w-16 rounded-full flex items-center justify-center bg-[rgba(248,248,248,0.01)]
-    shadow-[0px_0px_8px_0px_rgba(248,248,248,0.25)_inset,0px_32px_24px_-16px_rgba(0,0,0,0.40)]
-    `,
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-};
+}) => (
+  <div
+    className={cn(
+      `h-16 w-16 rounded-full flex items-center justify-center bg-[rgba(248,248,248,0.01)]
+       shadow-[0px_0px_8px_0px_rgba(248,248,248,0.25)_inset,0px_32px_24px_-16px_rgba(0,0,0,0.40)]`,
+      className
+    )}
+  >
+    {children}
+  </div>
+);

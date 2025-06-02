@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { IconArrowLeft } from "@tabler/icons-react";
 
+
 // This would normally come from an API or database
 // Using mock data for demonstration
 const getMockEmailAnalysis = (emailId: string): EmailAnalysisData => {
@@ -59,8 +60,14 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-export default async function EmailDetailPage({ params }: { params: { emailId: string } }) {
-  // Await the params object before accessing its properties
+type EmailDetailPageProps = {
+  params: Promise<{
+    emailId: string;
+  }>;
+};
+
+export default async function EmailDetailPage({ params }: EmailDetailPageProps) {
+  // 1. `await params` → erst jetzt haben wir `{ emailId: string }`
   const { emailId } = await params;
   
   // In a real app, you'd fetch this data from an API
@@ -74,7 +81,7 @@ export default async function EmailDetailPage({ params }: { params: { emailId: s
         asChild 
         className="mb-4 w-fit"
       >
-        <Link href="/dashboard/emails">
+        <Link href="/emails">
           <IconArrowLeft className="mr-2 h-4 w-4" />
           Back to Email List
         </Link>

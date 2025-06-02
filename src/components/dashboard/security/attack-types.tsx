@@ -2,13 +2,29 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconShieldOff, IconMailOff, IconBug, IconFishHook, IconAlertTriangle } from "@tabler/icons-react";
+import {
+  IconShieldOff,
+  IconMailOff,
+  IconBug,
+  IconFishHook,
+  IconAlertTriangle,
+} from "@tabler/icons-react";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
+// 1) Interface so ändern, dass das Icon eine className-Prop haben darf:
+interface AttackType {
+  id: number;
+  name: string;
+  count: number;
+  percentage: number;
+  icon: React.ReactElement<{ className?: string }>;
+  color: string;
+}
+
 export function AttackTypes() {
-  // Mock data for attack types
-  const attackTypes = [
+  // 2) Mock-Daten: Icon-Elements jetzt automatisch den richtigen Typ haben
+  const attackTypes: AttackType[] = [
     {
       id: 1,
       name: "Phishing",
@@ -51,7 +67,6 @@ export function AttackTypes() {
     },
   ];
 
-  // Map color to actual Tailwind class
   const getColorClass = (color: string) => {
     const colors: Record<string, string> = {
       purple: "bg-purple-500/80",
@@ -60,8 +75,29 @@ export function AttackTypes() {
       orange: "bg-orange-500/80",
       neutral: "bg-neutral-500/80",
     };
-    
     return colors[color] || "bg-neutral-500/80";
+  };
+
+  const getBgColorClass = (color: string) => {
+    const colors: Record<string, string> = {
+      purple: "bg-purple-900/30",
+      blue: "bg-blue-900/30",
+      red: "bg-red-900/30",
+      orange: "bg-orange-900/30",
+      neutral: "bg-neutral-900/30",
+    };
+    return colors[color] || "bg-neutral-900/30";
+  };
+
+  const getTextColorClass = (color: string) => {
+    const colors: Record<string, string> = {
+      purple: "text-purple-400",
+      blue: "text-blue-400",
+      red: "text-red-400",
+      orange: "text-orange-400",
+      neutral: "text-neutral-400",
+    };
+    return colors[color] || "text-neutral-400";
   };
 
   return (
@@ -75,19 +111,34 @@ export function AttackTypes() {
             <div key={attack.id} className="space-y-2">
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
-                  <div className={`p-2 rounded-md bg-${attack.color}-900/30 mr-2`}>
-                    {React.cloneElement(attack.icon as React.ReactElement, {
-                      className: cn((attack.icon as React.ReactElement).props.className, `text-${attack.color}-400`),
+                  <div
+                    className={cn(
+                      "p-2 rounded-md mr-2",
+                      getBgColorClass(attack.color)
+                    )}
+                  >
+                    {React.cloneElement(attack.icon, {
+                      // 3) An dieser Stelle greift jetzt die className-Prop 
+                      className: cn(
+                        attack.icon.props.className,
+                        getTextColorClass(attack.color)
+                      ),
                     })}
                   </div>
                   <div>
                     <span className="font-medium">{attack.name}</span>
-                    <span className="text-xs text-neutral-400 ml-2">({attack.count} emails)</span>
+                    <span className="text-xs text-neutral-400 ml-2">
+                      ({attack.count} emails)
+                    </span>
                   </div>
                 </div>
                 <div className="text-sm font-medium">{attack.percentage}%</div>
               </div>
-              <Progress value={attack.percentage} className="h-2" indicatorClassName={getColorClass(attack.color)} />
+              <Progress
+                value={attack.percentage}
+                className="h-2"
+                indicatorClassName={getColorClass(attack.color)}
+              />
             </div>
           ))}
         </div>

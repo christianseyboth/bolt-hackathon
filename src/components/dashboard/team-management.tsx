@@ -158,7 +158,7 @@ export function TeamManagement() {
             </div>
             <div>
               <CardTitle className="text-lg">Team Usage</CardTitle>
-              <CardDescription>Manage your team's access</CardDescription>
+              <CardDescription>Manage your team&apos;s access</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -176,7 +176,7 @@ export function TeamManagement() {
               <div className="bg-amber-900/20 border border-amber-900/30 text-amber-400 px-4 py-3 rounded-md flex items-start mt-4">
                 <IconAlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  You've reached the maximum number of team members for your current plan. 
+                  You&apos;ve reached the maximum number of team members for your current plan. 
                   <a href="/dashboard/billing\" className="underline ml-1 hover:text-amber-300">
                     Upgrade your plan
                   </a> to add more team members.
