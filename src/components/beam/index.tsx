@@ -18,7 +18,7 @@ const Beam = ({
 
       if (!meteor) return;
 
-      meteor.addEventListener("animationend", () => {
+      const handleAnimationEnd = () => {
         meteor.style.visibility = "hidden";
         const animationDelay = Math.floor(Math.random() * (2 - 0) + 0);
         const animationDuration = Math.floor(Math.random() * (4 - 0) + 0);
@@ -28,20 +28,25 @@ const Beam = ({
         meteor.style.setProperty("--meteor-width", `${meteorWidth}px`);
 
         restartAnimation();
-      });
+      };
 
-      meteor.addEventListener("animationstart", () => {
+      const handleAnimationStart = () => {
         meteor.style.visibility = "visible";
-      });
-    }
+      };
 
-    return () => {
-      const meteor = meteorRef.current;
-      if (!meteor) return;
-      meteor.removeEventListener("animationend", () => {});
-      meteor.removeEventListener("animationstart", () => {});
-    };
-  }, []);
+      meteor.addEventListener("animationend", handleAnimationEnd);
+      meteor.addEventListener("animationstart", handleAnimationStart);
+
+      return () => {
+        // Save a reference to the current meteor element for cleanup
+        const currentMeteor = meteorRef.current;
+        if (!currentMeteor) return;
+        currentMeteor.removeEventListener("animationend", handleAnimationEnd);
+        currentMeteor.removeEventListener("animationstart", handleAnimationStart);
+      };
+    }
+  }, [showBeam]);
+  
   const restartAnimation = () => {
     const meteor = meteorRef.current;
     if (!meteor) return;

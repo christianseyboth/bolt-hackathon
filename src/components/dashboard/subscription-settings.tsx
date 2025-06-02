@@ -229,7 +229,7 @@ export function SubscriptionSettings() {
         <CardHeader>
           <CardTitle className="text-lg">Available Plans</CardTitle>
           <CardDescription>
-            Compare plans and choose the one that's right for you
+            Compare plans and choose the one that&apos;s right for you
           </CardDescription>
         </CardHeader>
         <CardContent>
