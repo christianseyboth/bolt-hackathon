@@ -72,8 +72,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
           });
           // Force a refresh of server components to update auth state
           router.refresh();
-          // Explicitly navigate to dashboard
-          router.push("/dashboard");
+          // Let middleware handle redirection after refresh
         }
       } else if (isRegisterMode) {
         const { user, error } = await signUpWithEmail(email, password);
@@ -91,8 +90,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
           });
           // Force a refresh of server components to update auth state
           router.refresh();
-          // Explicitly navigate to dashboard
-          router.push("/dashboard");
+          // Let middleware handle redirection after refresh
         }
       } else if (isResetMode) {
         const { error } = await resetPassword(email);
