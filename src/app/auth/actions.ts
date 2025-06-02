@@ -4,42 +4,33 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export type AuthError = {
-  message: string;
-};
+export type AuthError = { message: string };
 
 export async function signIn(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
-  // Only create the client when the function is executed (within request scope)
-  const cookieStore = cookies()
-  
+  const cookieStore = cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
+          return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: any) {
-          cookieStore.set(name, value, options)
+          cookieStore.set(name, value, options);
         },
         remove(name: string, options: any) {
-          cookieStore.delete(name, options)
+          cookieStore.delete(name, options);
         },
       },
     }
-  )
-  
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  })
-  
-  if (error) {
-    return { user: null, error: { message: error.message } }
-  }
+  );
 
-  return { user: data.user, error: null }
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    return { user: null, error: { message: error.message } };
+  }
+  return { user: data.user, error: null };
 }
 
 export async function signUp(email: string, password: string): Promise<{ user: any | null; error: AuthError | null }> {
