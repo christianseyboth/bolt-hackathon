@@ -39,16 +39,19 @@ export function AuthForm({ mode, className }: AuthFormProps) {
       // Validation
       if (!email.trim()) {
         setFormError("Please enter your email address");
+        setIsLoading(false);
         return;
       }
 
       if (!isResetMode && !password.trim()) {
         setFormError("Please enter your password");
+        setIsLoading(false);
         return;
       }
 
       if (isRegisterMode && password !== confirmPassword) {
         setFormError("Passwords don't match");
+        setIsLoading(false);
         return;
       }
 
@@ -58,6 +61,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         
         if (error) {
           setFormError(error.message);
+          setIsLoading(false);
           return;
         }
 
@@ -66,13 +70,15 @@ export function AuthForm({ mode, className }: AuthFormProps) {
             title: "Login successful",
             description: "Welcome back!",
           });
-          router.push("/dashboard");
+          // Use window.location.href instead of router.push for a full page reload
+          window.location.href = "/dashboard";
         }
       } else if (isRegisterMode) {
         const { user, error } = await signUpWithEmail(email, password);
         
         if (error) {
           setFormError(error.message);
+          setIsLoading(false);
           return;
         }
 
@@ -81,13 +87,15 @@ export function AuthForm({ mode, className }: AuthFormProps) {
             title: "Registration successful",
             description: "Please check your email to confirm your account.",
           });
-          router.push("/");
+          // Use window.location.href instead of router.push for a full page reload
+          window.location.href = "/";
         }
       } else if (isResetMode) {
         const { error } = await resetPassword(email);
         
         if (error) {
           setFormError(error.message);
+          setIsLoading(false);
           return;
         }
 
@@ -95,31 +103,39 @@ export function AuthForm({ mode, className }: AuthFormProps) {
           title: "Password reset email sent",
           description: "Please check your email for password reset instructions.",
         });
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Auth error:", error);
       setFormError("An unexpected error occurred. Please try again later.");
-    } finally {
       setIsLoading(false);
     }
+    // Note: We don't call setIsLoading(false) here in the finally block
+    // because we want the loading state to persist during page navigation
   };
 
   const handleSocialAuth = async (provider: "github" | "google") => {
     setFormError(null);
+    setIsLoading(true);
     
     try {
       const { error } = await signInWithOAuth(provider);
       
       if (error) {
         setFormError(error.message);
+        setIsLoading(false);
         return;
       }
 
       // The redirect happens in the signInWithOAuth function
+      // We don't reset isLoading here since we're navigating away
     } catch (error) {
       console.error(`Error with ${provider} auth:`, error);
       setFormError("An unexpected error occurred with social login.");
+      setIsLoading(false);
     }
+    // Note: We don't call setIsLoading(false) in the finally block
+    // because we want the loading state to persist during redirection
   };
 
   return (
