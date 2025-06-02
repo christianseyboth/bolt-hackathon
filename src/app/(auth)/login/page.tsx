@@ -1,4 +1,3 @@
-"use client"
 import React from "react";
 import { AmbientColor } from "@/components/ambient-color";
 import { Container } from "@/components/container";
