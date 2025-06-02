@@ -59,11 +59,11 @@ Klicken Sie hier für weitere Informationen:
   };
 };
 
-export default function EmailDetailPage({ 
-  params 
-}: { 
-  params: { emailId: string } 
-}) {
+type Props = {
+  params: { emailId: string }
+}
+
+export default function EmailDetailPage({ params }: Props) {
   const { emailId } = params;
   
   // In a real app, you'd fetch this data from an API
