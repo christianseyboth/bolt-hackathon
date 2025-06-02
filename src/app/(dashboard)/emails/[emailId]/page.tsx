@@ -4,7 +4,7 @@ import { EmailDetail, EmailAnalysisData } from "@/components/dashboard/email-det
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { PageProps } from "next";
+import PageProps from "next";
 
 // This would normally come from an API or database
 // Using mock data for demonstration
