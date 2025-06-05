@@ -1,3 +1,15 @@
 {
-    "cSpell.words": ["tailwindcss"]
+    "cSpell.words": [
+        "clsx",
+        "headlessui",
+        "mapbox",
+        "motionone",
+        "nextjs",
+        "rehype",
+        "Signout",
+        "supabase",
+        "tabler",
+        "tailwindcss",
+        "tsparticles"
+    ]
 }

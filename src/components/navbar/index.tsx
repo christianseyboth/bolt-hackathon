@@ -1,51 +1,49 @@
-"use client";
-import { DesktopNavbar } from "./desktop-navbar";
-import { MobileNavbar } from "./mobile-navbar";
-import { motion } from "motion/react";
-import { AuthProvider } from "@/components/auth/auth-provider";
+'use client';
+import { createClient } from '@/utils/supabase/client';
+import { DesktopNavbar } from './desktop-navbar';
+import { MobileNavbar } from './mobile-navbar';
+import { motion } from 'motion/react';
 
 const navItems = [
-  {
-    title: "Features",
-    link: "/features",
-  },
-  {
-    title: "Pricing",
-    link: "/pricing",
-  },
-  {
-    title: "Blog",
-    link: "/blog",
-  },
-  {
-    title: "Contact",
-    link: "/contact",
-  },
+    {
+        title: 'Features',
+        link: '/features',
+    },
+    {
+        title: 'Pricing',
+        link: '/pricing',
+    },
+    {
+        title: 'Blog',
+        link: '/blog',
+    },
+    {
+        title: 'Contact',
+        link: '/contact',
+    },
 ];
 
-export function NavBar() {
-  return (
-    <AuthProvider>
-      <motion.nav
-        initial={{
-          y: -80,
-        }}
-        animate={{
-          y: 0,
-        }}
-        transition={{
-          ease: [0.6, 0.05, 0.1, 0.9],
-          duration: 0.8,
-        }}
-        className="max-w-7xl fixed top-4 mx-auto inset-x-0 z-50 w-[95%] lg:w-full"
-      >
-        <div className="hidden lg:block w-full">
-          <DesktopNavbar navItems={navItems} />
-        </div>
-        <div className="flex h-full w-full items-center lg:hidden">
-          <MobileNavbar navItems={navItems} />
-        </div>
-      </motion.nav>
-    </AuthProvider>
-  );
+export function NavBar({ user }: any) {
+    return (
+        <motion.nav
+            initial={{
+                y: -80,
+            }}
+            animate={{
+                y: 0,
+            }}
+            transition={{
+                ease: [0.6, 0.05, 0.1, 0.9],
+                duration: 0.8,
+            }}
+            className='max-w-7xl fixed top-4 mx-auto inset-x-0 z-50 w-[95%] lg:w-full'
+        >
+            <div className='hidden lg:block w-full'>
+                <DesktopNavbar navItems={navItems} user={user} />
+            </div>
+            <div className='flex h-full w-full items-center lg:hidden'>
+                <MobileNavbar navItems={navItems} user={user} />
+            </div>
+        </motion.nav>
+    );
 }
