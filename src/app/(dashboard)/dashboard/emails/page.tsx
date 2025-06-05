@@ -2,7 +2,6 @@ import React from 'react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { EmailList } from '@/components/dashboard/email-list';
 import { createClient } from '@/utils/supabase/server';
-import { log } from 'console';
 import { redirect } from 'next/navigation';
 
 export default async function EmailsPage() {
@@ -18,7 +17,6 @@ export default async function EmailsPage() {
         .from('mail_events')
         .select('*')
         .eq('user_id', user.id);
-    log(emails);
     return (
         <>
             <DashboardHeader

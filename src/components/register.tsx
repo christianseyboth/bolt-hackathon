@@ -17,7 +17,6 @@ export const Register = () => {
   const handleSubmit = (e: React.FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     const target = e.target as HTMLInputElement; // Typecasting to HTMLInputElement
-    console.log(target.value);
   };
   return (
     <Container className="h-screen max-w-lg mx-auto flex flex-col items-center justify-center">

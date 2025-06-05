@@ -23,18 +23,17 @@ export function DeleteAccountSection() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = () => {
-    // In a real app, this would call an API to delete the account
-    console.log("Account deletion requested");
-    
+
+
     // Close the dialog
     setShowDeleteDialog(false);
-    
+
     // Show a toast notification
     toast({
       title: "Account deleted",
       description: "Your account has been deleted successfully.",
     });
-    
+
     // Redirect to home page
     // Using a timeout to allow the toast to be seen
     setTimeout(() => {
@@ -63,7 +62,7 @@ export function DeleteAccountSection() {
           <div className="text-sm">
             <p className="font-medium mb-1">Warning: This action cannot be undone</p>
             <p>
-              Once you delete your account, all of your data, including scanned emails, 
+              Once you delete your account, all of your data, including scanned emails,
               security reports, and user preferences will be permanently removed from our systems.
             </p>
           </div>
@@ -84,7 +83,7 @@ export function DeleteAccountSection() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your 
+              This action cannot be undone. This will permanently delete your
               account and remove all your data from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
