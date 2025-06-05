@@ -1,5 +1,4 @@
-@import "tailwindcss/preflight";
-@tailwind utilities;
+@import 'tailwindcss/preflight';
 @tailwind utilities;
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -144,4 +143,3 @@
         @apply bg-background text-foreground font-['Spinnaker'];
     }
 }
-
