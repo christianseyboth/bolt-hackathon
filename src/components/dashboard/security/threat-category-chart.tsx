@@ -1,164 +1,212 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell, // ← Wichtig: Cell importieren
-} from "recharts";
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    Cell,
+} from 'recharts';
 
-export function ThreatCategoryChart() {
-  // 1) Mock-Daten
-  const weeklyData = [
-    { category: "Phishing", count: 48 },
-    { category: "Malware", count: 32 },
-    { category: "Spam", count: 67 },
-    { category: "Scam", count: 27 },
-    { category: "Impersonation", count: 15 },
-    { category: "Ransomware", count: 7 },
-  ];
+export function ThreatCategoryChart({
+    weeklyData,
+    monthlyData,
+    yearlyData,
+}: {
+    weeklyData: any[];
+    monthlyData: any[];
+    yearlyData: any[];
+}) {
+    const [tab, setTab] = useState('weekly');
 
-  const monthlyData = [
-    { category: "Phishing", count: 156 },
-    { category: "Malware", count: 98 },
-    { category: "Spam", count: 237 },
-    { category: "Scam", count: 89 },
-    { category: "Impersonation", count: 45 },
-    { category: "Ransomware", count: 21 },
-  ];
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.toLocaleString('en-US', { month: 'long' });
 
-  // 2) Farb-Mapping
-  const categoryColors: Record<string, string> = {
-    Phishing: "#9333ea",      // purple-600
-    Malware: "#ef4444",       // red-500
-    Spam: "#3b82f6",          // blue-500
-    Scam: "#f97316",          // orange-500
-    Impersonation: "#06b6d4", // cyan-500
-    Ransomware: "#14b8a6",    // teal-500
-  };
+    const weekNumber = Math.ceil(
+        ((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000 +
+            new Date(now.getFullYear(), 0, 1).getDay() +
+            1) /
+            7
+    );
 
-  // 3) Custom Tooltip-Komponente
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-neutral-800 p-3 border border-neutral-700 rounded-md shadow-lg">
-          <p className="font-medium text-xs mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <div key={`item-${index}`} className="flex items-center text-xs">
-              <div
-                className="w-3 h-3 mr-2 rounded-sm"
-                style={{ backgroundColor: entry.fill }}
-              />
-              <span className="mr-2">Count:</span>
-              <span className="font-medium">{entry.value}</span>
-            </div>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
+    const categoryColors: Record<string, string> = {
+        Phishing: '#9333ea', // purple-600
+        Malware: '#ef4444', // red-500
+        Spam: '#3b82f6', // blue-500
+        Scam: '#f97316', // orange-500
+        Impersonation: '#06b6d4', // cyan-500
+        Ransomware: '#14b8a6', // teal-500
+    };
 
-  return (
-    <Card className="border-neutral-800 bg-neutral-900">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">Threat Categories</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="weekly">
-          <div className="flex justify-end mb-4">
-            <TabsList>
-              <TabsTrigger value="weekly">Weekly</TabsTrigger>
-              <TabsTrigger value="monthly">Monthly</TabsTrigger>
-            </TabsList>
-          </div>
+    const CustomTooltip = ({ active, payload, label }: any) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className='bg-neutral-800 p-3 border border-neutral-700 rounded-md shadow-lg'>
+                    <p className='font-medium text-xs mb-2'>{label}</p>
+                    {payload.map((entry: any, index: number) => (
+                        <div key={`item-${index}`} className='flex items-center text-xs'>
+                            <div
+                                className='w-3 h-3 mr-2 rounded-sm'
+                                style={{ backgroundColor: entry.fill }}
+                            />
+                            <span className='mr-2'>Count:</span>
+                            <span className='font-medium'>{entry.value}</span>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+        return null;
+    };
 
-          {/* ─── Weekly Chart ────────────────────────────────────────────── */}
-          <TabsContent value="weekly" className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={weeklyData}
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#333"
-                  vertical={false}
-                />
-                <XAxis dataKey="category" stroke="#666" fontSize={12} />
-                <YAxis stroke="#666" fontSize={12} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
+    return (
+        <Card className='border-neutral-800 bg-neutral-900'>
+            <CardHeader className='pb-2'>
+                <CardTitle className='text-lg font-medium'>Threat Categories</CardTitle>
+                <div className='text-xs text-neutral-400 '>
+                    {tab === 'weekly' && (
+                        <>
+                            CW {weekNumber} • {year}
+                        </>
+                    )}
+                    {tab === 'monthly' && (
+                        <>
+                            {month} {year}
+                        </>
+                    )}
+                    {tab === 'yearly' && <>{year}</>}
+                </div>
+            </CardHeader>
+            <CardContent>
+                <Tabs defaultValue='weekly' value={tab} onValueChange={setTab}>
+                    <div className='flex justify-end mb-4'>
+                        <TabsList>
+                            <TabsTrigger value='weekly'>Weekly</TabsTrigger>
+                            <TabsTrigger value='monthly'>Monthly</TabsTrigger>
+                            <TabsTrigger value='yearly'>Yearly</TabsTrigger>
+                        </TabsList>
+                    </div>
 
-                {/* ─── Hier liegt der Unterschied: nur eine übergeordnete Bar mit dataKey="count" ─── */}
-                <Bar
-                  dataKey="count"
-                  name="Threat Count"
-                  radius={[4, 4, 0, 0]}
-                  barSize={40}
-                  // fill: Default-Farbe, wird durch Cells überschrieben
-                  fill="#8884d8"
-                  isAnimationActive={true}
-                  animationDuration={1000}
-                >
-                  {/* ─── Für jede Datenzeile genau ein <Cell> erzeugen und die Farbe setzen ─── */}
-                  {weeklyData.map((entry, index) => (
-                    <Cell
-                      key={index}
-                      fill={categoryColors[entry.category] || "#8884d8"}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </TabsContent>
+                    {/* ─── Weekly Chart ────────────────────────────────────────────── */}
+                    <TabsContent value='weekly' className='h-[300px]'>
+                        <ResponsiveContainer width='100%' height='100%'>
+                            <BarChart
+                                data={weeklyData}
+                                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray='3 3'
+                                    stroke='#333'
+                                    vertical={false}
+                                />
+                                <XAxis dataKey='category' stroke='#666' fontSize={12} />
+                                <YAxis stroke='#666' fontSize={12} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend />
 
-          {/* ─── Monthly Chart ───────────────────────────────────────────── */}
-          <TabsContent value="monthly" className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={monthlyData}
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#333"
-                  vertical={false}
-                />
-                <XAxis dataKey="category" stroke="#666" fontSize={12} />
-                <YAxis stroke="#666" fontSize={12} />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
+                                <Bar
+                                    dataKey='count'
+                                    name='Threat Count'
+                                    radius={[4, 4, 0, 0]}
+                                    barSize={40}
+                                    fill='#8884d8'
+                                    isAnimationActive={true}
+                                    animationDuration={1000}
+                                >
+                                    {weeklyData.map((entry, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={categoryColors[entry.category] || '#8884d8'}
+                                        />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </TabsContent>
 
-                <Bar
-                  dataKey="count"
-                  name="Threat Count"
-                  radius={[4, 4, 0, 0]}
-                  barSize={40}
-                  fill="#8884d8"
-                  isAnimationActive={true}
-                  animationDuration={1000}
-                >
-                  {monthlyData.map((entry, index) => (
-                    <Cell
-                      key={index}
-                      fill={categoryColors[entry.category] || "#8884d8"}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  );
+                    {/* ─── Monthly Chart ───────────────────────────────────────────── */}
+                    <TabsContent value='monthly' className='h-[300px]'>
+                        <ResponsiveContainer width='100%' height='100%'>
+                            <BarChart
+                                data={monthlyData}
+                                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray='3 3'
+                                    stroke='#333'
+                                    vertical={false}
+                                />
+                                <XAxis dataKey='category' stroke='#666' fontSize={12} />
+                                <YAxis stroke='#666' fontSize={12} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend />
+
+                                <Bar
+                                    dataKey='count'
+                                    name='Threat Count'
+                                    radius={[4, 4, 0, 0]}
+                                    barSize={40}
+                                    fill='#8884d8'
+                                    isAnimationActive={true}
+                                    animationDuration={1000}
+                                >
+                                    {monthlyData.map((entry, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={categoryColors[entry.category] || '#8884d8'}
+                                        />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </TabsContent>
+
+                    {/* ─── Yearly Chart ───────────────────────────────────────────── */}
+                    <TabsContent value='yearly' className='h-[300px]'>
+                        <ResponsiveContainer width='100%' height='100%'>
+                            <BarChart
+                                data={yearlyData}
+                                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray='3 3'
+                                    stroke='#333'
+                                    vertical={false}
+                                />
+                                <XAxis dataKey='category' stroke='#666' fontSize={12} />
+                                <YAxis stroke='#666' fontSize={12} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend />
+
+                                <Bar
+                                    dataKey='count'
+                                    name='Threat Count'
+                                    radius={[4, 4, 0, 0]}
+                                    barSize={40}
+                                    fill='#8884d8'
+                                    isAnimationActive={true}
+                                    animationDuration={1000}
+                                >
+                                    {yearlyData.map((entry, index) => (
+                                        <Cell
+                                            key={index}
+                                            fill={categoryColors[entry.category] || '#8884d8'}
+                                        />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </TabsContent>
+                </Tabs>
+            </CardContent>
+        </Card>
+    );
 }
