@@ -41,9 +41,9 @@ export async function getSubscriptionStatus(userId: string): Promise<Subscriptio
       .select('*, plans(*)')
       .eq('userId', userId)
       .single();
-    
+
     if (error) throw error;
-    
+
     return {
       plan: data.plans.name,
       status: data.status,
@@ -75,9 +75,9 @@ export async function getAvailablePlans(): Promise<SubscriptionPlan[]> {
       .from('plans')
       .select('*')
       .order('priceMonthly');
-    
+
     if (error) throw error;
-    
+
     return data;
   } catch (error) {
     console.error('Error fetching available plans:', error);
@@ -92,9 +92,9 @@ export async function getInvoiceHistory(userId: string): Promise<any[]> {
       .select('*')
       .eq('userId', userId)
       .order('date', { ascending: false });
-    
+
     if (error) throw error;
-    
+
     return data;
   } catch (error) {
     console.error('Error fetching invoice history:', error);

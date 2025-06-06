@@ -37,7 +37,7 @@ export function TeamManagement() {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingMember, setAddingMember] = useState(false);
-  
+
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -52,11 +52,11 @@ export function TeamManagement() {
       try {
         // In a real app, you would get the organization ID from context or state management
         const orgId = 'current-org-id'; // This should be dynamically obtained
-        
+
         // Fetch team members
         const teamMembers = await getTeamMembers(orgId);
         setMembers(teamMembers);
-        
+
         // Fetch subscription status to get the member limit
         const subscription = await getSubscriptionStatus('current-user-id'); // This should be dynamically obtained
         if (subscription) {
@@ -80,7 +80,7 @@ export function TeamManagement() {
   // Add new team member
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast({
         variant: "destructive",
@@ -110,12 +110,12 @@ export function TeamManagement() {
     }
 
     setAddingMember(true);
-    
+
     try {
       // In a real app, you would get the organization ID from context or state management
       const orgId = 'current-org-id'; // This should be dynamically obtained
       const newMember = await addTeamMember(orgId, email, note);
-      
+
       if (newMember) {
         setMembers([...members, newMember]);
         setEmail("");
@@ -150,12 +150,12 @@ export function TeamManagement() {
     if (memberToDelete) {
       try {
         const success = await removeTeamMember(memberToDelete);
-        
+
         if (success) {
           const memberToRemove = members.find(m => m.id === memberToDelete);
           const updatedMembers = members.filter(member => member.id !== memberToDelete);
           setMembers(updatedMembers);
-          
+
           toast({
             title: "Team member removed",
             description: `${memberToRemove?.email} has been removed from your team.`,
@@ -181,15 +181,15 @@ export function TeamManagement() {
   const handleStatusChange = async (id: string, status: 'active' | 'pending' | 'disabled') => {
     try {
       const success = await updateTeamMemberStatus(id, status);
-      
+
       if (success) {
         // Update local state
-        const updatedMembers = members.map(member => 
+        const updatedMembers = members.map(member =>
           member.id === id ? { ...member, status } : member
         );
-        
+
         setMembers(updatedMembers);
-        
+
         toast({
           title: "Status updated",
           description: `Team member status has been updated.`,
@@ -250,7 +250,7 @@ export function TeamManagement() {
       <div className="flex space-x-1">
         {member.status !== 'active' && (
           <Button
-            variant="ghost" 
+            variant="ghost"
             size="sm"
             onClick={() => handleStatusChange(member.id, 'active')}
             className="h-7 px-2 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/30"
@@ -259,10 +259,10 @@ export function TeamManagement() {
             Activate
           </Button>
         )}
-        
+
         {member.status !== 'disabled' && (
           <Button
-            variant="ghost" 
+            variant="ghost"
             size="sm"
             onClick={() => handleStatusChange(member.id, 'disabled')}
             className="h-7 px-2 text-xs text-neutral-400 hover:text-neutral-300 hover:bg-neutral-800/80"
@@ -298,12 +298,12 @@ export function TeamManagement() {
               </div>
             </div>
             <Progress value={memberPercentage} className="h-2" />
-            
+
             {currentMemberCount >= maxTeamMembers && (
               <div className="bg-amber-900/20 border border-amber-900/30 text-amber-400 px-4 py-3 rounded-md flex items-start mt-4">
                 <IconAlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  You&apos;ve reached the maximum number of team members for your current plan. 
+                  You&apos;ve reached the maximum number of team members for your current plan.
                   <a href="/dashboard/settings\" className="underline ml-1 hover:text-amber-300">
                     Upgrade your plan
                   </a> to add more team members.
@@ -313,7 +313,7 @@ export function TeamManagement() {
           </div>
         </CardContent>
       </Card>
-      
+
       <Card className="border-neutral-800 bg-neutral-900">
         <CardHeader>
           <CardTitle className="text-lg">Add Team Member</CardTitle>
@@ -345,9 +345,9 @@ export function TeamManagement() {
                 />
               </div>
             </div>
-            
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               className="flex items-center"
               disabled={currentMemberCount >= maxTeamMembers || addingMember}
             >
@@ -357,7 +357,7 @@ export function TeamManagement() {
           </form>
         </CardContent>
       </Card>
-      
+
       <Card className="border-neutral-800 bg-neutral-900">
         <CardHeader>
           <CardTitle className="text-lg">Team Members</CardTitle>
@@ -412,7 +412,7 @@ export function TeamManagement() {
           )}
         </CardContent>
       </Card>
-      
+
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
