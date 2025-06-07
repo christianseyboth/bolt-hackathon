@@ -36,7 +36,6 @@ export function ThreatCategoryChart({
             1) /
             7
     );
-
     const categoryColors: Record<string, string> = {
         Phishing: '#9333ea', // purple-600
         Malware: '#ef4444', // red-500

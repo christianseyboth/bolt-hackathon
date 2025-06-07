@@ -32,7 +32,6 @@ export default async function SecurityPage() {
         .select('*')
         .eq('owner_id', user.id)
         .single();
-
     const {
         analyzedChange,
         threatsChange,
@@ -94,7 +93,6 @@ export default async function SecurityPage() {
         weekly: weeklyCats,
         yearly: yearlyCats,
     } = await getAllThreatCategoryData(supabase, account_data.id, ['weekly', 'monthly', 'yearly']);
-
     return (
         <>
             <DashboardHeader
