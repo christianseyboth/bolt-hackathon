@@ -119,7 +119,7 @@ export default async function SecurityPage() {
 
             <div className='mt-6 grid grid-cols-1 md:grid-cols-2 gap-6'>
                 <RiskiestSenders />
-                <AttackTypes />
+                <AttackTypes yearlyAttackDataTypes={yearlyCats} />
             </div>
 
             <div className='mt-6'>
