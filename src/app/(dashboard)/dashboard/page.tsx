@@ -18,10 +18,16 @@ export default async function DashboardPage() {
         redirect('/login');
     }
 
-    let { data: account_data, error: subscription_error } = await supabase
+    let { data: account_data } = await supabase
         .from('accounts')
         .select('*')
         .eq('owner_id', user.id)
+        .single();
+
+    let { data: subscription_data, error: subscription_error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('account_id', account_data.id)
         .single();
 
     const { weekly: weeklyEmailStats, monthly: monthlyEmailStats } = await getAllEmailAnalytics(
@@ -38,7 +44,7 @@ export default async function DashboardPage() {
             />
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-8'>
                 <EmailAnalytics weeklyData={weeklyEmailStats} monthlyData={monthlyEmailStats} />
-                <SubscriptionInfo />
+                <SubscriptionInfo subscription={subscription_data} />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
                 <SecurityScore />

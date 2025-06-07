@@ -4,7 +4,6 @@ import { SubscriptionSettings } from '@/components/dashboard/subscription-settin
 import { DeleteAccountSection } from '@/components/dashboard/delete-account-section';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
-import { log } from 'console';
 
 export default async function SettingsPage() {
     const supabase = await createClient();

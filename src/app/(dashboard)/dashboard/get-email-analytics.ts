@@ -49,7 +49,6 @@ function mapWeeklyData(rawData: any[]) {
 
 function mapMonthlyData(rawData: any[]) {
   const dataMap = Object.fromEntries(rawData.map(d => [d.week_label, d]));
- console.log(dataMap)
 
   return weekLabels.map(week => ({
     name: week,
