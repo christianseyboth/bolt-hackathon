@@ -65,11 +65,11 @@ export function Sidebar({ className }: SidebarProps) {
                 </SidebarItem>
 
                 <SidebarItem
-                    href='/dashboard/security'
+                    href='/dashboard/security-analytics'
                     icon={<IconShieldCheck className='h-5 w-5' />}
-                    isActive={pathname === '/dashboard/security'}
+                    isActive={pathname === '/dashboard/security-analytics'}
                 >
-                    Security
+                    Security Analytics
                 </SidebarItem>
 
                 <SidebarItem

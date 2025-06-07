@@ -82,9 +82,15 @@ export function ThreatHistoryChart({
                 <Tabs defaultValue='weekly' value={tab} onValueChange={setTab}>
                     <div className='flex justify-end mb-4'>
                         <TabsList>
-                            <TabsTrigger value='weekly'>Weekly</TabsTrigger>
-                            <TabsTrigger value='monthly'>Monthly</TabsTrigger>
-                            <TabsTrigger value='yearly'>Yearly</TabsTrigger>
+                            <TabsTrigger className='cursor-pointer' value='weekly'>
+                                Weekly
+                            </TabsTrigger>
+                            <TabsTrigger className='cursor-pointer' value='monthly'>
+                                Monthly
+                            </TabsTrigger>
+                            <TabsTrigger className='cursor-pointer' value='yearly'>
+                                Yearly
+                            </TabsTrigger>
                         </TabsList>
                     </div>
 

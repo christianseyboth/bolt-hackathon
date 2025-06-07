@@ -40,13 +40,17 @@ export function EmailAnalytics({ weeklyData, monthlyData }: EmailAnalyticsProps)
                                     : 'Emails scanned this month'}
                             </div>
                         </div>
-                        <TabsList className='grid grid-cols-2 h-8'>
-                            <TabsTrigger value='weekly'>Weekly</TabsTrigger>
-                            <TabsTrigger value='monthly'>Monthly</TabsTrigger>
+                        <TabsList className='grid grid-cols-2 h-10'>
+                            <TabsTrigger className='cursor-pointer' value='weekly'>
+                                Weekly
+                            </TabsTrigger>
+                            <TabsTrigger className='cursor-pointer' value='monthly'>
+                                Monthly
+                            </TabsTrigger>
                         </TabsList>
                     </div>
 
-                    <TabsContent value='weekly' className='space-y-4'>
+                    <TabsContent value='weekly' className='space-y-4 '>
                         <div className='h-[200px] mt-4'>
                             <ResponsiveContainer width='100%' height='100%'>
                                 <BarChart
