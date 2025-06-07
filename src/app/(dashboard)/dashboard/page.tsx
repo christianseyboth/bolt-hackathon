@@ -6,6 +6,7 @@ import { SubscriptionInfo } from '@/components/dashboard/subscription-info';
 import { SecurityScore } from '@/components/dashboard/security-score';
 import { PhishingAttempts } from '@/components/dashboard/phishing-attempts';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
+import { getAllEmailAnalytics } from './get-email-analytics';
 
 export default async function DashboardPage() {
     const supabase = await createClient();
@@ -17,6 +18,18 @@ export default async function DashboardPage() {
         redirect('/login');
     }
 
+    let { data: account_data, error: subscription_error } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('owner_id', user.id)
+        .single();
+
+    const { weekly: weeklyEmailStats, monthly: monthlyEmailStats } = await getAllEmailAnalytics(
+        supabase,
+        account_data.id,
+        ['weekly', 'monthly']
+    );
+
     return (
         <>
             <DashboardHeader
@@ -24,7 +37,7 @@ export default async function DashboardPage() {
                 subheading='Monitor your email security and subscription status'
             />
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-8'>
-                <EmailAnalytics />
+                <EmailAnalytics weeklyData={weeklyEmailStats} monthlyData={monthlyEmailStats} />
                 <SubscriptionInfo />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
