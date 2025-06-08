@@ -6,8 +6,6 @@ import { IconCrown } from '@tabler/icons-react';
 import Link from 'next/link';
 
 export function SubscriptionInfo({ subscription }: { subscription: any }) {
-    console.log('Subscription Info:', subscription);
-
     const calcProgress = (used: number, total: number) => {
         return total > 0 ? (used / total) * 100 : 0;
     };

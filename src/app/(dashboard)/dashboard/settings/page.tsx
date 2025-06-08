@@ -35,13 +35,17 @@ export default async function SettingsPage() {
             <DashboardHeader
                 heading='Settings'
                 subheading='Manage your account settings and preferences'
+                user={{
+                    name: undefined,
+                    avatar_url: undefined,
+                    email: undefined,
+                }}
             />
             <div className='mt-8 space-y-6'>
                 <SubscriptionSettings
                     subscriptionPlans={subscription_plans}
                     currentSubscription={current_subscription}
                 />
-                <DeleteAccountSection />
             </div>
         </>
     );

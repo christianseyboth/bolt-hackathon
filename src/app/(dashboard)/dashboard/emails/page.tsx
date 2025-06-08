@@ -25,7 +25,6 @@ export default async function EmailsPage() {
         .select('*')
         .eq('account_id', accountId);
 
-    console.log(emails);
     return (
         <>
             <DashboardHeader

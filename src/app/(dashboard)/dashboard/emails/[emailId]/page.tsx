@@ -24,18 +24,18 @@ export default async function EmailDetailPage({ params }: EmailDetailPageProps) 
         redirect('/login');
     }
 
-    const { data: aiAnalysis } = await supabase
+    const { data: mail } = await supabase
         .from('mail_events')
-        .select('ai_analysis')
+        .select('*')
         .eq('id', emailId)
         .single();
 
-    console.log(aiAnalysis);
+    console.log(mail);
 
     return (
         <>
             <Button variant='outline' size='sm' asChild className='mb-4 w-fit'>
-                <Link href='/emails'>
+                <Link href='/dashboard/emails'>
                     <IconArrowLeft className='mr-2 h-4 w-4' />
                     Back to Email List
                 </Link>
@@ -47,7 +47,7 @@ export default async function EmailDetailPage({ params }: EmailDetailPageProps) 
             />
 
             <div className='mt-8'>
-                <EmailDetail data={aiAnalysis} />
+                <EmailDetail mail={mail} />
             </div>
         </>
     );
