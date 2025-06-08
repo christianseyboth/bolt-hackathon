@@ -21,17 +21,37 @@ import { getAllThreatCategoryData } from './get-threat-categories';
 export default async function SecurityPage() {
     const supabase = await createClient();
 
+    // 1. Get user/account info first (these depend on auth)
     const { data, error } = await supabase.auth.getUser();
     const user = data.user;
-
     if (error || !user) {
         redirect('/login');
     }
+
     let { data: account_data } = await supabase
         .from('accounts')
         .select('*')
         .eq('owner_id', user.id)
         .single();
+
+    const accountId = account_data.id;
+
+    // 2. PARALLEL DATA FETCHING
+    const [statisticsRes, threatHistory, threatCategories, riskiestSendersRes, topTargetsRes] =
+        await Promise.all([
+            getStatistics(supabase, accountId),
+            getAllThreatHistoryData(supabase, accountId, ['weekly', 'monthly', 'yearly']),
+            getAllThreatCategoryData(supabase, accountId, ['weekly', 'monthly', 'yearly']),
+            supabase
+                .from('riskiest_sender_domains')
+                .select('*')
+                .eq('account_id', accountId)
+                .order('risk_score', { ascending: false })
+                .limit(10),
+            supabase.from('top_attack_targets').select('*').eq('account_id', accountId),
+        ]);
+
+    // 3. Prepare statistics for overview component
     const {
         analyzedChange,
         threatsChange,
@@ -41,7 +61,7 @@ export default async function SecurityPage() {
         threatsNow,
         falseNow,
         targetUserNow,
-    } = await getStatistics(supabase, account_data.id);
+    } = statisticsRes;
 
     const statistics = [
         {
@@ -82,17 +102,11 @@ export default async function SecurityPage() {
         },
     ];
 
-    const {
-        monthly: monthlyHistory,
-        weekly: weeklyHistory,
-        yearly: yearlyHistory,
-    } = await getAllThreatHistoryData(supabase, account_data.id, ['weekly', 'monthly', 'yearly']);
+    const { monthly: monthlyHistory, weekly: weeklyHistory, yearly: yearlyHistory } = threatHistory;
+    const { monthly: monthlyCats, weekly: weeklyCats, yearly: yearlyCats } = threatCategories;
+    const riskiestSenders = riskiestSendersRes.data ?? [];
+    const topTargets = topTargetsRes.data ?? [];
 
-    const {
-        monthly: monthlyCats,
-        weekly: weeklyCats,
-        yearly: yearlyCats,
-    } = await getAllThreatCategoryData(supabase, account_data.id, ['weekly', 'monthly', 'yearly']);
     return (
         <>
             <DashboardHeader
@@ -118,12 +132,12 @@ export default async function SecurityPage() {
             </div>
 
             <div className='mt-6 grid grid-cols-1 md:grid-cols-2 gap-6'>
-                <RiskiestSenders />
+                <RiskiestSenders riskiestSenders={riskiestSenders} />
                 <AttackTypes yearlyAttackDataTypes={yearlyCats} />
             </div>
 
             <div className='mt-6'>
-                <TopAttackTargetsChart />
+                <TopAttackTargetsChart topTargets={topTargets} />
             </div>
         </>
     );

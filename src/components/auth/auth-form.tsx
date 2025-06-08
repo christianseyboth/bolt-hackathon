@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import {
     IconBrandGithub,
     IconBrandGoogle,
@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { signIn, signUp } from '@/app/auth/actions';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 interface AuthFormProps {
     mode: 'login' | 'register' | 'reset';
@@ -28,7 +29,9 @@ export function AuthForm({ mode, className }: AuthFormProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
+    const router = useRouter();
 
     const isLoginMode = mode === 'login';
     const isRegisterMode = mode === 'register';
@@ -215,7 +218,20 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                 </form>
             ) : (
                 // Login/Register form (server action)
-                <form >
+                <form
+                    action={async (formData) => {
+                        const result = await signIn(formData);
+                        if (result.success) {
+                            router.push('/dashboard?login=success');
+                        } else {
+                            toast({
+                                variant: 'destructive',
+                                title: 'Login fehlgeschlagen',
+                                description: result.error || 'Bitte überprüfe deine Zugangsdaten.',
+                            });
+                        }
+                    }}
+                >
                     <div className='space-y-4'>
                         <div className='space-y-2'>
                             <Label htmlFor='email'>Email</Label>
@@ -301,7 +317,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                             </div>
                         )}
 
-                        <Button formAction={signIn} className='w-full'>
+                        <Button className='w-full'>
                             {isSubmitting ? (
                                 <>
                                     <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
@@ -349,4 +365,3 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         </div>
     );
 }
-

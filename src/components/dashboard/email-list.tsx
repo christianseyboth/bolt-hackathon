@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, JSX } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import {
@@ -10,104 +10,46 @@ import {
     IconShieldCheck,
     IconAlertTriangle,
     IconAlertOctagon,
+    IconBug,
+    IconMailOff,
+    IconShieldOff,
 } from '@tabler/icons-react';
-import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import Link from 'next/link';
-
-// Mock data for email list
-const mockEmails = [
-    {
-        id: 'email-1',
-        sender: 'paypal@service.paypal.com',
-        subject: 'Your account needs attention',
-        receivedAt: '2023-05-16T09:30:00',
-        status: 'phishing',
-        threatLevel: 'high',
-        flagged: true,
-    },
-    {
-        id: 'email-2',
-        sender: 'newsletter@nytimes.com',
-        subject: 'Your daily briefing: Top news of the day',
-        receivedAt: '2023-05-16T08:15:00',
-        status: 'clean',
-        threatLevel: 'none',
-        flagged: false,
-    },
-    {
-        id: 'email-3',
-        sender: 'security@chase.com',
-        subject: 'Important security alert for your account',
-        receivedAt: '2023-05-15T22:45:00',
-        status: 'phishing',
-        threatLevel: 'critical',
-        flagged: true,
-    },
-    {
-        id: 'email-4',
-        sender: 'updates@linkedin.com',
-        subject: 'You have 5 new notifications',
-        receivedAt: '2023-05-15T17:20:00',
-        status: 'clean',
-        threatLevel: 'none',
-        flagged: false,
-    },
-    {
-        id: 'email-5',
-        sender: 'no-reply@amazon.com',
-        subject: 'Your Amazon.com order #402-7371294-2138740 has shipped',
-        receivedAt: '2023-05-15T14:10:00',
-        status: 'clean',
-        threatLevel: 'none',
-        flagged: false,
-    },
-    {
-        id: 'email-6',
-        sender: 'support@microsoftonline.com',
-        subject: 'Action required: Your Microsoft account password will expire soon',
-        receivedAt: '2023-05-15T11:35:00',
-        status: 'suspicious',
-        threatLevel: 'medium',
-        flagged: true,
-    },
-    {
-        id: 'email-7',
-        sender: 'donotreply@netflix.com',
-        subject: 'New sign-in to Netflix from a new device',
-        receivedAt: '2023-05-14T20:05:00',
-        status: 'clean',
-        threatLevel: 'none',
-        flagged: false,
-    },
-    {
-        id: 'email-8',
-        sender: 'billing@dropbox.com',
-        subject: 'Your Dropbox subscription receipt',
-        receivedAt: '2023-05-14T16:30:00',
-        status: 'clean',
-        threatLevel: 'none',
-        flagged: false,
-    },
-];
+import { cn } from '@/lib/utils';
 
 export function EmailList({ emails }: any) {
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredEmails, setFilteredEmails] = useState(emails);
+    const [tab, setTab] = useState<'all' | 'threats' | 'clean'>('all');
+    const [page, setPage] = useState(1);
+    const pageSize = 20;
+
+    useEffect(() => {
+        setPage(1);
+    }, [searchQuery, tab]);
 
     // Handle search functionality
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const query = e.target.value;
-        setSearchQuery(query);
-
-        if (query.trim() === '') {
-            setFilteredEmails(emails);
-        } else {
-            const filtered = emails.filter((email: any) =>
-                email.from_email.toLowerCase().includes(query.toLowerCase())
+    const filteredEmails = emails.filter((email: any) => {
+        // Tab filter
+        if (tab === 'threats' && !['phishing', 'suspicious'].includes(email.category)) return false;
+        if (tab === 'clean' && email.threat_level !== 'low') return false;
+        // Search filter
+        if (searchQuery.trim() !== '') {
+            const query = searchQuery.toLowerCase();
+            return (
+                email.sender?.toLowerCase().includes(query) ||
+                email.subject?.toLowerCase().includes(query)
             );
-            setFilteredEmails(filtered);
         }
+        return true;
+    });
+
+    const totalResults = filteredEmails.length;
+    const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+    const paginatedEmails = filteredEmails.slice((page - 1) * pageSize, page * pageSize);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
     };
 
     const formatDate = (dateString: string) => {
@@ -121,40 +63,18 @@ export function EmailList({ emails }: any) {
     };
 
     // Render status badge based on email status
-    const renderStatusBadge = (status: string, threatLevel: string) => {
-        const baseClasses =
-            'px-2 py-1 rounded-full text-xs font-medium inline-flex items-center space-x-1';
-
-        switch (status) {
-            case 'clean':
-                return (
-                    <span className={`${baseClasses} bg-emerald-900/30 text-emerald-400`}>
-                        <IconShieldCheck className='h-3 w-3 mr-1' />
-                        <span>Clean</span>
-                    </span>
-                );
-            case 'suspicious':
-                return (
-                    <span className={`${baseClasses} bg-amber-900/30 text-amber-400`}>
-                        <IconAlertTriangle className='h-3 w-3 mr-1' />
-                        <span>Suspicious</span>
-                    </span>
-                );
-            case 'phishing':
-                const bgColor =
-                    threatLevel === 'critical'
-                        ? 'bg-red-900/40 text-red-400'
-                        : 'bg-red-900/30 text-red-400';
-                return (
-                    <span className={`${baseClasses} ${bgColor}`}>
-                        <IconAlertOctagon className='h-3 w-3 mr-1' />
-                        <span>{threatLevel === 'critical' ? 'Critical Threat' : 'Phishing'}</span>
-                    </span>
-                );
-            default:
-                return null;
+    function renderStatusBadges(category: string, threatLevel: string) {
+        // Special case: treat "clean" or "other" + "low" as clean
+        if (category === 'clean' || (category === 'other' && threatLevel === 'low')) {
+            return <CategoryBadge category='clean' />;
         }
-    };
+        return (
+            <div className='flex items-center space-x-1'>
+                <CategoryBadge category={category} />
+                <ThreatLevelBadge level={threatLevel} />
+            </div>
+        );
+    }
 
     return (
         <Card className='border-neutral-800 bg-neutral-900'>
@@ -177,20 +97,20 @@ export function EmailList({ emails }: any) {
                         <Button
                             variant='outline'
                             size='sm'
-                            className='text-neutral-300 border-neutral-700'
+                            className='text-neutral-300 border-none cursor-auto bg-transparent hover:bg-transparent hover:text-neutral-300 disabled:cursor-not-allowed disabled:opacity-50'
                         >
                             <IconFilter className='h-4 w-4 mr-2' />
                             Filter
                         </Button>
-                        <Tabs defaultValue='all' className='inline-flex h-9'>
+                        <Tabs value={tab} onValueChange={setTab as any} className='inline-flex h-9'>
                             <TabsList className='grid grid-cols-3 h-9'>
-                                <TabsTrigger value='all' className='text-xs'>
+                                <TabsTrigger value='all' className='text-xs cursor-pointer'>
                                     All
                                 </TabsTrigger>
-                                <TabsTrigger value='threats' className='text-xs'>
+                                <TabsTrigger value='threats' className='text-xs cursor-pointer'>
                                     Threats
                                 </TabsTrigger>
-                                <TabsTrigger value='clean' className='text-xs'>
+                                <TabsTrigger value='clean' className='text-xs cursor-pointer'>
                                     Clean
                                 </TabsTrigger>
                             </TabsList>
@@ -201,39 +121,53 @@ export function EmailList({ emails }: any) {
 
             <CardContent>
                 <div className='rounded-md border border-neutral-800'>
-                    <div className='bg-neutral-800/50 px-4 py-2 text-xs font-medium grid grid-cols-12 gap-4'>
-                        <div className='col-span-5 md:col-span-4'>Sender / Subject</div>
+                    {/* TABLE HEADER */}
+                    <div className='bg-neutral-800/50 px-4 py-2 text-xs font-medium grid grid-cols-14 gap-4'>
+                        <div className='col-span-1'>Category</div>
+                        <div className='col-span-2'>Sender</div>
+                        <div className='col-span-2'>Recipient</div>
                         <div className='hidden md:block md:col-span-4'>Subject</div>
-                        <div className='col-span-4 md:col-span-2'>Received</div>
-                        <div className='col-span-3 md:col-span-2'>Status</div>
+                        <div className='col-span-2'>Received</div>
+                        <div className='col-span-2 text-right'>Threat Level</div>
                     </div>
 
                     <div className='divide-y divide-neutral-800'>
-                        {filteredEmails.length > 0 ? (
-                            filteredEmails.map((email: any) => (
-                                <Link key={email.id} href={`/emails/${email.id}`} className='block'>
-                                    <div className='px-4 py-3 grid grid-cols-12 gap-4 hover:bg-neutral-800/50 transition-colors cursor-pointer'>
-                                        <div className='col-span-5 md:col-span-4 flex flex-col'>
+                        {paginatedEmails.length > 0 ? (
+                            paginatedEmails.map((email: any) => (
+                                <Link key={email.id} href={`emails/${email.id}`} className='block'>
+                                    <div className='px-4 py-3 grid grid-cols-14 gap-4 hover:bg-neutral-800/50 transition-colors cursor-pointer'>
+                                        {/* CATEGORY (first col) */}
+                                        <div className='col-span-1 flex items-center'>
+                                            <CategoryBadge category={email.category} />
+                                        </div>
+                                        {/* SENDER */}
+                                        <div className='col-span-2 flex flex-col'>
                                             <span className='text-sm font-medium truncate'>
-                                                {email.from_email}
-                                            </span>
-                                            <span className='text-xs text-neutral-400 truncate md:hidden'>
-                                                {email.metadata.from}
+                                                {email.sender_email}
                                             </span>
                                         </div>
+                                        {/* RECIPIENT */}
+                                        <div className='col-span-2 flex flex-col'>
+                                            <span className='text-xs text-neutral-400 truncate '>
+                                                {email.from_email}
+                                            </span>
+                                        </div>
+                                        {/* SUBJECT */}
                                         <div className='hidden md:block md:col-span-4'>
                                             <span className='text-sm truncate block'>
                                                 {email.subject}
                                             </span>
                                         </div>
-                                        <div className='col-span-4 md:col-span-2 flex items-center'>
+                                        {/* RECEIVED */}
+                                        <div className='col-span-2 flex items-center'>
                                             <span className='text-xs text-neutral-400'>
-                                                {formatDate(email.analyzed_at)}
+                                                {formatDate(email.created_at)}
                                             </span>
                                         </div>
-                                        <div className='col-span-3 md:col-span-2 flex items-center justify-between'>
-                                            {renderStatusBadge(email.category, email.threat_level)}
-                                            <IconChevronRight className='h-4 w-4 text-neutral-500' />
+                                        {/* THREAT LEVEL (last col) */}
+                                        <div className='col-span-2 flex items-center justify-end'>
+                                            <ThreatLevelBadge level={email.threat_level} />
+                                            <IconChevronRight className='h-4 w-4 text-neutral-500 ml-2' />
                                         </div>
                                     </div>
                                 </Link>
@@ -246,24 +180,19 @@ export function EmailList({ emails }: any) {
                     </div>
                 </div>
 
-                {filteredEmails.length > 0 && (
+                {totalResults > 0 && (
                     <div className='flex justify-between items-center mt-4'>
                         <div className='text-sm text-neutral-400'>
-                            Showing{' '}
-                            <span className='font-medium text-neutral-300'>
-                                {filteredEmails.length}
-                            </span>{' '}
-                            of{' '}
-                            <span className='font-medium text-neutral-300'>
-                                {mockEmails.length}
-                            </span>{' '}
-                            emails
+                            Page <span className='font-medium text-neutral-300'>{page}</span> of{' '}
+                            <span className='font-medium text-neutral-300'>{totalPages}</span> (
+                            {totalResults} emails)
                         </div>
                         <div className='flex space-x-2'>
                             <Button
                                 variant='outline'
                                 size='sm'
-                                disabled
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                disabled={page === 1}
                                 className='text-neutral-300 border-neutral-700'
                             >
                                 Previous
@@ -271,6 +200,8 @@ export function EmailList({ emails }: any) {
                             <Button
                                 variant='outline'
                                 size='sm'
+                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages || totalResults === 0}
                                 className='text-neutral-300 border-neutral-700'
                             >
                                 Next
@@ -280,5 +211,74 @@ export function EmailList({ emails }: any) {
                 )}
             </CardContent>
         </Card>
+    );
+}
+
+// Helper
+
+function CategoryBadge({ category }: { category: string }) {
+    const categories: Record<string, { color: string; icon: JSX.Element; label: string }> = {
+        phishing: {
+            color: 'bg-purple-900/30 text-purple-400',
+            icon: <IconAlertOctagon className='h-3 w-3 mr-1' />,
+            label: 'Phishing',
+        },
+        spam: {
+            color: 'bg-blue-900/30 text-blue-400',
+            icon: <IconMailOff className='h-3 w-3 mr-1' />,
+            label: 'Spam',
+        },
+        malware: {
+            color: 'bg-red-900/30 text-red-400',
+            icon: <IconBug className='h-3 w-3 mr-1' />,
+            label: 'Malware',
+        },
+        scam: {
+            color: 'bg-orange-900/30 text-orange-400',
+            icon: <IconShieldOff className='h-3 w-3 mr-1' />,
+            label: 'Scam',
+        },
+        other: {
+            color: 'bg-neutral-900/30 text-neutral-400',
+            icon: <IconAlertTriangle className='h-3 w-3 mr-1' />,
+            label: 'Other',
+        },
+        clean: {
+            color: 'bg-emerald-900/30 text-emerald-400',
+            icon: <IconShieldCheck className='h-3 w-3 mr-1' />,
+            label: 'Clean',
+        },
+    };
+    const info = categories[category] || categories['other'];
+    return (
+        <span
+            className={cn(
+                'px-2 py-1 rounded-full text-xs font-medium inline-flex items-center mr-1',
+                info.color
+            )}
+        >
+            {info.icon}
+            <span>{info.label}</span>
+        </span>
+    );
+}
+
+function ThreatLevelBadge({ level }: { level: string }) {
+    const levels: Record<string, string> = {
+        critical: 'bg-red-900/40 text-red-400',
+        high: 'bg-red-900/30 text-red-400',
+        medium: 'bg-amber-900/30 text-amber-400',
+        low: 'bg-emerald-900/20 text-emerald-400',
+    };
+    const levelText = level.charAt(0).toUpperCase() + level.slice(1).toLowerCase();
+    return (
+        <span
+            className={cn(
+                'px-2 py-1 rounded-full text-xs font-semibold ml-1',
+                levels[level] || 'bg-neutral-900/30 text-neutral-400'
+            )}
+        >
+            {levelText}
+        </span>
     );
 }

@@ -7,6 +7,7 @@ import { SecurityScore } from '@/components/dashboard/security-score';
 import { PhishingAttempts } from '@/components/dashboard/phishing-attempts';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { getAllEmailAnalytics } from './get-email-analytics';
+import { ClientToastHandler } from '@/components/ui/client-toaster';
 
 export default async function DashboardPage() {
     const supabase = await createClient();
@@ -38,6 +39,7 @@ export default async function DashboardPage() {
 
     return (
         <>
+            <ClientToastHandler />
             <DashboardHeader
                 heading={`Dashboard - Welcome, ${user.user_metadata.full_name || user.email}`}
                 subheading='Monitor your email security and subscription status'

@@ -15,8 +15,7 @@ export async function signIn(formData: FormData) {
   if (error) {
     return { error: error.message };
   }
-  revalidatePath('/dashboard', 'layout')
-  redirect('/dashboard');
+  return { success: true };
 }
 
  // Signup

@@ -12,11 +12,20 @@ export default async function EmailsPage() {
     if (error || !user) {
         redirect('/login');
     }
+    let { data: account_data } = await supabase
+        .from('accounts')
+        .select('*')
+        .eq('owner_id', user.id)
+        .single();
 
-    let { data: emails, error: fetchError } = await supabase
+    const accountId = account_data.id;
+
+    let { data: emails } = await supabase
         .from('mail_events')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('account_id', accountId);
+
+    console.log(emails);
     return (
         <>
             <DashboardHeader
