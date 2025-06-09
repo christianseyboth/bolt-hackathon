@@ -1,6 +1,6 @@
 import React from 'react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { EmailDetail, EmailAnalysisData } from '@/components/dashboard/email-detail';
+import { EmailDetail, EmailAnalysisData } from '@/components/dashboard/email/email-detail';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { IconArrowLeft } from '@tabler/icons-react';

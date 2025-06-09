@@ -10,6 +10,7 @@ import {
     IconFileDescription,
     IconLink,
     IconShieldCheck,
+    IconAlertHexagon,
 } from '@tabler/icons-react';
 import {
     Table,
@@ -59,8 +60,13 @@ export interface EmailAnalysisData {
 export function EmailDetail({ mail }: any) {
     const data = mail.ai_analysis;
 
+    function capitalize(str: string) {
+        if (!str) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
     const getThreatLevelColor = (level: string) => {
-        switch (level) {
+        switch (capitalize(level)) {
             case 'Critical':
                 return 'bg-red-900/40 text-red-400 border-red-800';
             case 'High':
@@ -75,7 +81,7 @@ export function EmailDetail({ mail }: any) {
     };
 
     const getThreatLevelIcon = (level: string) => {
-        switch (level) {
+        switch (capitalize(level)) {
             case 'Critical':
                 return <IconAlertOctagon className='h-5 w-5 mr-2' />;
             case 'High':
@@ -99,6 +105,7 @@ export function EmailDetail({ mail }: any) {
         });
     };
 
+    const newLocal = 'bg-red-800 text-neutral-300';
     return (
         <div className='space-y-6'>
             {/* Header Section */}
@@ -122,7 +129,7 @@ export function EmailDetail({ mail }: any) {
                             {getThreatLevelIcon(data.threat_level)}
                             <div>
                                 <div className='font-semibold flex items-center'>
-                                    {data.threat_level} Threat Level
+                                    {capitalize(data.threat_level)} Threat Level
                                 </div>
                                 {data.category && (
                                     <div className='text-xs'>Category: {data.category}</div>
@@ -148,13 +155,18 @@ export function EmailDetail({ mail }: any) {
 
                         <div className='bg-neutral-800 rounded-lg p-4'>
                             <h4 className='font-medium mb-2'>Recommendation</h4>
+
                             <ul className='space-y-2'>
                                 {data.recommendation.map((element: any, idx: number) => (
                                     <li
                                         key={idx}
                                         className='bg-neutral-800/50 p-3 rounded-md text-sm'
                                     >
-                                        {element}
+                                        <span className='flex'>
+                                            {' '}
+                                            <IconAlertHexagon className='h-5 w-5 mr-2 text-orange-500' />
+                                            {element}
+                                        </span>
                                     </li>
                                 ))}
                             </ul>
@@ -173,7 +185,7 @@ export function EmailDetail({ mail }: any) {
                         <TabsList className='grid w-full grid-cols-3 mb-4'>
                             <TabsTrigger value='content'>Content Analysis</TabsTrigger>
                             <TabsTrigger value='urls'>URLs & Links</TabsTrigger>
-                            <TabsTrigger value='preview'>Email Preview</TabsTrigger>
+                            <TabsTrigger value='reasoning'>Reasoning</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value='content' className='space-y-4'>
@@ -231,95 +243,78 @@ export function EmailDetail({ mail }: any) {
                                     )}
                                 </ul>
 
-                                {data.attachments && data.attachments.length > 0 && (
+                                {data.details.attachment_risk && (
                                     <>
                                         <h3 className='font-medium text-base mt-6'>Attachments</h3>
-                                        <div className='overflow-auto'>
-                                            <Table>
-                                                <TableHeader>
-                                                    <TableRow>
-                                                        <TableHead>File Name</TableHead>
-                                                        <TableHead>Type</TableHead>
-                                                        <TableHead>Risk</TableHead>
-                                                        <TableHead>Scan Result</TableHead>
-                                                    </TableRow>
-                                                </TableHeader>
-                                                <TableBody>
-                                                    {data.attachments.map((attachment, idx) => (
-                                                        <TableRow key={idx}>
-                                                            <TableCell className='font-medium flex items-center'>
-                                                                <IconFileDescription className='h-4 w-4 mr-2 text-neutral-400' />
-                                                                {attachment.name}
-                                                            </TableCell>
-                                                            <TableCell>{attachment.type}</TableCell>
-                                                            <TableCell>
-                                                                <Badge
-                                                                    className={cn(
-                                                                        getThreatLevelColor(
-                                                                            attachment.risk
-                                                                        )
-                                                                    )}
-                                                                >
-                                                                    {attachment.risk
-                                                                        .charAt(0)
-                                                                        .toUpperCase() +
-                                                                        attachment.risk.slice(1)}
-                                                                </Badge>
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                {attachment.scanResult ||
-                                                                    'No scan available'}
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                        </div>
+                                        <ul className='space-y-2'>
+                                            <li className='bg-neutral-800/50 p-3 rounded-md text-sm'>
+                                                {data.details.attachment_risk}
+                                            </li>
+                                        </ul>
                                     </>
                                 )}
                             </div>
                         </TabsContent>
 
                         <TabsContent value='urls'>
-                            {data.urlAnalysis && data.urlAnalysis.urls.length > 0 ? (
+                            {mail.links && mail.links.length > 0 ? (
                                 <div className='space-y-4'>
                                     <h3 className='font-medium text-base'>Detected URLs</h3>
-                                    <div className='overflow-auto'>
+                                    <div>
                                         <Table>
                                             <TableHeader>
                                                 <TableRow>
                                                     <TableHead className='w-1/2'>URL</TableHead>
-                                                    <TableHead>Risk Level</TableHead>
-                                                    <TableHead>Description</TableHead>
+                                                    {/* <TableHead>Recommendation</TableHead> */}
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {data.urlAnalysis.urls.map((url, idx) => (
+                                                {mail.links.map((url: string, idx: number) => (
                                                     <TableRow key={idx}>
                                                         <TableCell className='font-medium'>
                                                             <div className='flex items-center'>
                                                                 <IconLink className='h-4 w-4 mr-2 text-neutral-400' />
                                                                 <span className='text-sm truncate max-w-[250px]'>
-                                                                    {url.url}
+                                                                    {url}
                                                                 </span>
-                                                                <IconExternalLink className='h-4 w-4 ml-2 text-neutral-500 cursor-pointer' />
                                                             </div>
                                                         </TableCell>
-                                                        <TableCell>
-                                                            <Badge
-                                                                className={cn(
-                                                                    getThreatLevelColor(url.risk)
-                                                                )}
-                                                            >
-                                                                {url.risk.charAt(0).toUpperCase() +
-                                                                    url.risk.slice(1)}
+                                                        {/* <TableCell>
+                                                            <Badge className={newLocal}>
+                                                                <IconAlertOctagon className='mr-2' />{' '}
+                                                                Do not click
                                                             </Badge>
-                                                        </TableCell>
-                                                        <TableCell>{url.description}</TableCell>
+                                                        </TableCell> */}
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
                                         </Table>
+                                        <div className='my-8'>
+                                            <h3 className='font-medium text-base'>
+                                                Recommendation:
+                                            </h3>
+                                            <div className='overflow-auto mt-4'>
+                                                {data.details.url_analysis &&
+                                                    data.details.url_analysis.length > 0 && (
+                                                        <ul className='space-y-2'>
+                                                            {data.details.url_analysis.map(
+                                                                (element: any, idx: number) => (
+                                                                    <li
+                                                                        key={idx}
+                                                                        className='bg-neutral-800/50 p-3 rounded-md text-sm'
+                                                                    >
+                                                                        <span className='flex'>
+                                                                            {' '}
+                                                                            <IconAlertHexagon className='h-5 w-5 mr-2 text-orange-500' />
+                                                                            {element}
+                                                                        </span>
+                                                                    </li>
+                                                                )
+                                                            )}
+                                                        </ul>
+                                                    )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
@@ -329,21 +324,55 @@ export function EmailDetail({ mail }: any) {
                             )}
                         </TabsContent>
 
-                        <TabsContent value='preview'>
+                        <TabsContent value='reasoning'>
                             <div className='space-y-4'>
                                 <div className='bg-neutral-800/50 p-4 rounded-md'>
                                     <div className='flex items-center justify-between mb-3'>
-                                        <div className='text-sm font-medium'>
-                                            Email Content Preview
-                                        </div>
+                                        <div className='text-sm font-medium'>Reasoning</div>
                                         <Badge className='bg-neutral-700 text-neutral-300'>
-                                            Raw Content
+                                            AI Analysis
                                         </Badge>
                                     </div>
                                     <div className='bg-neutral-900 p-4 rounded-md border border-neutral-700 font-mono text-xs whitespace-pre-wrap max-h-[400px] overflow-y-auto'>
-                                        {data.emailContent}
+                                        {data.reasoning || 'No reasoning available.'}
                                     </div>
                                 </div>
+                                {mail.links && mail.links.length > 0 ? (
+                                    <div className='space-y-4'>
+                                        <div className='overflow-auto'>
+                                            <div className='my-2'>
+                                                <h3 className='font-medium text-base'>
+                                                    References:
+                                                </h3>
+                                                <div className='overflow-auto mt-4'>
+                                                    {data.references &&
+                                                        data.references.length > 0 && (
+                                                            <ul className='space-y-2'>
+                                                                {data.references.map(
+                                                                    (element: any, idx: number) => (
+                                                                        <li
+                                                                            key={idx}
+                                                                            className='bg-neutral-800/50 p-3 rounded-md text-sm'
+                                                                        >
+                                                                            <span className='flex'>
+                                                                                {' '}
+                                                                                <IconAlertHexagon className='h-5 w-5 mr-2 text-orange-500' />
+                                                                                {element}
+                                                                            </span>
+                                                                        </li>
+                                                                    )
+                                                                )}
+                                                            </ul>
+                                                        )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className='py-10 text-center text-neutral-400'>
+                                        No URLs or suspicious links detected in this email.
+                                    </div>
+                                )}
                                 <p className='text-xs text-neutral-500 italic'>
                                     Note: Suspicious elements in the email may be highlighted in a
                                     different color. Always exercise caution when interacting with

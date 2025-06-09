@@ -1,6 +1,6 @@
 import React from 'react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { EmailList } from '@/components/dashboard/email-list';
+import { EmailList } from '@/components/dashboard/email/email-list';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
