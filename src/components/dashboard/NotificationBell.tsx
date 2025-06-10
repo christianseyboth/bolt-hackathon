@@ -258,8 +258,8 @@ export const NotificationBell = () => {
         <div data-tour="threat-alerts">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
                 <PopoverTrigger asChild>
-                    <Button variant="ghost" size="sm" className="relative">
-                        <IconBell className="h-5 w-5" />
+                    <Button variant="ghost" className="relative cursor-pointer">
+                        <IconBell className="h-8 w-8" style={{ width: '20px', height: '20px' }} />
                         {unreadCount > 0 && (
                             <Badge
                                 variant="default"
