@@ -5,13 +5,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
-    font-family: 'Spinnaker';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Spinnaker'),
-        url('https://fonts.cdnfonts.com/s/15444/Spinnaker-Regular.woff') format('woff');
-}
+
 
 @theme inline {
     /* Configure your theme variables here */

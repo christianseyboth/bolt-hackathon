@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm';
 const nextConfig = {
     // MDX Configuration
     experimental: {
-        mdxRs: false, // Disable the Rust-based MDX compiler
+        mdxRs: true, // Disable the Rust-based MDX compiler
     },
 
     // File extensions Next.js should handle
@@ -38,7 +38,7 @@ const nextConfig = {
         // Directories to run ESLint on during production builds
         dirs: ['pages', 'components', 'lib', 'src', 'mdx'],
         // Don't run ESLint during builds if you want to handle it separately
-        ignoreDuringBuilds: true,
+        ignoreDuringBuilds: false,
     },
 };
 

@@ -21,7 +21,6 @@ import { getAllThreatCategoryData } from './get-threat-categories';
 export default async function SecurityPage() {
     const supabase = await createClient();
 
-    // 1. Get user/account info first (these depend on auth)
     const { data, error } = await supabase.auth.getUser();
     const user = data.user;
     if (error || !user) {
@@ -112,6 +111,7 @@ export default async function SecurityPage() {
             <DashboardHeader
                 heading='Security Analytics'
                 subheading='Comprehensive analysis of your email security posture'
+                user={user}
             />
 
             <div className='mt-8'>

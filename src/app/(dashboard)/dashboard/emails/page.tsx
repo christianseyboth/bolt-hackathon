@@ -30,6 +30,7 @@ export default async function EmailsPage() {
             <DashboardHeader
                 heading='Email Analysis'
                 subheading='View and manage all analyzed emails'
+                user={user}
             />
             <div className='mt-8'>
                 <EmailList emails={emails} />

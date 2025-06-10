@@ -56,17 +56,15 @@ export default async function DashboardPage() {
             .limit(5),
         subscriptionPromise,
     ]);
+
+
     return (
         <>
             <ClientToastHandler />
             <DashboardHeader
                 heading={`Dashboard - Welcome, ${user.user_metadata.full_name || user.email}`}
                 subheading='Monitor your email security and subscription status'
-                user={{
-                    name: undefined,
-                    avatar_url: undefined,
-                    email: undefined,
-                }}
+                user={user}
             />
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-8'>
                 <EmailAnalytics weeklyData={weeklyEmailStats} monthlyData={monthlyEmailStats} />

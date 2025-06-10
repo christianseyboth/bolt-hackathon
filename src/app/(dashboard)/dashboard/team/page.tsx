@@ -34,13 +34,13 @@ export default async function TeamPage() {
         .select('id, email, label, created_at, status')
         .eq('subscription_id', current_subscription.id);
 
-    console.log(members);
 
     return (
         <>
             <DashboardHeader
                 heading='Team Management'
                 subheading='Manage who can send emails for analysis'
+                user={user}
             />
             <div className='mt-8'>
                 <TeamManagement

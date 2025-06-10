@@ -56,11 +56,6 @@ export function SubscriptionInfo({ subscription }: { subscription: any }) {
                         className='h-2'
                     />
 
-                    <div className='flex justify-between text-xs mt-4'>
-                        <span>AI Analysis</span>
-                        <span>48 / 50</span>
-                    </div>
-                    <Progress value={96} className='h-2' />
 
                     <div className='flex justify-between text-xs mt-4'>
                         <span>Team Members</span>

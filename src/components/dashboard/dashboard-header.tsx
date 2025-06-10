@@ -8,11 +8,7 @@ interface DashboardHeaderProps {
     subheading?: string;
     className?: string;
     children?: React.ReactNode;
-    user: {
-        name?: string;
-        avatar_url?: string;
-        email?: string;
-    };
+    user: any;
 }
 
 export function DashboardHeader({
