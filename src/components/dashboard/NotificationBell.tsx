@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,12 +18,13 @@ import {
     IconX
 } from '@tabler/icons-react';
 import { createClient } from '@/utils/supabase/client';
+import { useAccount } from '@/hooks/useAccount';
 
 interface MailEvent {
     id: string;
     subject: string | null;
     sender: string | null;
-    risk_level: 'critical' | 'high' | 'medium' | 'low' | null;
+    threat_level: 'critical' | 'high' | 'medium' | 'low' | null;
     threat_type: string | null;
     created_at: string;
     is_read?: boolean | null;
@@ -34,7 +36,7 @@ interface Notification {
     message: string;
     type: 'critical' | 'high' | 'medium' | 'low';
     timestamp: string;
-    isRead: boolean;
+    is_read: boolean;
     mailEventId: string;
 }
 
@@ -43,38 +45,47 @@ export const NotificationBell = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const supabase = createClient();
+    const { accountId } = useAccount();
+    const router = useRouter();
 
     useEffect(() => {
+        if (!accountId) return; // Wait for accountId to be available
+
         // Load initial notifications
         loadNotifications();
 
-        // Set up realtime subscription
+        // Set up realtime subscription with account filtering
         const channel = supabase
             .channel('mail_events_changes')
             .on(
                 'postgres_changes',
                 {
-                    event: 'INSERT',
+                    event: '*',
                     schema: 'public',
                     table: 'mail_events',
+                    filter: `account_id=eq.${accountId}`, // Filter by account_id
                 },
                 (payload) => {
                     console.log('New mail event:', payload);
                     handleNewMailEvent(payload.new as MailEvent);
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log('Subscription status:', status);
+            });
 
         return () => {
+            console.log('Cleaning up subscription');
             supabase.removeChannel(channel);
         };
-    }, []);
+    }, [accountId]); // Add accountId as dependency
 
     const loadNotifications = async () => {
         try {
             const { data: mailEvents, error } = await supabase
                 .from('mail_events')
                 .select('*')
+                .eq('account_id', accountId)
                 .order('created_at', { ascending: false })
                 .limit(10);
 
@@ -84,18 +95,18 @@ export const NotificationBell = () => {
             }
 
             if (!mailEvents) {
-                console.log('No mail events found');
                 setNotifications([]);
                 setUnreadCount(0);
                 return;
             }
 
             const notifications = mailEvents
-                .filter(event => event && event.id) // Filter out null/invalid events
-                .map(event => createNotificationFromMailEvent(event));
+                .filter(event => event && event.id)
+                .map(event => createNotificationFromMailEvent(event))
+                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
             setNotifications(notifications);
-            setUnreadCount(notifications.filter(n => !n.isRead).length);
+            setUnreadCount(notifications.filter(n => !n.is_read).length);
         } catch (error) {
             console.error('Error loading notifications:', error);
             setNotifications([]);
@@ -106,13 +117,17 @@ export const NotificationBell = () => {
     const handleNewMailEvent = (mailEvent: MailEvent) => {
         const notification = createNotificationFromMailEvent(mailEvent);
 
-        setNotifications(prev => [notification, ...prev.slice(0, 9)]); // Keep only 10 notifications
+        setNotifications(prev => {
+            const updated = [notification, ...prev].slice(0, 10);
+            return updated.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        });
+
         setUnreadCount(prev => prev + 1);
 
         // Show browser notification for critical/high threats
-        if (mailEvent.risk_level === 'critical' || mailEvent.risk_level === 'high') {
+        if (mailEvent.threat_level === 'critical' || mailEvent.threat_level === 'high') {
             if (Notification.permission === 'granted') {
-                new Notification(`${mailEvent.risk_level.toUpperCase()} Threat Detected`, {
+                new Notification(`${mailEvent.threat_level.toUpperCase()} Threat Detected`, {
                     body: `${mailEvent.threat_type} from ${mailEvent.sender}`,
                     icon: '/favicon.ico',
                 });
@@ -135,11 +150,11 @@ export const NotificationBell = () => {
 
         return {
             id: mailEvent.id,
-            title: getThreatTitle(mailEvent.risk_level || '', mailEvent.threat_type || ''),
+            title: getThreatTitle(mailEvent.threat_level || '', mailEvent.threat_type || ''),
             message: getThreatMessage(mailEvent.subject || '', mailEvent.sender || ''),
-            type: (mailEvent.risk_level as 'critical' | 'high' | 'medium' | 'low') || 'low',
+            type: (mailEvent.threat_level as 'critical' | 'high' | 'medium' | 'low') || 'low',
             timestamp: mailEvent.created_at || new Date().toISOString(),
-            isRead: mailEvent.is_read || false,
+            is_read: mailEvent.is_read || false,
             mailEventId: mailEvent.id,
         };
     };
@@ -155,7 +170,7 @@ export const NotificationBell = () => {
             // Update local state
             setNotifications(prev =>
                 prev.map(n =>
-                    n.id === notificationId ? { ...n, isRead: true } : n
+                    n.id === notificationId ? { ...n, is_read: true } : n
                 )
             );
             setUnreadCount(prev => Math.max(0, prev - 1));
@@ -166,18 +181,19 @@ export const NotificationBell = () => {
 
     const markAllAsRead = async () => {
         try {
-            const unreadIds = notifications.filter(n => !n.isRead).map(n => n.id);
+            const { data, error } = await supabase
+                .from('mail_events')
+                .update({ is_read: true })
+                .eq('account_id', accountId)
+                .select('id, is_read');
 
-            if (unreadIds.length > 0) {
-                await supabase
-                    .from('mail_events')
-                    .update({ is_read: true })
-                    .in('id', unreadIds);
+            if (error) {
+                console.error('Database update error:', error);
+                return;
+            }
 
-                setNotifications(prev =>
-                    prev.map(n => ({ ...n, isRead: true }))
-                );
-                setUnreadCount(0);
+            if (data && data.length > 0) {
+                await loadNotifications();
             }
         } catch (error) {
             console.error('Error marking all as read:', error);
@@ -224,6 +240,19 @@ export const NotificationBell = () => {
             Notification.requestPermission();
         }
     }, []);
+
+    const handleNotificationClick = (notification: Notification) => {
+        // Mark as read when clicked
+        if (!notification.is_read) {
+            markAsRead(notification.id);
+        }
+
+        // Close the popover
+        setIsOpen(false);
+
+        // Navigate to the specific email
+        router.push(`/dashboard/emails/${notification.mailEventId}`);
+    };
 
     return (
         <div data-tour="threat-alerts">
@@ -272,8 +301,9 @@ export const NotificationBell = () => {
                                     {notifications.map((notification) => (
                                         <div
                                             key={notification.id}
-                                            className={`p-3 border-b border-neutral-800 transition-colors hover:bg-neutral-800/30 ${!notification.isRead ? 'bg-neutral-800/20' : ''
+                                            className={`p-3 border-b border-neutral-800 transition-colors hover:bg-neutral-700/50 cursor-pointer ${!notification.is_read ? 'bg-neutral-800/20' : ''
                                                 }`}
+                                            onClick={() => handleNotificationClick(notification)}
                                         >
                                             <div className="flex items-start gap-3">
                                                 <div className="flex-shrink-0 mt-0.5">
@@ -284,7 +314,7 @@ export const NotificationBell = () => {
                                                         <h4 className="text-sm font-medium text-neutral-200 truncate">
                                                             {notification.title}
                                                         </h4>
-                                                        {!notification.isRead && (
+                                                        {!notification.is_read && (
                                                             <div className="h-2 w-2 bg-blue-500 rounded-full flex-shrink-0" />
                                                         )}
                                                     </div>
@@ -295,16 +325,9 @@ export const NotificationBell = () => {
                                                         <span className="text-xs text-neutral-500">
                                                             {formatTime(notification.timestamp)}
                                                         </span>
-                                                        {!notification.isRead && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-6 px-2 text-xs"
-                                                                onClick={() => markAsRead(notification.id)}
-                                                            >
-                                                                <IconCheck className="h-3 w-3" />
-                                                            </Button>
-                                                        )}
+                                                        <span className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            Click to view
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
