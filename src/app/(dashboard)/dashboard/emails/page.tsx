@@ -32,7 +32,7 @@ export default async function EmailsPage() {
                 subheading='View and manage all analyzed emails'
                 user={user}
             />
-            <div className='mt-8'>
+            <div className='mt-8' data-tour="email-list">
                 <EmailList emails={emails} />
             </div>
         </>

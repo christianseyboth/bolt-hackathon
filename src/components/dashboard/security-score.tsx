@@ -160,7 +160,7 @@ export function SecurityScore({ scoreData }: { scoreData: SecurityScoreData }) {
 
     if (!hasData) {
         return (
-            <Card className='border border-neutral-800 bg-neutral-900'>
+            <Card className='border border-neutral-800 bg-neutral-900' data-tour="security-score">
                 <CardHeader className='pb-2'>
                     <CardTitle className='text-lg font-medium flex items-center'>
                         <IconShieldCheck className='mr-2 h-5 w-5 text-emerald-400' />
@@ -188,7 +188,7 @@ export function SecurityScore({ scoreData }: { scoreData: SecurityScoreData }) {
     }
 
     return (
-        <Card className='border border-neutral-800 bg-neutral-900'>
+        <Card className='border border-neutral-800 bg-neutral-900' data-tour="security-score">
             <CardHeader className='pb-2'>
                 <CardTitle className='text-lg font-medium flex items-center'>
                     <IconShieldCheck className='mr-2 h-5 w-5 text-emerald-400' />

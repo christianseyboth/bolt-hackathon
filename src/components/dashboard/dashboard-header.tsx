@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import { IconBell, IconSettings } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { AvatarMenu } from '@/components/ui/avatar-menu';
+import { NotificationBell } from './NotificationBell';
 
 interface DashboardHeaderProps {
     heading: string;
@@ -30,13 +31,7 @@ export function DashboardHeader({
                 {subheading && <p className='text-neutral-400 text-sm mt-1'>{subheading}</p>}
             </div>
             <div className='flex items-center mt-4 md:mt-0 space-x-2'>
-                {/* Icon Buttons nur wenn du sie wirklich brauchst */}
-                {/* <Button variant="ghost" size="icon">
-          <IconBell className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon">
-          <IconSettings className="h-5 w-5" />
-        </Button> */}
+                <NotificationBell />
                 <AvatarMenu user={user} />
             </div>
             {children}

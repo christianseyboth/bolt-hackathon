@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ import {
     IconCopy,
     IconRefresh,
 } from '@tabler/icons-react';
+import { useSearchParams } from 'next/navigation';
 
 // Mock user data
 const mockUser = {
@@ -50,6 +51,35 @@ export default function ProfilePage() {
     const [user, setUser] = useState(mockUser);
     const [isEditing, setIsEditing] = useState(false);
     const [showApiKey, setShowApiKey] = useState(false);
+    const searchParams = useSearchParams();
+    const [activeTab, setActiveTab] = useState('account');
+    const [isMounted, setIsMounted] = useState(false);
+
+    // Prevent hydration mismatch
+    useEffect(() => {
+        setIsMounted(true);
+        const tab = searchParams.get('tab');
+        if (tab) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
+
+    // Don't render tabs until mounted to prevent hydration mismatch
+    if (!isMounted) {
+        return (
+            <>
+                <DashboardHeader
+                    heading="Profile & Settings"
+                    subheading="Manage your account, security, and preferences"
+                    user={user}
+                />
+                <div className="mt-6 animate-pulse">
+                    <div className="h-10 bg-neutral-800 rounded mb-6"></div>
+                    <div className="h-96 bg-neutral-800 rounded"></div>
+                </div>
+            </>
+        );
+    }
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -75,7 +105,7 @@ export default function ProfilePage() {
             />
 
             <div className="mt-6">
-                <Tabs defaultValue="account" className="w-full">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="grid w-full grid-cols-4 bg-neutral-800/50">
                         <TabsTrigger value="account" className="flex items-center gap-2">
                             <IconUser className="h-4 w-4" />
@@ -297,7 +327,7 @@ export default function ProfilePage() {
                     </TabsContent>
 
                     {/* Email Tab */}
-                    <TabsContent value="email" className="space-y-6">
+                    <TabsContent value="email" className="space-y-6" data-tour="email-setup-detailed">
                         <Card className="border border-neutral-800 bg-neutral-900">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">

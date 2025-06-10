@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { MobileHeader } from '@/components/dashboard/mobile-header';
 import { redirect } from 'next/navigation';
 import { AccountProvider } from '@/context/account-context';
+import { CustomTour } from '@/components/tour/CustomTour';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     const supabase = await createClient();
@@ -35,6 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                         {children}
                     </main>
                     <Toaster />
+                    <CustomTour />
                 </div>
             </div>
         </AccountProvider>
