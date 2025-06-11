@@ -57,7 +57,6 @@ export default async function DashboardPage() {
         subscriptionPromise,
     ]);
 
-
     return (
         <>
             <ClientToastHandler />
@@ -68,7 +67,7 @@ export default async function DashboardPage() {
             />
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-8'>
                 <EmailAnalytics weeklyData={weeklyEmailStats} monthlyData={monthlyEmailStats} />
-                <SubscriptionInfo subscription={subscription_data} />
+                <SubscriptionInfo account={account_data} subscription={subscription_data} />
             </div>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
                 <SecurityScore scoreData={events} />

@@ -5,17 +5,19 @@ import { Progress } from '../ui/progress';
 import { IconCrown } from '@tabler/icons-react';
 import Link from 'next/link';
 
-export function SubscriptionInfo({ subscription }: { subscription: any }) {
+export function SubscriptionInfo({
+    subscription,
+    account
+}: {
+    subscription: any | null;
+    account: any | null;
+}) {
     const calcProgress = (used: number, total: number) => {
         return total > 0 ? (used / total) * 100 : 0;
     };
 
-    const scanProgress =
-        subscription.analysis_amount > 0
-            ? (subscription.analysis_used / subscription.analysis_amount) * 100
-            : 0;
-
-    const date = new Date(subscription.current_period_end);
+    // Handle free accounts (no subscription) or subscriptions without end date
+    const date = subscription?.current_period_end ? new Date(subscription.current_period_end) : null;
 
     return (
         <Card className='border border-neutral-800 bg-neutral-900'>
@@ -29,10 +31,14 @@ export function SubscriptionInfo({ subscription }: { subscription: any }) {
                             <IconCrown className='h-4 w-4 text-black' />
                         </div>
                         <div>
-                            <div className='text-base font-medium'>{subscription.plan_name}</div>
+                            <div className='text-base font-medium'>{subscription?.plan_name || account?.plan || 'Free'}</div>
                             <div className='text-xs text-neutral-400'>
                                 renews on{' '}
-                                <span className='text-amber-400'>{date.toLocaleDateString()}</span>
+                                <span className='text-amber-400'>
+                                    {(!subscription || subscription.plan_name === 'Free' || !date)
+                                        ? 'N/A'
+                                        : date.toLocaleDateString()}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -45,23 +51,22 @@ export function SubscriptionInfo({ subscription }: { subscription: any }) {
                     <div className='flex justify-between text-xs'>
                         <span>Email Scans</span>
                         <span>
-                            {subscription.analysis_used} / {subscription.analysis_amount}
+                            {subscription?.analysis_used || (100 - (account?.emails_left || 100))} / {subscription?.analysis_amount || 100}
                         </span>
                     </div>
                     <Progress
                         value={calcProgress(
-                            subscription.analysis_used,
-                            subscription.analysis_amount
+                            subscription?.analysis_used || (100 - (account?.emails_left || 100)),
+                            subscription?.analysis_amount || 100
                         )}
                         className='h-2'
                     />
 
-
                     <div className='flex justify-between text-xs mt-4'>
                         <span>Team Members</span>
-                        <span>3 / {subscription.seats}</span>
+                        <span>1 / {subscription?.seats || 1}</span>
                     </div>
-                    <Progress value={60} className='h-2' />
+                    <Progress value={subscription?.seats ? (1 / subscription.seats) * 100 : 100} className='h-2' />
                 </div>
 
                 <div className='mt-6 pt-6 border-t border-neutral-800'>

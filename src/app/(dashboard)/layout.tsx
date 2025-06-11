@@ -27,7 +27,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
 
     return (
-        <AccountProvider accountId={account_data.id}>
+        <AccountProvider accountId={"account_data.id"}>
             <div className='h-screen flex dark:bg-neutral-950'>
                 <Sidebar />
                 <div className='flex-1 flex flex-col h-screen'>

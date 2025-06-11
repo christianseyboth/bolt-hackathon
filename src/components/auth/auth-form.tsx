@@ -12,10 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { signIn, signUp } from '@/app/auth/actions';
+import { signIn, signUp, signInWithOAuth, resetPassword } from '@/app/auth/actions';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
 
 interface AuthFormProps {
     mode: 'login' | 'register' | 'reset';
@@ -23,107 +22,73 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ mode, className }: AuthFormProps) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
-    const router = useRouter();
 
     const isLoginMode = mode === 'login';
     const isRegisterMode = mode === 'register';
     const isResetMode = mode === 'reset';
 
-    // Client-side validation before form submission
-    const validateForm = () => {
-        setFormError(null);
-
-        if (!email.trim()) {
-            setFormError('Please enter your email address');
-            return false;
-        }
-
-        if (!isResetMode && !password.trim()) {
-            setFormError('Please enter your password');
-            return false;
-        }
-
-        if (isRegisterMode && password !== confirmPassword) {
-            setFormError("Passwords don't match");
-            return false;
-        }
-
-        return true;
-    };
-
-    // Handle OAuth authentication (client-side)
+    // Handle OAuth authentication
     const handleSocialAuth = async (provider: 'github' | 'google') => {
         setFormError(null);
-
-        try {
-            const { error } = await provider;
-
-            if (error) {
-                setFormError(error.message);
+        startTransition(async () => {
+            try {
+                const result = await signInWithOAuth(provider);
+                if (result?.error) {
+                    setFormError(result.error);
+                }
+            } catch (error) {
+                console.error(`Error with ${provider} auth:`, error);
+                setFormError('An unexpected error occurred with social login.');
             }
-            // The redirect happens in the  function
-        } catch (error) {
-            console.error(`Error with ${provider} auth:`, error);
-            setFormError('An unexpected error occurred with social login.');
-        }
+        });
     };
 
-    // Handle password reset (client-side)
-    const handleResetPassword = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateForm()) return;
+    // Handle form submission for login/register
+    const handleSubmit = async (formData: FormData) => {
+        setFormError(null);
+        startTransition(async () => {
+            try {
+                let result;
+                if (isLoginMode) {
+                    result = await signIn(formData);
+                } else if (isRegisterMode) {
+                    // Validate password match on client side first
+                    const password = formData.get('password') as string;
+                    const confirmPassword = formData.get('confirmPassword') as string;
 
-        setIsSubmitting(true);
-        try {
-            const { error } = await email;
+                    if (password !== confirmPassword) {
+                        setFormError("Passwords don't match");
+                        return;
+                    }
+                    result = await signUp(formData);
+                } else if (isResetMode) {
+                    result = await resetPassword(formData);
+                    if (!result?.error) {
+                        toast({
+                            title: 'Password reset email sent',
+                            description: 'Please check your email for password reset instructions.',
+                        });
+                        return;
+                    }
+                }
 
-            if (error) {
-                setFormError(error.message);
-            } else {
-                toast({
-                    title: 'Password reset email sent',
-                    description: 'Please check your email for password reset instructions.',
-                });
+                if (result?.error) {
+                    setFormError(result.error);
+                } else {
+                    toast({
+                        title: isLoginMode ? 'Login successful' : 'Registration successful',
+                        description: isLoginMode ? 'Welcome back!' : 'Your account has been created.',
+                    });
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                setFormError('An unexpected error occurred. Please try again.');
             }
-        } catch (error) {
-            console.error('Reset error:', error);
-            setFormError('An unexpected error occurred. Please try again later.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    // Handle form submission results (after server action completes)
-    const handleActionResult = (result: { error?: { message: string } }) => {
-        setIsSubmitting(false);
-
-        if (result?.error) {
-            setFormError(result.error.message);
-            return;
-        }
-
-        // Success handling
-        if (isLoginMode) {
-            toast({
-                title: 'Login successful',
-                description: 'Welcome back!',
-            });
-            // Removed router.push('/dashboard') - the server action now handles redirect
-        } else if (isRegisterMode) {
-            toast({
-                title: 'Registration successful',
-                description: 'Your account has been created.',
-            });
-            // Removed router.push('/dashboard') - the server action now handles redirect
-        }
+        });
     };
 
     return (
@@ -148,7 +113,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                         variant='outline'
                         className='bg-neutral-800 hover:bg-neutral-700 text-white border-neutral-700'
                         onClick={() => handleSocialAuth('github')}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                     >
                         <IconBrandGithub className='mr-2 h-4 w-4' />
                         GitHub
@@ -157,7 +122,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                         variant='outline'
                         className='bg-neutral-800 hover:bg-neutral-700 text-white border-neutral-700'
                         onClick={() => handleSocialAuth('google')}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                     >
                         <IconBrandGoogle className='mr-2 h-4 w-4' />
                         Google
@@ -185,69 +150,22 @@ export function AuthForm({ mode, className }: AuthFormProps) {
             )}
 
             {/* Email/Password Form */}
-            {isResetMode ? (
-                // Reset password form (client-side handling)
-                <form onSubmit={handleResetPassword}>
-                    <div className='space-y-4'>
-                        <div className='space-y-2'>
-                            <Label htmlFor='reset-email'>Email</Label>
-                            <Input
-                                id='reset-email'
-                                name='email'
-                                type='email'
-                                placeholder='name@example.com'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                disabled={isSubmitting}
-                                className='bg-neutral-800 border-neutral-700 text-white'
-                            />
-                        </div>
-
-                        <Button type='submit' className='w-full' disabled={isSubmitting}>
-                            {isSubmitting ? (
-                                <>
-                                    <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
-                                    Sending reset link...
-                                </>
-                            ) : (
-                                'Send Reset Link'
-                            )}
-                        </Button>
+            <form action={handleSubmit}>
+                <div className='space-y-4'>
+                    <div className='space-y-2'>
+                        <Label htmlFor='email'>Email</Label>
+                        <Input
+                            id='email'
+                            name='email'
+                            type='email'
+                            placeholder='name@example.com'
+                            required
+                            disabled={isPending}
+                            className='bg-neutral-800 border-neutral-700 text-white'
+                        />
                     </div>
-                </form>
-            ) : (
-                // Login/Register form (server action)
-                <form
-                    action={async (formData) => {
-                        const result = await signIn(formData);
-                        if (result.success) {
-                            router.push('/dashboard?login=success');
-                        } else {
-                            toast({
-                                variant: 'destructive',
-                                title: 'Login fehlgeschlagen',
-                                description: result.error || 'Bitte überprüfe deine Zugangsdaten.',
-                            });
-                        }
-                    }}
-                >
-                    <div className='space-y-4'>
-                        <div className='space-y-2'>
-                            <Label htmlFor='email'>Email</Label>
-                            <Input
-                                id='email'
-                                name='email'
-                                type='email'
-                                placeholder='name@example.com'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                disabled={isSubmitting}
-                                className='bg-neutral-800 border-neutral-700 text-white'
-                            />
-                        </div>
 
+                    {!isResetMode && (
                         <div className='space-y-2'>
                             <div className='flex justify-between items-center'>
                                 <Label htmlFor='password'>Password</Label>
@@ -266,16 +184,16 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                                     name='password'
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder='••••••••'
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    disabled={isSubmitting}
+                                    disabled={isPending}
                                     className='bg-neutral-800 border-neutral-700 text-white pr-10'
                                 />
                                 <Button
+                                    type='button'
                                     variant='ghost'
                                     className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
                                     onClick={() => setShowPassword(!showPassword)}
+                                    disabled={isPending}
                                 >
                                     {showPassword ? (
                                         <IconEyeOff className='h-4 w-4 text-neutral-400' />
@@ -285,55 +203,56 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                                 </Button>
                             </div>
                         </div>
+                    )}
 
-                        {isRegisterMode && (
-                            <div className='space-y-2'>
-                                <Label htmlFor='confirm-password'>Confirm Password</Label>
-                                <div className='relative'>
-                                    <Input
-                                        id='confirm-password'
-                                        name='confirmPassword'
-                                        type={showPassword ? 'text' : 'password'}
-                                        placeholder='••••••••'
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        required
-                                        disabled={isSubmitting}
-                                        className='bg-neutral-800 border-neutral-700 text-white pr-10'
-                                    />
-                                    <Button
-                                        type='button'
-                                        variant='ghost'
-                                        className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
-                                        onClick={() => setShowPassword(!showPassword)}
-                                    >
-                                        {showPassword ? (
-                                            <IconEyeOff className='h-4 w-4 text-neutral-400' />
-                                        ) : (
-                                            <IconEye className='h-4 w-4 text-neutral-400' />
-                                        )}
-                                    </Button>
-                                </div>
+                    {isRegisterMode && (
+                        <div className='space-y-2'>
+                            <Label htmlFor='confirm-password'>Confirm Password</Label>
+                            <div className='relative'>
+                                <Input
+                                    id='confirm-password'
+                                    name='confirmPassword'
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder='••••••••'
+                                    required
+                                    disabled={isPending}
+                                    className='bg-neutral-800 border-neutral-700 text-white pr-10'
+                                />
+                                <Button
+                                    type='button'
+                                    variant='ghost'
+                                    className='absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent'
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    disabled={isPending}
+                                >
+                                    {showPassword ? (
+                                        <IconEyeOff className='h-4 w-4 text-neutral-400' />
+                                    ) : (
+                                        <IconEye className='h-4 w-4 text-neutral-400' />
+                                    )}
+                                </Button>
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        <Button className='w-full'>
-                            {isSubmitting ? (
-                                <>
-                                    <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
-                                    {isLoginMode && 'Logging in...'}
-                                    {isRegisterMode && 'Creating account...'}
-                                </>
-                            ) : (
-                                <>
-                                    {isLoginMode && 'Sign In'}
-                                    {isRegisterMode && 'Create Account'}
-                                </>
-                            )}
-                        </Button>
-                    </div>
-                </form>
-            )}
+                    <Button type='submit' className='w-full' disabled={isPending}>
+                        {isPending ? (
+                            <>
+                                <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
+                                {isLoginMode && 'Logging in...'}
+                                {isRegisterMode && 'Creating account...'}
+                                {isResetMode && 'Sending reset link...'}
+                            </>
+                        ) : (
+                            <>
+                                {isLoginMode && 'Sign In'}
+                                {isRegisterMode && 'Create Account'}
+                                {isResetMode && 'Send Reset Link'}
+                            </>
+                        )}
+                    </Button>
+                </div>
+            </form>
 
             {/* Switch between login and register */}
             <div className='text-center text-sm'>
