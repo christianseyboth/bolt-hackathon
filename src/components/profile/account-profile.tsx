@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IconCheck, IconEdit, IconGavel, IconX, IconCrown } from '@tabler/icons-react';
+import { IconCheck, IconEdit, IconDeviceFloppy, IconX, IconCrown, IconCamera } from '@tabler/icons-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { createClient } from '@/utils/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -29,6 +30,10 @@ export function AccountProfile() {
     const [editedAccount, setEditedAccount] = useState<Partial<AccountProfile>>({});
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const supabase = createClient();
     const { toast } = useToast();
 
@@ -70,15 +75,121 @@ export function AccountProfile() {
         }
     };
 
+    const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            // Validate file type - only png, jpg, jpeg
+            const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+            if (!allowedTypes.includes(file.type)) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Invalid file type',
+                    description: 'Please select a PNG, JPG, or JPEG image.',
+                });
+                return;
+            }
+
+            // Validate file size (max 1MB as per bucket settings)
+            if (file.size > 1024 * 1024) {
+                toast({
+                    variant: 'destructive',
+                    title: 'File too large',
+                    description: 'Please select an image smaller than 1MB.',
+                });
+                return;
+            }
+
+            setAvatarFile(file);
+
+            // Create preview URL
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
+    };
+
+    const deleteOldAvatar = async (avatarUrl: string) => {
+        try {
+            // Extract filename from URL
+            const urlParts = avatarUrl.split('/');
+            const fileName = urlParts[urlParts.length - 1];
+
+            const { error } = await supabase.storage
+                .from('avatars')
+                .remove([fileName]);
+
+            if (error) {
+                console.error('Error deleting old avatar:', error);
+            } else {
+                console.log('Old avatar deleted successfully:', fileName);
+            }
+        } catch (error) {
+            console.error('Error deleting old avatar:', error);
+        }
+    };
+
+    const uploadAvatar = async () => {
+        if (!avatarFile || !account) return null;
+
+        setUploadingAvatar(true);
+        try {
+            // Delete old avatar if exists
+            if (account.avatar_url) {
+                await deleteOldAvatar(account.avatar_url);
+            }
+
+            const fileExt = avatarFile.name.split('.').pop();
+            const fileName = `avatar-${account.id}-${Date.now()}.${fileExt}`;
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, avatarFile, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (uploadError) {
+                console.error('Upload error:', uploadError);
+                throw uploadError;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(fileName);
+
+            return publicUrl;
+        } catch (error) {
+            console.error('Error uploading avatar:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Upload failed',
+                description: 'Failed to upload avatar. Please try again.',
+            });
+            return null;
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
+
     const handleSave = async () => {
         if (!account) return;
 
         setUpdating(true);
         try {
+            let avatarUrl = editedAccount.avatar_url;
+
+            // Upload new avatar if one was selected
+            if (avatarFile) {
+                const newAvatarUrl = await uploadAvatar();
+                if (newAvatarUrl) {
+                    avatarUrl = newAvatarUrl;
+                }
+            }
+
             const { error } = await supabase
                 .from('accounts')
                 .update({
                     full_name: editedAccount.full_name,
+                    avatar_url: avatarUrl,
                     updated_at: new Date().toISOString(),
                 })
                 .eq('id', account.id);
@@ -90,8 +201,12 @@ export function AccountProfile() {
                     description: 'Failed to update profile.',
                 });
             } else {
-                setAccount({ ...account, ...editedAccount });
+                const updatedAccount = { ...account, ...editedAccount, avatar_url: avatarUrl || null };
+                setAccount(updatedAccount);
+                setEditedAccount(updatedAccount);
                 setIsEditing(false);
+                setAvatarFile(null);
+                setPreviewUrl(null);
                 toast({
                     title: 'Success',
                     description: 'Profile updated successfully.',
@@ -104,9 +219,58 @@ export function AccountProfile() {
         }
     };
 
+    const handleDeleteAvatar = async () => {
+        if (!account?.avatar_url) return;
+
+        setUpdating(true);
+        try {
+            // Delete from storage
+            await deleteOldAvatar(account.avatar_url);
+
+            // Update database to remove avatar_url
+            const { error } = await supabase
+                .from('accounts')
+                .update({
+                    avatar_url: null,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('id', account.id);
+
+            if (error) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: 'Failed to delete avatar.',
+                });
+            } else {
+                const updatedAccount = { ...account, avatar_url: null };
+                setAccount(updatedAccount);
+                setEditedAccount(updatedAccount);
+                toast({
+                    title: 'Success',
+                    description: 'Avatar deleted successfully.',
+                });
+            }
+        } catch (error) {
+            console.error('Error deleting avatar:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Failed to delete avatar.',
+            });
+        } finally {
+            setUpdating(false);
+        }
+    };
+
     const handleCancel = () => {
         setEditedAccount(account || {});
         setIsEditing(false);
+        setAvatarFile(null);
+        setPreviewUrl(null);
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
     };
 
     const getPlanColor = (plan: string) => {
@@ -115,6 +279,12 @@ export function AccountProfile() {
             case 'pro': return 'bg-blue-600';
             case 'enterprise': return 'bg-purple-600';
             default: return 'bg-gray-600';
+        }
+    };
+
+    const handleAvatarClick = () => {
+        if (account?.provider === 'email' && isEditing) {
+            fileInputRef.current?.click();
         }
     };
 
@@ -140,26 +310,51 @@ export function AccountProfile() {
         );
     }
 
+    const displayAvatarUrl = previewUrl || (account.avatar_url ? `${account.avatar_url}?t=${Date.now()}` : account.avatar_url);
+    const canEditAvatar = account.provider === 'email';
+
     return (
         <div className="space-y-6">
             {/* Profile Header */}
             <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16">
-                    <AvatarImage
-                        src={account.avatar_url ?? undefined}
-                        alt={account.full_name ?? ''}
+                <div className="relative">
+                    <Avatar
+                        className={`h-16 w-16 ${canEditAvatar && isEditing ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+                        onClick={handleAvatarClick}
+                    >
+                        <AvatarImage
+                            src={displayAvatarUrl ?? undefined}
+                            alt={account.full_name ?? ''}
+                        />
+                        <AvatarFallback className="text-lg">
+                            {account.full_name?.[0]?.toUpperCase() ?? account.billing_email?.[0]?.toUpperCase() ?? 'U'}
+                        </AvatarFallback>
+                    </Avatar>
+
+                    {canEditAvatar && isEditing && (
+                        <div
+                            className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                            onClick={handleAvatarClick}
+                        >
+                            <IconCamera className="h-4 w-4 text-white" />
+                        </div>
+                    )}
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/png,image/jpg,image/jpeg"
+                        onChange={handleAvatarFileChange}
+                        className="hidden"
                     />
-                    <AvatarFallback className="text-lg">
-                        {account.full_name?.[0]?.toUpperCase() ?? account.billing_email?.[0]?.toUpperCase() ?? 'U'}
-                    </AvatarFallback>
-                </Avatar>
+                </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                         <h2 className="text-xl font-semibold">{account.full_name || 'Anonymous User'}</h2>
                         <Badge variant="secondary" className="text-xs">
                             {account.provider === 'email' ? 'Email' : `OAuth (${account.provider})`}
                         </Badge>
-                        {account.avatar_url && (
+                        {displayAvatarUrl && (
                             <Badge variant="default" className="text-xs bg-emerald-600">
                                 <IconCheck className="h-3 w-3 mr-1" />
                                 Avatar
@@ -176,6 +371,34 @@ export function AccountProfile() {
                             {account.emails_left} emails left
                         </span>
                     </div>
+                    {canEditAvatar && (
+                        <p className="text-xs text-neutral-400 mt-1">
+                            {isEditing ? 'Click avatar to upload new photo (PNG/JPG/JPEG, max 1MB)' : 'Click Edit to change avatar'}
+                        </p>
+                    )}
+                    {canEditAvatar && isEditing && (
+                        <div className="flex gap-2 mt-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <IconCamera className="h-3 w-3 mr-1" />
+                                Upload Photo
+                            </Button>
+                            {account.avatar_url && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={handleDeleteAvatar}
+                                    disabled={updating}
+                                >
+                                    <IconX className="h-3 w-3 mr-1" />
+                                    Remove
+                                </Button>
+                            )}
+                        </div>
+                    )}
                 </div>
                 {!isEditing && (
                     <Button
@@ -189,97 +412,144 @@ export function AccountProfile() {
                 )}
             </div>
 
-            {/* Profile Form */}
-            <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="full_name">Full Name</Label>
-                        <Input
-                            id="full_name"
-                            value={isEditing ? editedAccount.full_name || '' : account.full_name || ''}
-                            onChange={(e) => setEditedAccount({ ...editedAccount, full_name: e.target.value })}
-                            disabled={!isEditing}
-                        />
-                    </div>
+            {/* Profile Information Card */}
+            <Card className="border-0 bg-neutral-900/50">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-lg">Profile Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-0">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="full_name">Full Name</Label>
+                            <Input
+                                id="full_name"
+                                value={isEditing ? editedAccount.full_name || '' : account.full_name || ''}
+                                onChange={(e) => setEditedAccount({ ...editedAccount, full_name: e.target.value })}
+                                disabled={!isEditing}
+                            />
+                        </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input
-                            id="email"
-                            value={account.billing_email || ''}
-                            disabled
-                            className="bg-neutral-800/50"
-                        />
-                        <p className="text-xs text-neutral-400">
-                            Email cannot be changed. Contact support if needed.
-                        </p>
-                    </div>
-                </div>
-
-                {account.avatar_url && (
-                    <div className="space-y-2">
-                        <Label>Profile Avatar</Label>
-                        <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-md">
-                            <Avatar className="h-8 w-8">
-                                <AvatarImage src={account.avatar_url} />
-                                <AvatarFallback>
-                                    {account.full_name?.[0]?.toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                                <p className="text-sm">
-                                    Avatar from {account.provider === 'google' ? 'Google' : account.provider}
-                                </p>
-                                <p className="text-xs text-neutral-400">
-                                    Automatically synced from your OAuth provider
-                                </p>
-                            </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email Address</Label>
+                            <Input
+                                id="email"
+                                value={account.billing_email || ''}
+                                disabled
+                                className="bg-neutral-800/50"
+                            />
+                            <p className="text-xs text-neutral-400">
+                                Email cannot be changed. Contact support if needed.
+                            </p>
                         </div>
                     </div>
-                )}
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                        <Label className="text-neutral-400">Account Created</Label>
-                        <p>{new Date(account.created_at).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                        <Label className="text-neutral-400">Last Updated</Label>
-                        <p>{new Date(account.updated_at).toLocaleDateString()}</p>
-                    </div>
-                    <div>
-                        <Label className="text-neutral-400">Plan</Label>
-                        <p className="capitalize">{account.plan}</p>
-                    </div>
-                    <div>
-                        <Label className="text-neutral-400">Role</Label>
-                        <p className="capitalize">{account.role}</p>
-                    </div>
-                </div>
+                    {/* Avatar Upload Section for Email Users */}
+                    {canEditAvatar && isEditing && avatarFile && (
+                        <div className="space-y-2">
+                            <Label>Selected Avatar</Label>
+                            <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-md">
+                                <Avatar className="h-8 w-8">
+                                    <AvatarImage src={previewUrl ?? undefined} />
+                                    <AvatarFallback>
+                                        {account.full_name?.[0]?.toUpperCase() ?? account.billing_email?.[0]?.toUpperCase() ?? 'U'}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <p className="text-sm">{avatarFile.name}</p>
+                                    <p className="text-xs text-neutral-400">
+                                        {(avatarFile.size / 1024).toFixed(1)} KB • Ready to upload
+                                    </p>
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        setAvatarFile(null);
+                                        setPreviewUrl(null);
+                                        if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                    }}
+                                >
+                                    <IconX className="h-3 w-3 mr-1" />
+                                    Remove
+                                </Button>
+                            </div>
+                        </div>
+                    )}
 
-                {/* Edit Actions */}
-                {isEditing && (
-                    <div className="flex gap-2 pt-4">
-                        <Button onClick={handleSave} disabled={updating}>
-                            {updating ? (
-                                <>
-                                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white"></div>
-                                    Saving...
-                                </>
-                            ) : (
-                                <>
-                                    <IconGavel className="h-4 w-4 mr-2" />
-                                    Save Changes
-                                </>
-                            )}
-                        </Button>
-                        <Button variant="outline" onClick={handleCancel} disabled={updating}>
-                            <IconX className="h-4 w-4 mr-2" />
-                            Cancel
-                        </Button>
+                    {/* OAuth Avatar Info */}
+                    {!canEditAvatar && account.avatar_url && (
+                        <div className="space-y-2">
+                            <Label>Profile Avatar</Label>
+                            <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-md">
+                                <Avatar className="h-8 w-8">
+                                    <AvatarImage src={account.avatar_url} />
+                                    <AvatarFallback>
+                                        {account.full_name?.[0]?.toUpperCase()}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <p className="text-sm">
+                                        Avatar from {account.provider === 'google' ? 'Google' : account.provider}
+                                    </p>
+                                    <p className="text-xs text-neutral-400">
+                                        Automatically synced from your OAuth provider
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Edit Actions */}
+                    {isEditing && (
+                        <div className="flex gap-2 pt-4">
+                            <Button onClick={handleSave} disabled={updating || uploadingAvatar}>
+                                {updating || uploadingAvatar ? (
+                                    <>
+                                        <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white"></div>
+                                        {uploadingAvatar ? 'Uploading...' : 'Saving...'}
+                                    </>
+                                ) : (
+                                    <>
+                                        <IconDeviceFloppy className="h-4 w-4 mr-2" />
+                                        Save Changes
+                                    </>
+                                )}
+                            </Button>
+                            <Button variant="outline" onClick={handleCancel} disabled={updating || uploadingAvatar}>
+                                <IconX className="h-4 w-4 mr-2" />
+                                Cancel
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Account Information Card */}
+            <Card className="border-0 bg-neutral-900/50">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-lg">Account Information</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                            <Label className="text-neutral-400">Account Created</Label>
+                            <p>{new Date(account.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                            <Label className="text-neutral-400">Last Updated</Label>
+                            <p>{new Date(account.updated_at).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                            <Label className="text-neutral-400">Plan</Label>
+                            <p className="capitalize">{account.plan}</p>
+                        </div>
+                        <div>
+                            <Label className="text-neutral-400">Role</Label>
+                            <p className="capitalize">{account.role}</p>
+                        </div>
                     </div>
-                )}
-            </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
