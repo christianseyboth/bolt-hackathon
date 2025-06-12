@@ -12,23 +12,34 @@ export const tourSteps = [
         placement: 'bottom'
     },
     {
-        target: '[data-tour="email-forwarding"]',
-        title: '📧 Email Forwarding Setup',
-        content: 'The most important step! Set up email forwarding to start analyzing threats. Click Next to go to the detailed setup page.',
+        target: '[data-tour="team-setup"]',
+        title: '👥 Team Email Setup',
+        content: 'Add the email addresses that will be sending emails for analysis. This is crucial for monitoring threats from your team members.',
         placement: 'left',
         action: () => {
             // Preserve tour state before navigation
             localStorage.setItem('tour-current-step', '3');
             localStorage.setItem('tour-navigating', 'true');
-            // Navigate to profile email tab
+            // Navigate to team page
+            window.location.href = '/dashboard/team';
+        }
+    },
+    {
+        target: '[data-tour="add-team-member"]',
+        title: '📧 Add Team Member',
+        content: 'Add email addresses of team members who will be sending emails for security analysis. Each email added here will be monitored for threats. Click Next to proceed to email forwarding setup.',
+        placement: 'top',
+        action: () => {
+            localStorage.setItem('tour-current-step', '4');
+            localStorage.setItem('tour-navigating', 'true');
             window.location.href = '/dashboard/profile?tab=email';
         }
     },
     {
-        target: '[data-tour="email-setup-detailed"]',
-        title: '⚙️ Detailed Email Setup',
-        content: 'Here you can configure your email forwarding settings in detail.',
-        placement: 'bottom'
+        target: '[data-tour="email-forwarding"]',
+        title: '📧 Email Forwarding Setup',
+        content: 'The most important step! Set up email forwarding to start analyzing threats. This is where you get your unique forwarding address.',
+        placement: 'top'
     },
     {
         target: '[data-tour="threat-alerts"]',
@@ -37,7 +48,7 @@ export const tourSteps = [
         placement: 'bottom',
         action: () => {
             // Preserve tour state before navigation to emails page
-            localStorage.setItem('tour-current-step', '5');
+            localStorage.setItem('tour-current-step', '6');
             localStorage.setItem('tour-navigating', 'true');
             // Navigate to emails page
             window.location.href = '/dashboard/emails';

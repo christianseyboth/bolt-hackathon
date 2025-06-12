@@ -137,7 +137,7 @@ export function TeamManagement({
             </Card>
 
             {/* Add Member */}
-            <Card className='border-neutral-800 bg-neutral-900'>
+            <Card className='border-neutral-800 bg-neutral-900' data-tour="add-team-member">
                 <CardHeader>
                     <CardTitle className='text-lg'>Add Team Member</CardTitle>
                     <CardDescription>

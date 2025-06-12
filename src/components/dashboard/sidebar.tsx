@@ -76,6 +76,7 @@ export function Sidebar({ className }: SidebarProps) {
                     href='/dashboard/team'
                     icon={<IconUsers className='h-5 w-5' />}
                     isActive={pathname === '/dashboard/team'}
+                    data-tour="team-setup"
                 >
                     Team
                 </SidebarItem>
@@ -107,9 +108,10 @@ interface SidebarItemProps {
     icon: React.ReactNode;
     children: React.ReactNode;
     isActive?: boolean;
+    'data-tour'?: string;
 }
 
-function SidebarItem({ href, icon, children, isActive }: SidebarItemProps) {
+function SidebarItem({ href, icon, children, isActive, 'data-tour': dataTour }: SidebarItemProps) {
     return (
         <Link
             href={href}
@@ -119,6 +121,7 @@ function SidebarItem({ href, icon, children, isActive }: SidebarItemProps) {
                     ? 'bg-neutral-900 text-white'
                     : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
             )}
+            data-tour={dataTour}
         >
             {icon}
             <span>{children}</span>

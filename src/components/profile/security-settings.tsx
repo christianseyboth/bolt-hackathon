@@ -63,6 +63,7 @@ export function SecuritySettings() {
     const [showPasswordChange, setShowPasswordChange] = useState(false);
     const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
     const [mfaSecret, setMfaSecret] = useState<string>('');
+    const [factorId, setFactorId] = useState<string>('');
     const [verificationCode, setVerificationCode] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -123,6 +124,7 @@ export function SecuritySettings() {
 
             if (data) {
                 setMfaSecret(data.totp.secret);
+                setFactorId(data.id); // Store the factor ID
                 // Generate QR code
                 const qrUrl = await QRCode.toDataURL(data.totp.uri);
                 setQrCodeUrl(qrUrl);
@@ -150,9 +152,27 @@ export function SecuritySettings() {
             return;
         }
 
+        if (!factorId) {
+            toast({
+                title: 'Error',
+                description: 'Factor ID not found. Please restart the setup process.',
+                variant: 'destructive',
+            });
+            return;
+        }
+
         try {
-            const { data, error } = await supabase.auth.mfa.challengeAndVerify({
-                factorId: 'pending', // Use the pending factor
+            // First create a challenge for the factor
+            const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+                factorId: factorId,
+            });
+
+            if (challengeError) throw challengeError;
+
+            // Then verify the challenge with the code
+            const { data, error } = await supabase.auth.mfa.verify({
+                factorId: factorId,
+                challengeId: challengeData.id,
                 code: verificationCode,
             });
 
@@ -165,6 +185,9 @@ export function SecuritySettings() {
 
             setShowMfaSetup(false);
             setVerificationCode('');
+            setFactorId('');
+            setMfaSecret('');
+            setQrCodeUrl('');
             await fetchUserSecurityInfo();
         } catch (error) {
             console.error('Error verifying MFA:', error);

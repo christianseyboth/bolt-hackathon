@@ -38,9 +38,15 @@ export const CustomTour = () => {
         // Additional safety check
         if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-        // Even longer delay to ensure DOM is completely ready
-        const timer = setTimeout(() => {
+        // Dynamic delay based on step type - longer for navigation steps
+        const isNavigationStep = tourSteps[currentStep].action !== undefined;
+        const isEmailForwardingStep = tourSteps[currentStep].target === '[data-tour="email-forwarding"]';
+        const delay = isEmailForwardingStep ? 1500 : (isNavigationStep ? 1000 : 300); // Extra long for email forwarding
+
+                const findAndHighlightElement = (retryCount = 0) => {
             const element = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
+
+            console.log(`Tour step ${currentStep}: Looking for ${tourSteps[currentStep].target}, found:`, !!element, `(retry ${retryCount})`);
 
             // Only proceed if element exists and we're still mounted
             if (element && isMounted && isHydrated) {
@@ -64,8 +70,15 @@ export const CustomTour = () => {
                         }
                     }
                 });
+            } else if (retryCount < (isEmailForwardingStep ? 5 : 3) && isMounted && isHydrated) {
+                // Retry more times for email forwarding step, regular retry for others
+                setTimeout(() => findAndHighlightElement(retryCount + 1), 500 * (retryCount + 1));
             }
-        }, 300); // Increased delay
+        };
+
+        const timer = setTimeout(() => {
+            findAndHighlightElement();
+        }, delay); // Dynamic delay based on step type
 
         return () => {
             clearTimeout(timer);
@@ -97,7 +110,7 @@ export const CustomTour = () => {
             setTargetElement(null);
         }
 
-        // Execute action if it exists
+                // Execute action if it exists
         if (currentStepData.action) {
             currentStepData.action();
             return;

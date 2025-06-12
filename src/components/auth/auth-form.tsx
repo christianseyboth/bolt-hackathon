@@ -47,15 +47,53 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         });
     };
 
-    // Handle form submission for login/register
+        // Handle form submission for login/register
     const handleSubmit = async (formData: FormData) => {
         setFormError(null);
+
+        // For login mode, don't use startTransition to allow redirects to work
+        if (isLoginMode) {
+            try {
+                const result = await signIn(formData);
+                if (result?.error) {
+                    setFormError(result.error);
+                }
+                // If we get here without redirect, login was successful
+            } catch (error) {
+                console.error('Form submission error:', error);
+                console.log('Error details:', {
+                    error,
+                    errorType: typeof error,
+                    errorString: String(error),
+                    errorMessage: error instanceof Error ? error.message : 'Unknown',
+                    hasDigest: error && typeof error === 'object' && 'digest' in error,
+                    digest: error && typeof error === 'object' && 'digest' in error ? error.digest : null
+                });
+
+                // Check if this is a redirect error (which is expected for MFA)
+                const errorString = String(error);
+                const isRedirect = (
+                    (error && typeof error === 'object' && 'digest' in error &&
+                     typeof error.digest === 'string' && error.digest.includes('NEXT_REDIRECT')) ||
+                    errorString.includes('NEXT_REDIRECT') ||
+                    errorString.includes('redirect')
+                );
+
+                if (isRedirect) {
+                    // This is a redirect, which is expected for MFA - re-throw to allow redirect
+                    console.log('Redirect detected (likely MFA challenge), re-throwing to allow redirect');
+                    throw error;
+                }
+                setFormError('An unexpected error occurred. Please try again.');
+            }
+            return;
+        }
+
+        // For other modes (register, reset), use startTransition
         startTransition(async () => {
             try {
                 let result;
-                if (isLoginMode) {
-                    result = await signIn(formData);
-                } else if (isRegisterMode) {
+                if (isRegisterMode) {
                     // Validate password match on client side first
                     const password = formData.get('password') as string;
                     const confirmPassword = formData.get('confirmPassword') as string;
@@ -78,11 +116,6 @@ export function AuthForm({ mode, className }: AuthFormProps) {
 
                 if (result?.error) {
                     setFormError(result.error);
-                } else {
-                    toast({
-                        title: isLoginMode ? 'Login successful' : 'Registration successful',
-                        description: isLoginMode ? 'Welcome back!' : 'Your account has been created.',
-                    });
                 }
             } catch (error) {
                 console.error('Form submission error:', error);

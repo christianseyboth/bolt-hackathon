@@ -20,6 +20,22 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { useAccount } from '@/hooks/useAccount';
 
+// Validate Supabase configuration
+const validateSupabaseConfig = () => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !anonKey) {
+        console.error('Supabase configuration missing:', {
+            hasUrl: !!url,
+            hasAnonKey: !!anonKey
+        });
+        return false;
+    }
+
+    return true;
+};
+
 interface MailEvent {
     id: string;
     subject: string | null;
@@ -48,6 +64,13 @@ export const NotificationBell = () => {
     const { accountId } = useAccount();
     const router = useRouter();
 
+    // Validate Supabase configuration on component mount
+    React.useEffect(() => {
+        if (!validateSupabaseConfig()) {
+            console.error('NotificationBell: Supabase configuration is invalid');
+        }
+    }, []);
+
     useEffect(() => {
         if (!accountId) return; // Wait for accountId to be available
 
@@ -66,12 +89,29 @@ export const NotificationBell = () => {
                     filter: `account_id=eq.${accountId}`, // Filter by account_id
                 },
                 (payload) => {
-                    console.log('New mail event:', payload);
-                    handleNewMailEvent(payload.new as MailEvent);
+                    try {
+                        console.log('New mail event:', payload);
+                        if (payload.new) {
+                            handleNewMailEvent(payload.new as MailEvent);
+                        }
+                    } catch (error) {
+                        console.error('Error handling new mail event:', {
+                            error: error instanceof Error ? error.message : error,
+                            payload,
+                            accountId
+                        });
+                    }
                 }
             )
-            .subscribe((status) => {
+            .subscribe((status, error) => {
                 console.log('Subscription status:', status);
+                if (error) {
+                    console.error('Subscription error:', {
+                        error: error.message || error,
+                        status,
+                        accountId
+                    });
+                }
             });
 
         return () => {
@@ -81,7 +121,24 @@ export const NotificationBell = () => {
     }, [accountId]); // Add accountId as dependency
 
     const loadNotifications = async () => {
+        // Don't attempt to load if accountId is not available
+        if (!accountId) {
+            console.warn('loadNotifications called without accountId');
+            return;
+        }
+
+        // Debug the accountId value
+        console.log('Loading notifications - accountId type:', typeof accountId, 'value:', accountId);
+
+        // Check if accountId looks like a UUID
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(accountId)) {
+            console.error('Invalid accountId format - expected UUID but got:', accountId);
+            return;
+        }
+
         try {
+
             const { data: mailEvents, error } = await supabase
                 .from('mail_events')
                 .select('*')
@@ -90,15 +147,21 @@ export const NotificationBell = () => {
                 .limit(10);
 
             if (error) {
-                console.error('Supabase error:', error);
+                console.error('Supabase error loading notifications:',
+                    error?.message || error?.toString() || 'Unknown error',
+                    { accountId, errorCode: error?.code }
+                );
                 return;
             }
 
             if (!mailEvents) {
+                console.log('No mail events found for account:', accountId);
                 setNotifications([]);
                 setUnreadCount(0);
                 return;
             }
+
+            console.log(`Loaded ${mailEvents.length} mail events for account:`, accountId);
 
             const notifications = mailEvents
                 .filter(event => event && event.id)
@@ -108,7 +171,11 @@ export const NotificationBell = () => {
             setNotifications(notifications);
             setUnreadCount(notifications.filter(n => !n.is_read).length);
         } catch (error) {
-            console.error('Error loading notifications:', error);
+            console.error('Error loading notifications:', {
+                error: error instanceof Error ? error.message : error,
+                stack: error instanceof Error ? error.stack : undefined,
+                accountId
+            });
             setNotifications([]);
             setUnreadCount(0);
         }
@@ -162,10 +229,18 @@ export const NotificationBell = () => {
     const markAsRead = async (notificationId: string) => {
         try {
             // Update in database
-            await supabase
+            const { error } = await supabase
                 .from('mail_events')
                 .update({ is_read: true })
                 .eq('id', notificationId);
+
+            if (error) {
+                console.error('Supabase error marking notification as read:',
+                    error?.message || error?.toString() || 'Unknown error',
+                    { notificationId, errorCode: error?.code }
+                );
+                return;
+            }
 
             // Update local state
             setNotifications(prev =>
@@ -175,11 +250,20 @@ export const NotificationBell = () => {
             );
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (error) {
-            console.error('Error marking notification as read:', error);
+            console.error('Error marking notification as read:', {
+                error: error instanceof Error ? error.message : error,
+                stack: error instanceof Error ? error.stack : undefined,
+                notificationId
+            });
         }
     };
 
     const markAllAsRead = async () => {
+        if (!accountId) {
+            console.warn('markAllAsRead called without accountId');
+            return;
+        }
+
         try {
             const { data, error } = await supabase
                 .from('mail_events')
@@ -188,15 +272,23 @@ export const NotificationBell = () => {
                 .select('id, is_read');
 
             if (error) {
-                console.error('Database update error:', error);
+                console.error('Supabase error marking all notifications as read:',
+                    error?.message || error?.toString() || 'Unknown error',
+                    { accountId, errorCode: error?.code }
+                );
                 return;
             }
 
             if (data && data.length > 0) {
+                console.log(`Marked ${data.length} notifications as read for account:`, accountId);
                 await loadNotifications();
             }
         } catch (error) {
-            console.error('Error marking all as read:', error);
+            console.error('Error marking all as read:', {
+                error: error instanceof Error ? error.message : error,
+                stack: error instanceof Error ? error.stack : undefined,
+                accountId
+            });
         }
     };
 

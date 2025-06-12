@@ -78,12 +78,13 @@ export const Hero = () => {
                 >
                     <Card rotate={rotate} translate={translate} scale={scale}>
                         <Image
-                            src={`/dashboard.png`}
+                            src={`/hero-screenshot.png`}
                             alt='hero'
                             height={720}
                             width={1400}
                             className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full  md:object-left-top'
                             draggable={false}
+                            loading='lazy' 
                         />
                     </Card>
                 </div>

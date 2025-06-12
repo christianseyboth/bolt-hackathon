@@ -19,29 +19,59 @@ export const useTour = () => {
         // Delay mounting to ensure hydration is complete
         const timer = setTimeout(() => {
             setIsMounted(true);
-
-            // Only check localStorage after mounting (client-side)
-            if (typeof window !== 'undefined') {
-                const completed = localStorage.getItem('tour-completed');
-                const isFirstLogin = localStorage.getItem('first-login');
-                const isNavigating = localStorage.getItem('tour-navigating');
-                const savedStep = localStorage.getItem('tour-current-step');
-
-                if (!completed) {
-                    if (isNavigating === 'true' && savedStep) {
-                        setIsActive(true);
-                        setCurrentStep(parseInt(savedStep));
-                        localStorage.removeItem('tour-navigating');
-                    } else if (isFirstLogin === 'true') {
-                        setIsActive(true);
-                        setCurrentStep(0);
-                    }
-                }
-            }
+            checkTourStatus();
         }, 100);
 
         return () => clearTimeout(timer);
     }, []);
+
+    // Function to check tour status
+    const checkTourStatus = () => {
+        if (typeof window !== 'undefined') {
+            const completed = localStorage.getItem('tour-completed');
+            const isFirstLogin = localStorage.getItem('first-login');
+            const isNavigating = localStorage.getItem('tour-navigating');
+            const savedStep = localStorage.getItem('tour-current-step');
+
+            console.log('useTour - checkTourStatus called with:', {
+                completed,
+                isFirstLogin,
+                isNavigating,
+                savedStep
+            });
+
+            if (!completed) {
+                if (isNavigating === 'true' && savedStep) {
+                    console.log('🔄 Resuming tour from navigation to step:', savedStep);
+                    setIsActive(true);
+                    setCurrentStep(parseInt(savedStep));
+                    localStorage.removeItem('tour-navigating');
+                    localStorage.removeItem('tour-current-step');
+                } else if (isFirstLogin === 'true') {
+                    console.log('🚀 First login detected, starting tour');
+                    setIsActive(true);
+                    setCurrentStep(0);
+                }
+            } else {
+                console.log('❌ Tour already completed, not starting');
+            }
+        }
+    };
+
+    // Listen for storage events to detect when first-login flag is set
+    useEffect(() => {
+        if (!isMounted) return;
+
+        const handleStorageChange = () => {
+            checkTourStatus();
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, [isMounted]);
 
     const startTour = () => {
         if (!isMounted) return;

@@ -178,8 +178,8 @@ export default function ProfilePage() {
                     </TabsContent>
 
                     {/* Email Tab */}
-                    <TabsContent value="email" className="space-y-6" data-tour="email-setup-detailed">
-                        <Card className="border border-neutral-800 bg-neutral-900">
+                    <TabsContent value="email" className="space-y-6">
+                        <Card className="border border-neutral-800 bg-neutral-900" data-tour="email-forwarding">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <IconMail className="h-5 w-5" />
