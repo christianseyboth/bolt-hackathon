@@ -13,6 +13,7 @@ import {
     IconSettings,
     IconLogout,
     IconDeviceLaptop,
+    IconFileText,
 } from '@tabler/icons-react';
 import { useToast } from '@/components/ui/use-toast';
 import { signOut } from '@/app/auth/actions';
@@ -84,6 +85,15 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
                     onNavigate={onNavigate}
                 >
                     Team
+                </SidebarItem>
+
+                <SidebarItem
+                    href='/dashboard/reports'
+                    icon={<IconFileText className='h-5 w-5' />}
+                    isActive={pathname === '/dashboard/reports'}
+                    onNavigate={onNavigate}
+                >
+                    Reports
                 </SidebarItem>
             </nav>
 
