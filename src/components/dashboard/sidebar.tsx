@@ -19,9 +19,10 @@ import { signOut } from '@/app/auth/actions';
 
 interface SidebarProps {
     className?: string;
+    onNavigate?: () => void;
 }
 
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({ className, onNavigate }: SidebarProps) {
     const pathname = usePathname();
     const { toast } = useToast();
 
@@ -49,6 +50,7 @@ export function Sidebar({ className }: SidebarProps) {
                     href='/dashboard'
                     icon={<IconDashboard className='h-5 w-5' />}
                     isActive={pathname === '/dashboard'}
+                    onNavigate={onNavigate}
                 >
                     Dashboard
                 </SidebarItem>
@@ -60,6 +62,7 @@ export function Sidebar({ className }: SidebarProps) {
                         pathname === '/dashboard/emails' ||
                         pathname.startsWith('/dashboard/emails/')
                     }
+                    onNavigate={onNavigate}
                 >
                     Email Analysis
                 </SidebarItem>
@@ -68,6 +71,7 @@ export function Sidebar({ className }: SidebarProps) {
                     href='/dashboard/security-analytics'
                     icon={<IconShieldCheck className='h-5 w-5' />}
                     isActive={pathname === '/dashboard/security-analytics'}
+                    onNavigate={onNavigate}
                 >
                     Security Analytics
                 </SidebarItem>
@@ -77,6 +81,7 @@ export function Sidebar({ className }: SidebarProps) {
                     icon={<IconUsers className='h-5 w-5' />}
                     isActive={pathname === '/dashboard/team'}
                     data-tour="team-setup"
+                    onNavigate={onNavigate}
                 >
                     Team
                 </SidebarItem>
@@ -84,9 +89,10 @@ export function Sidebar({ className }: SidebarProps) {
 
             <div className='space-y-1 pt-6 mt-6 border-t border-neutral-800'>
                 <SidebarItem
-                    href='/dashboard/settings'
+                    href='/dashboard/profile'
                     icon={<IconSettings className='h-5 w-5' />}
-                    isActive={pathname === '/dashboard/settings'}
+                    isActive={pathname === '/dashboard/profile'}
+                    onNavigate={onNavigate}
                 >
                     Settings
                 </SidebarItem>
@@ -109,9 +115,10 @@ interface SidebarItemProps {
     children: React.ReactNode;
     isActive?: boolean;
     'data-tour'?: string;
+    onNavigate?: () => void;
 }
 
-function SidebarItem({ href, icon, children, isActive, 'data-tour': dataTour }: SidebarItemProps) {
+function SidebarItem({ href, icon, children, isActive, 'data-tour': dataTour, onNavigate }: SidebarItemProps) {
     return (
         <Link
             href={href}
@@ -122,6 +129,11 @@ function SidebarItem({ href, icon, children, isActive, 'data-tour': dataTour }: 
                     : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
             )}
             data-tour={dataTour}
+            onClick={() => {
+                if (onNavigate) {
+                    onNavigate();
+                }
+            }}
         >
             {icon}
             <span>{children}</span>

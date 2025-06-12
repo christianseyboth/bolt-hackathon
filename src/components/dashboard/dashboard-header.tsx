@@ -9,7 +9,6 @@ interface DashboardHeaderProps {
     subheading?: string;
     className?: string;
     children?: React.ReactNode;
-    user: any;
 }
 
 export function DashboardHeader({
@@ -17,22 +16,21 @@ export function DashboardHeader({
     subheading,
     className,
     children,
-    user,
 }: DashboardHeaderProps) {
     return (
         <div
             className={cn(
-                'flex flex-col md:flex-row justify-between items-start md:items-center mt-2',
+                'flex flex-col [@media(min-width:1025px)]:flex-row justify-between items-start [@media(min-width:1025px)]:items-center mt-2',
                 className
             )}
         >
             <div>
-                <h1 className='text-2xl md:text-3xl font-bold'>{heading}</h1>
+                <h1 className='text-2xl [@media(min-width:1025px)]:text-3xl font-bold'>{heading}</h1>
                 {subheading && <p className='text-neutral-400 text-sm mt-1'>{subheading}</p>}
             </div>
-            <div className='flex items-center mt-4 md:mt-0 space-x-2'>
+            <div className='hidden [@media(min-width:1025px)]:flex items-center mt-4 [@media(min-width:1025px)]:mt-0 space-x-2'>
                 <NotificationBell />
-                <AvatarMenu user={user} />
+                <AvatarMenu />
             </div>
             {children}
         </div>

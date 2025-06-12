@@ -90,110 +90,139 @@ export function EmailList({ emails }: any) {
     };
 
     return (
-        <Card className='border-neutral-800 bg-neutral-900'>
-            <CardHeader className='space-y-4 pb-4'>
-                <CardTitle className='text-xl'>Email Analysis</CardTitle>
-                {/* FILTERBAR */}
-                <EmailFilterBar
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    dateRange={dateRange}
-                    setDateRange={setDateRange}
-                    datePreset={datePreset}
-                    setDatePreset={setDatePreset}
-                    category={category}
-                    setCategory={setCategory}
-                    threatLevel={threatLevel}
-                    setThreatLevel={setThreatLevel}
-                />
-            </CardHeader>
-            <CardContent>
-                <div className='rounded-md border border-neutral-800'>
-                    {/* TABLE HEADER */}
-                    <div className='bg-neutral-800/50 px-4 py-2 text-xs font-medium grid grid-cols-14 gap-4'>
-                        <div className='col-span-1'>Category</div>
-                        <div className='col-span-2'>Sender</div>
-                        <div className='col-span-2'>Recipient</div>
-                        <div className='hidden md:block md:col-span-4'>Subject</div>
-                        <div className='col-span-2'>Received</div>
-                        <div className='col-span-2 text-right'>Threat Level</div>
-                    </div>
+        <div className='flex flex-col gap-4'>
+            <Card className='border-neutral-800 bg-neutral-900'>
+                <CardHeader className='space-y-4 pb-4'>
+                    <CardTitle className='text-xl'>Email Analysis</CardTitle>
+                    <EmailFilterBar
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                        dateRange={dateRange}
+                        setDateRange={setDateRange}
+                        datePreset={datePreset}
+                        setDatePreset={setDatePreset}
+                        category={category}
+                        setCategory={setCategory}
+                        threatLevel={threatLevel}
+                        setThreatLevel={setThreatLevel}
+                    />
+                </CardHeader>
+            </Card>
 
-                    <div className='divide-y divide-neutral-800'>
-                        {paginatedEmails.length > 0 ? (
-                            paginatedEmails.map((email: any) => (
-                                <Link key={email.id} href={`emails/${email.id}`} className='block'>
-                                    <div className='px-4 py-3 grid grid-cols-14 gap-4 hover:bg-neutral-800/50 transition-colors cursor-pointer'>
-                                        <div className='col-span-1 flex items-center'>
-                                            <CategoryBadge category={email.category} />
-                                        </div>
-                                        <div className='col-span-2 flex flex-col'>
-                                            <span className='text-sm font-medium truncate'>
-                                                {email.sender_email}
-                                            </span>
-                                        </div>
-                                        <div className='col-span-2 flex flex-col'>
-                                            <span className='text-xs text-neutral-400 truncate '>
-                                                {email.from_email}
-                                            </span>
-                                        </div>
-                                        <div className='hidden md:block md:col-span-4'>
+            <div className='border rounded-lg border-neutral-800 bg-neutral-900'>
+                <div className='overflow-x-auto relative'>
+                    <table className='w-full min-w-[800px] border-collapse'>
+                        <thead className='bg-neutral-800/50'>
+                            <tr className='text-xs font-medium'>
+                                <th className='w-[8%] p-4 text-left'>Category</th>
+                                <th className='w-[15%] p-4 text-left'>Sender</th>
+                                <th className='w-[15%] p-4 text-left'>Recipient</th>
+                                <th className='w-[32%] p-4 text-left'>Subject</th>
+                                <th className='w-[15%] p-4 text-left'>Received</th>
+                                <th className='w-[15%] p-4 text-right'>Threat Level</th>
+                            </tr>
+                        </thead>
+                        <tbody className='divide-y divide-neutral-800'>
+                            {paginatedEmails.length > 0 ? (
+                                paginatedEmails.map((email: any) => (
+                                    <tr
+                                        key={email.id}
+                                        onClick={() => window.location.href = `emails/${email.id}`}
+                                        className='hover:bg-neutral-800/50 transition-colors cursor-pointer'
+                                    >
+                                        <td className='p-4'>
+                                            <div className='flex items-center'>
+                                                <CategoryBadge category={email.category} />
+                                            </div>
+                                        </td>
+                                        <td className='p-4'>
+                                            <div className='flex flex-col'>
+                                                <span className='text-sm font-medium truncate'>
+                                                    {email.sender_email}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className='p-4'>
+                                            <div className='flex flex-col'>
+                                                <span className='text-xs text-neutral-400 truncate'>
+                                                    {email.from_email}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className='p-4'>
                                             <span className='text-sm truncate block'>
                                                 {email.subject}
                                             </span>
-                                        </div>
-                                        <div className='col-span-2 flex items-center'>
+                                        </td>
+                                        <td className='p-4'>
                                             <span className='text-xs text-neutral-400'>
                                                 {formatDate(email.created_at)}
                                             </span>
+                                        </td>
+                                        <td className='p-4 text-right'>
+                                            <div className='flex items-center justify-end gap-2'>
+                                                <ThreatLevelBadge level={email.threat_level} />
+                                                <IconChevronRight className='h-4 w-4 text-neutral-500' />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={6}>
+                                        <div className='px-4 py-8 text-center text-neutral-400'>
+                                            Keine Emails gefunden.
                                         </div>
-                                        <div className='col-span-2 flex items-center justify-end'>
-                                            <ThreatLevelBadge level={email.threat_level} />
-                                            <IconChevronRight className='h-4 w-4 text-neutral-500 ml-2' />
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))
-                        ) : (
-                            <div className='px-4 py-8 text-center text-neutral-400'>
-                                Keine Emails gefunden.
-                            </div>
-                        )}
-                    </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                {/* PAGINATION */}
-                {totalResults > 0 && (
-                    <div className='flex justify-between items-center mt-4'>
-                        <div className='text-sm text-neutral-400'>
-                            Page <span className='font-medium text-neutral-300'>{page}</span> of{' '}
-                            <span className='font-medium text-neutral-300'>{totalPages}</span> (
-                            {totalResults} Emails)
+            {/* PAGINATION */}
+            {totalResults > 0 && (
+                <Card className='border-neutral-800 bg-neutral-900'>
+                    <CardContent>
+                        <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
+                            <div className='text-sm text-neutral-400 text-center sm:text-left'>
+                                <span className='hidden sm:inline'>
+                                    Page <span className='font-medium text-neutral-300'>{page}</span> of{' '}
+                                    <span className='font-medium text-neutral-300'>{totalPages}</span> (
+                                    {totalResults} Emails)
+                                </span>
+                                <span className='sm:hidden'>
+                                    {page}/{totalPages} ({totalResults} emails)
+                                </span>
+                            </div>
+                            <div className='flex space-x-2'>
+                                <Button
+                                    variant='simple'
+                                    size='sm'
+                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    className='text-neutral-300 border-neutral-700'
+                                >
+                                    <span className='hidden sm:inline'>Back</span>
+                                    <span className='sm:hidden'>←</span>
+                                </Button>
+                                <Button
+                                    variant='simple'
+                                    size='sm'
+                                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages || totalResults === 0}
+                                    className='text-neutral-300 border-neutral-700'
+                                >
+                                    <span className='hidden sm:inline'>Next</span>
+                                    <span className='sm:hidden'>→</span>
+                                </Button>
+                            </div>
                         </div>
-                        <div className='flex space-x-2'>
-                            <Button
-                                variant='simple'
-                                size='sm'
-                                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                disabled={page === 1}
-                                className='text-neutral-300 border-neutral-700'
-                            >
-                                Back
-                            </Button>
-                            <Button
-                                variant='simple'
-                                size='sm'
-                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                disabled={page === totalPages || totalResults === 0}
-                                className='text-neutral-300 border-neutral-700'
-                            >
-                                Next
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
+                    </CardContent>
+                </Card>
+            )}
+        </div>
     );
 }
 

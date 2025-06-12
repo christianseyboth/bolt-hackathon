@@ -35,7 +35,7 @@ export default async function SettingsPage() {
             <DashboardHeader
                 heading='Settings'
                 subheading='Manage your account settings and preferences'
-                user={user}
+
             />
             <div className='mt-8 space-y-6'>
                 <SubscriptionSettings

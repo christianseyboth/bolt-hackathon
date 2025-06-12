@@ -40,7 +40,6 @@ export default async function TeamPage() {
             <DashboardHeader
                 heading='Team Management'
                 subheading='Manage who can send emails for analysis'
-                user={user}
             />
             <div className='mt-8'>
                 <TeamManagement

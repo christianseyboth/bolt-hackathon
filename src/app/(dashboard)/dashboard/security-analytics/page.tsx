@@ -111,7 +111,7 @@ export default async function SecurityPage() {
             <DashboardHeader
                 heading='Security Analytics'
                 subheading='Comprehensive analysis of your email security posture'
-                user={user}
+
             />
 
             <div className='mt-8'>

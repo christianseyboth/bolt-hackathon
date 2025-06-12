@@ -68,7 +68,6 @@ export default function ProfilePage() {
                 <DashboardHeader
                     heading="Profile & Settings"
                     subheading="Manage your account, security, and preferences"
-                    user={user}
                 />
                 <div className="mt-6 animate-pulse">
                     <div className="h-10 bg-neutral-800 rounded mb-6"></div>
@@ -95,27 +94,29 @@ export default function ProfilePage() {
             <DashboardHeader
                 heading="Profile & Settings"
                 subheading="Manage your account, security, and preferences"
-                user={user}
             />
 
             <div className="mt-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-4 bg-neutral-800/50">
-                        <TabsTrigger value="account" className="flex items-center gap-2">
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 bg-neutral-800/50">
+                        <TabsTrigger value="account" className="flex items-center gap-1 md:gap-2">
                             <IconUser className="h-4 w-4" />
-                            Account
+                            <span className="hidden sm:inline">Account</span>
+                            <span className="sm:hidden">Acc</span>
                         </TabsTrigger>
-                        <TabsTrigger value="security" className="flex items-center gap-2">
+                        <TabsTrigger value="security" className="flex items-center gap-1 md:gap-2">
                             <IconShield className="h-4 w-4" />
-                            Security
+                            <span className="hidden sm:inline">Security</span>
+                            <span className="sm:hidden">Sec</span>
                         </TabsTrigger>
-                        <TabsTrigger value="email" className="flex items-center gap-2">
+                        <TabsTrigger value="email" className="flex items-center gap-1 md:gap-2">
                             <IconMail className="h-4 w-4" />
-                            Email
+                            <span className="hidden sm:inline">Email</span>
+                            <span className="sm:hidden">Mail</span>
                         </TabsTrigger>
-                        <TabsTrigger value="api" className="flex items-center gap-2">
+                        <TabsTrigger value="api" className="flex items-center gap-1 md:gap-2">
                             <IconKey className="h-4 w-4" />
-                            API
+                            <span>API</span>
                         </TabsTrigger>
                     </TabsList>
 

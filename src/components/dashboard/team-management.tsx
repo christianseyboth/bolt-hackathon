@@ -211,46 +211,48 @@ export function TeamManagement({
                             <p className='mt-2 text-neutral-400'>Loading team members...</p>
                         </div>
                     ) : initialMembers.length > 0 ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Note</TableHead>
-                                    <TableHead>Added On</TableHead>
-                                    <TableHead className='text-right'>Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {initialMembers.map((member) => (
-                                    <TableRow key={member.id}>
-                                        <TableCell className='font-medium'>
-                                            {member.email}
-                                        </TableCell>
-                                        <TableCell>{renderStatusBadge(member.status)}</TableCell>
-                                        <TableCell>{member.label || '-'}</TableCell>
-                                        <TableCell>
-                                            {new Date(member.created_at).toLocaleDateString()}
-                                        </TableCell>
-                                        <TableCell className='text-right space-x-1'>
-                                            <Button
-                                                type='button'
-                                                variant='ghost'
-                                                size='sm'
-                                                className='text-red-400 hover:text-red-300 hover:bg-red-950/30 h-8 w-8 p-0'
-                                                onClick={() => {
-                                                    setMemberToDelete(member);
-                                                    setShowDeleteDialog(true);
-                                                }}
-                                            >
-                                                <IconTrash className='h-4 w-4' />
-                                                <span className='sr-only'>Delete</span>
-                                            </Button>
-                                        </TableCell>
+                        <div className='overflow-x-auto'>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Email</TableHead>
+                                        <TableHead className='hidden sm:table-cell'>Status</TableHead>
+                                        <TableHead className='hidden md:table-cell'>Note</TableHead>
+                                        <TableHead className='hidden lg:table-cell'>Added On</TableHead>
+                                        <TableHead className='text-right'>Actions</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {initialMembers.map((member) => (
+                                        <TableRow key={member.id}>
+                                            <TableCell className='font-medium'>
+                                                {member.email}
+                                            </TableCell>
+                                            <TableCell className='hidden sm:table-cell'>{renderStatusBadge(member.status)}</TableCell>
+                                            <TableCell className='hidden md:table-cell'>{member.label || '-'}</TableCell>
+                                            <TableCell className='hidden lg:table-cell'>
+                                                {new Date(member.created_at).toLocaleDateString()}
+                                            </TableCell>
+                                            <TableCell className='text-right space-x-1'>
+                                                <Button
+                                                    type='button'
+                                                    variant='ghost'
+                                                    size='sm'
+                                                    className='text-red-400 hover:text-red-300 hover:bg-red-950/30 h-8 w-8 p-0'
+                                                    onClick={() => {
+                                                        setMemberToDelete(member);
+                                                        setShowDeleteDialog(true);
+                                                    }}
+                                                >
+                                                    <IconTrash className='h-4 w-4' />
+                                                    <span className='sr-only'>Delete</span>
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     ) : (
                         <div className='text-center py-6 text-neutral-400'>
                             No team members added yet. Add your first team member above.

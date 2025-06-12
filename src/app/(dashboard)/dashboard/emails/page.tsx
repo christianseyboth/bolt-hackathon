@@ -26,15 +26,14 @@ export default async function EmailsPage() {
         .eq('account_id', accountId);
 
     return (
-        <>
+        <div className='min-w-0 w-full'>
             <DashboardHeader
                 heading='Email Analysis'
                 subheading='View and manage all analyzed emails'
-                user={user}
             />
-            <div className='mt-8' data-tour="email-list">
+            <div className='mt-8 min-w-0' data-tour="email-list">
                 <EmailList emails={emails} />
             </div>
-        </>
+        </div>
     );
 }

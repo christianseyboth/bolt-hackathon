@@ -61,36 +61,45 @@ export function EmailFilterBar(props: EmailFilterBarProps) {
     } = props;
 
     return (
-        <div className='flex flex-col md:flex-row justify-between md:items-end gap-2 md:gap-4 mb-4'>
+        <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center sm:justify-between'>
             {/* Search */}
-            <div className='relative flex-1 max-w-sm'>
-                <IconSearch className='absolute left-3 top-2.5 h-4 w-4 text-neutral-400' />
-                <Input
-                    type='text'
-                    placeholder='Search for an Email...'
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className='pl-9 h-9 w-full rounded-md bg-neutral-800 border-neutral-700 text-white text-sm'
-                />
+            <div className='w-full sm:w-auto sm:min-w-[240px]'>
+                <div className='relative'>
+                    <IconSearch className='absolute left-3 top-2.5 h-4 w-4 text-neutral-400' />
+                    <Input
+                        type='text'
+                        placeholder='Search for an Email...'
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className='pl-9 h-9 w-full rounded-md bg-neutral-800 border-neutral-700 text-white text-sm'
+                    />
+                </div>
             </div>
 
-            <div className='flex align-middle gap-2'>
-                <Button
-                    variant='ghost'
-                    size='sm'
-                    className='flex items-center hover:bg-none!important'
-                >
-                    <IconFilter className='h-4 w-4' /> Filter:
-                </Button>
+            {/* Filters */}
+            <div className='flex flex-wrap items-center gap-2'>
+                <div className='hidden sm:flex items-center mr-2'>
+                    <Button
+                        variant='ghost'
+                        size='sm'
+                        className='flex items-center hover:bg-none!important'
+                    >
+                        <IconFilter className='h-4 w-4' /> Filter:
+                    </Button>
+                </div>
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant='outline' size='sm' className='flex items-center'>
-                            <IconCalendar className='h-4 w-4 mr-2' />
-                            {datePreset === 'custom'
-                                ? dateRange.from && dateRange.to
-                                    ? `${dateRange.from.toLocaleDateString()} – ${dateRange.to.toLocaleDateString()}`
-                                    : 'Custom'
-                                : DATE_RANGES.find((r) => r.key === datePreset)?.label || 'Date'}
+                        <Button variant='outline' size='sm' className='flex items-center shrink-0'>
+                            <IconCalendar className='h-4 w-4 mr-1 sm:mr-2' />
+                            <span className='hidden sm:inline'>
+                                {datePreset === 'custom'
+                                    ? dateRange.from && dateRange.to
+                                        ? `${dateRange.from.toLocaleDateString()} – ${dateRange.to.toLocaleDateString()}`
+                                        : 'Custom'
+                                    : DATE_RANGES.find((r) => r.key === datePreset)?.label || 'Date'}
+                            </span>
+                            <span className='sm:hidden'>Date</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -103,7 +112,6 @@ export function EmailFilterBar(props: EmailFilterBarProps) {
                                 {r.label}
                             </DropdownMenuItem>
                         ))}
-                        {/* DatePicker nur wenn custom */}
                         {datePreset === 'custom' && (
                             <div className='p-2'>
                                 <DateRangePicker date={dateRange} setDate={setDateRange} />
@@ -112,11 +120,11 @@ export function EmailFilterBar(props: EmailFilterBarProps) {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Kategorie-Filter */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant='outline' size='sm' className='ml-1 cursor-pointer'>
-                            Category
+                        <Button variant='outline' size='sm' className='shrink-0'>
+                            <span className='hidden sm:inline'>Category</span>
+                            <span className='sm:hidden'>Cat</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
@@ -132,11 +140,11 @@ export function EmailFilterBar(props: EmailFilterBarProps) {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Threat-Level-Filter */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant='outline' size='sm' className='ml-1 cursor-pointer'>
-                            Threat Level
+                        <Button variant='outline' size='sm' className='shrink-0'>
+                            <span className='hidden sm:inline'>Threat Level</span>
+                            <span className='sm:hidden'>Level</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>

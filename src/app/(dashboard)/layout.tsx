@@ -47,11 +47,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
     return (
         <AccountProvider accountId={account_data.id}>
             <div className='h-screen flex dark:bg-neutral-950'>
-                <Sidebar />
-                <div className='flex-1 flex flex-col h-screen'>
-                    <MobileHeader />
-                    <main className='flex-1 flex flex-col space-y-4 px-4 md:px-8 pt-4 pb-12 overflow-y-auto'>
-                        {children}
+                {/* Sidebar - Only visible above 1024px */}
+                <div className='hidden [@media(min-width:1025px)]:block flex-shrink-0'>
+                    <Sidebar />
+                </div>
+
+                <div className='flex-1 flex flex-col h-screen min-w-0'>
+                    {/* Mobile Header - Visible at 1024px and below */}
+                    <div className='[@media(min-width:1025px)]:hidden'>
+                        <MobileHeader />
+                    </div>
+
+                    <main className='flex-1 flex flex-col space-y-4 pt-4 pb-12 overflow-y-auto'>
+                        <div className='px-4 [@media(min-width:1025px)]:px-8 min-w-0'>
+                            {children}
+                        </div>
                     </main>
                     <Toaster />
                     <CustomTour />

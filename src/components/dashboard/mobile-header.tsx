@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '../ui/sheet';
 import { Button } from '../ui/button';
 import { IconDeviceLaptop, IconMenu2 } from '@tabler/icons-react';
 import { Logo } from '../logo';
@@ -17,6 +17,7 @@ import { useTransition } from 'react';
 import { signOut } from '@/app/auth/actions';
 import { useToast } from '../ui/use-toast';
 import { createClient } from '@/utils/supabase/client';
+import { NotificationBell } from '@/components/dashboard/NotificationBell';
 
 interface AccountProfile {
     id: string;
@@ -66,7 +67,7 @@ export function MobileHeader() {
     };
 
     return (
-        <div className='flex md:hidden items-center justify-between px-4 py-2 border-b border-neutral-800'>
+        <div className='flex items-center justify-between px-4 py-2 border-b border-neutral-800'>
             <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
                     <Button variant='ghost' size='icon'>
@@ -74,47 +75,56 @@ export function MobileHeader() {
                     </Button>
                 </SheetTrigger>
                 <SheetContent side='left' className='p-0 w-64'>
-                    <Sidebar />
+                    <SheetTitle className='sr-only'>Navigation Menu</SheetTitle>
+                    <SheetDescription className='sr-only'>
+                        Access dashboard navigation and menu items
+                    </SheetDescription>
+                    <Sidebar onNavigate={() => setOpen(false)} />
                 </SheetContent>
             </Sheet>
             <Logo />
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant='ghost' size='icon' className='rounded-full'>
-                        <Avatar>
-                            <AvatarImage
-                                src={account?.avatar_url ?? undefined}
-                                alt={account?.full_name ?? 'User'}
-                            />
-                            <AvatarFallback>
-                                {account ? (
-                                    account.full_name?.[0]?.toUpperCase() ??
-                                    account.billing_email?.[0]?.toUpperCase() ??
-                                    'U'
-                                ) : (
-                                    <IconDeviceLaptop className='h-5 w-5' />
-                                )}
-                            </AvatarFallback>
-                        </Avatar>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
-                    <div className='px-2 py-1.5 text-sm font-medium'>
-                        {account?.full_name || account?.billing_email || 'User'}
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                        <a href='/dashboard/profile'>Profile</a>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                        onClick={handleSignOut}
-                        disabled={pending}
-                    >
-                        Logout
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <div className='flex items-center gap-2'>
+                <NotificationBell />
+                <div className='hidden [@media(min-width:1025px)]:flex items-center mt-4 [@media(min-width:1025px)]:mt-0 space-x-2'>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant='ghost' size='icon' className='rounded-full'>
+                                <Avatar>
+                                    <AvatarImage
+                                        src={account?.avatar_url ?? undefined}
+                                        alt={account?.full_name ?? 'User'}
+                                    />
+                                    <AvatarFallback>
+                                        {account ? (
+                                            account.full_name?.[0]?.toUpperCase() ??
+                                            account.billing_email?.[0]?.toUpperCase() ??
+                                            'U'
+                                        ) : (
+                                            <IconDeviceLaptop className='h-5 w-5' />
+                                        )}
+                                    </AvatarFallback>
+                                </Avatar>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='end'>
+                            <div className='px-2 py-1.5 text-sm font-medium'>
+                                {account?.full_name || account?.billing_email || 'User'}
+                            </div>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <a href='/dashboard/profile'>Profile</a>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                                onClick={handleSignOut}
+                                disabled={pending}
+                            >
+                                Logout
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
         </div>
     );
 }

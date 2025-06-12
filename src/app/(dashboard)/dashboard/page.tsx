@@ -63,13 +63,12 @@ export default async function DashboardPage() {
             <DashboardHeader
                 heading={`Dashboard - Welcome, ${user.user_metadata.full_name || user.email}`}
                 subheading='Monitor your email security and subscription status'
-                user={user}
             />
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-8'>
+            <div className='grid grid-cols-1 [@media(min-width:768px)]:grid-cols-2 gap-4 mt-8'>
                 <EmailAnalytics weeklyData={weeklyEmailStats} monthlyData={monthlyEmailStats} />
                 <SubscriptionInfo account={account_data} subscription={subscription_data} />
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mt-4'>
+            <div className='grid grid-cols-1 [@media(min-width:768px)]:grid-cols-2 [@media(min-width:1025px)]:grid-cols-3 gap-4 mt-4'>
                 <SecurityScore scoreData={events} />
                 <PhishingAttempts attempts={attempts} />
                 <RecentActivity activities={recentActivities} />
