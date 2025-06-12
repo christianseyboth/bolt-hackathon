@@ -32,13 +32,16 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
             className={cn(
                 'w-full flex relative justify-between px-4 py-3 rounded-[15px]  transition duration-200 bg-dark mx-auto'
             )}
+            initial={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
             animate={{
                 width: showBackground ? '80%' : '100%',
-                background: showBackground ? 'var(--background)' : 'transparent',
+                backgroundColor: showBackground ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0)',
             }}
             transition={{
                 duration: 0.4,
+                ease: "easeInOut"
             }}
+            style={{ position: "relative" }}
         >
             <AnimatePresence>
                 {showBackground && (
@@ -49,7 +52,11 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
                         transition={{
                             duration: 1,
                         }}
-                        className='absolute inset-0 h-full w-full bg-neutral-900 pointer-events-none [mask-image:linear-gradient(to_bottom,var(--background),transparent,white)] rounded-[15px] '
+                        className='absolute inset-0 h-full w-full pointer-events-none rounded-[15px]'
+                        style={{
+                            backgroundColor: 'rgb(23, 23, 23)',
+                            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1), transparent, rgba(255,255,255,1))'
+                        }}
                     />
                 )}
             </AnimatePresence>

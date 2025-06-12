@@ -90,10 +90,12 @@ export const Tools = () => {
     target: ref,
     offset: ["start end", "end start"],
   });
+
+  // Replace CSS variables with actual color values that can be animated
   const backgrounds = [
-    "var(--charcoal)",
-    "var(--neutral-900)",
-    "var(--gray-900)",
+    "#0a0a0a", // Replaces var(--charcoal)
+    "rgb(23, 23, 23)", // Replaces var(--neutral-900)
+    "rgb(17, 24, 39)", // Replaces var(--gray-900)
   ];
   const index = Math.round(scrollYProgress.get() * (backgrounds.length - 1));
 
@@ -116,13 +118,15 @@ export const Tools = () => {
   return (
     <motion.div
       animate={{
-        background: gradient,
+        backgroundColor: gradient,
       }}
       transition={{
         duration: 0.5,
+        ease: "easeInOut"
       }}
       ref={ref}
       className="w-full relative h-full pt-20 md:pt-40"
+      style={{ position: "relative" }}
     >
       <div className="px-6">
         <FeatureIconContainer className="flex justify-center items-center overflow-hidden">

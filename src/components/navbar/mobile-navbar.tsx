@@ -6,7 +6,7 @@ import { IoIosMenu } from 'react-icons/io';
 import { IoIosClose } from 'react-icons/io';
 import { Button } from '@/components/button';
 import { Logo } from '@/components/logo';
-import { useMotionValueEvent, useScroll } from 'motion/react';
+import { useMotionValueEvent, useScroll, motion } from 'motion/react';
 
 export const MobileNavbar = ({ navItems, user }: any) => {
     const [open, setOpen] = useState(false);
@@ -23,12 +23,20 @@ export const MobileNavbar = ({ navItems, user }: any) => {
     });
 
     return (
-        <div
+        <motion.div
             className={cn(
-                'flex justify-between bg-transparent items-center w-full rounded-md px-2.5 py-1.5 transition duration-200',
-                showBackground &&
-                    ' bg-neutral-900  shadow-[0px_-2px_0px_0px_var(--neutral-800),0px_2px_0px_0px_var(--neutral-800)]'
+                'flex justify-between items-center w-full rounded-md px-2.5 py-1.5'
             )}
+            initial={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
+            animate={{
+                backgroundColor: showBackground ? 'rgb(23, 23, 23)' : 'rgba(0, 0, 0, 0)',
+            }}
+            transition={{ duration: 0.2 }}
+            style={{
+                boxShadow: showBackground
+                    ? '0px -2px 0px 0px rgb(38, 38, 38), 0px 2px 0px 0px rgb(38, 38, 38)'
+                    : 'none'
+            }}
         >
             <Logo />
             <IoIosMenu className='text-white h-6 w-6' onClick={() => setOpen(!open)} />
@@ -113,6 +121,6 @@ export const MobileNavbar = ({ navItems, user }: any) => {
                     </div>
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 };

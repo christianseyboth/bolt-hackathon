@@ -69,11 +69,12 @@ export const Hero = () => {
                     </Button>
                 </div>
             </Container>
-            <div className='flex  items-center justify-center relative p-2 md:p-20 cursor-pointer md:-mt-20'>
+            <div className='flex  items-center justify-center relative p-2 md:p-20 cursor-pointer md:-mt-20' style={{ position: "relative" }}>
                 <div
                     className='w-full relative'
                     style={{
                         perspective: '1000px',
+                        position: 'relative'
                     }}
                 >
                     <Card rotate={rotate} translate={translate} scale={scale}>
@@ -84,7 +85,7 @@ export const Hero = () => {
                             width={1400}
                             className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full  md:object-left-top'
                             draggable={false}
-                            loading='lazy' 
+                            loading='lazy'
                         />
                     </Card>
                 </div>
@@ -109,18 +110,24 @@ export const Card = ({
             style={{
                 rotateX: rotate,
                 translateY: translate,
-                // scale,
+                scale,
                 boxShadow:
                     '0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003',
             }}
-            className='max-w-6xl z-40 group -mt-12 mx-auto isolate group h-[20rem] md:h-[50rem] w-full border-4 border-neutral-900 p-2 md:p-2 bg-charcoal rounded-[30px] shadow-2xl relative'
+            className='max-w-6xl z-40 group -mt-12 mx-auto isolate group h-[20rem] md:h-[50rem] w-full border-4 border-neutral-900 p-2 md:p-2 rounded-[30px] shadow-2xl relative'
+            initial={{ backgroundColor: "#0a0a0a" }}
         >
             <Beam showBeam className='-top-1 block' />
-            <div className='absolute h-40 w-full bottom-0 md:-bottom-10 inset-x-0 scale-[1.2] z-20 pointer-events-none bg-charcoal [mask-image:linear-gradient(to_top,white_30%,transparent)]' />
-            <div className='absolute inset-0 z-20  bg-transparent group-hover:bg-black/0 transition-all duration-200 flex items-center justify-center'>
+            <div className='absolute h-40 w-full bottom-0 md:-bottom-10 inset-x-0 scale-[1.2] z-20 pointer-events-none [mask-image:linear-gradient(to_top,white_30%,transparent)]' style={{ backgroundColor: "#0a0a0a" }} />
+            <motion.div
+                className='absolute inset-0 z-20 group-hover:bg-black/0 flex items-center justify-center'
+                initial={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
+                whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
+                transition={{ duration: 0.2 }}
+            >
                 <VideoModal />
-            </div>
-            <div className=' h-full w-full  overflow-hidden rounded-2xl bg-transparent md:rounded-2xl md:p-4 '>
+            </motion.div>
+            <div className=' h-full w-full  overflow-hidden rounded-2xl md:rounded-2xl md:p-4' style={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}>
                 {children}
             </div>
         </motion.div>
