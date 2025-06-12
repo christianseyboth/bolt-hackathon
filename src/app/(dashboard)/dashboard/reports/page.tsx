@@ -50,7 +50,7 @@ export default async function ReportsPage() {
             .from('scheduled_reports')
             .select('*')
             .eq('account_id', accountId)
-            .eq('is_active', true);
+            .order('created_at', { ascending: false });
 
         if (!scheduledError) {
             scheduledReports = scheduledReportsData || [];
@@ -79,7 +79,7 @@ export default async function ReportsPage() {
                 />
                 <ScheduledReports
                     accountId={accountId}
-                    scheduledReports={scheduledReports || []}
+                    initialScheduledReports={scheduledReports || []}
                 />
             </div>
         </>

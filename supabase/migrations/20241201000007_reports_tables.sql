@@ -100,5 +100,6 @@ CREATE TRIGGER handle_scheduled_reports_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_updated_at();
 
--- Enable realtime for report_history table
+-- Enable realtime for both tables
 ALTER PUBLICATION supabase_realtime ADD TABLE public.report_history;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.scheduled_reports;
