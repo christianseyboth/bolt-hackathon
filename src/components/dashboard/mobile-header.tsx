@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { Button } from '../ui/button';
 import { IconDeviceLaptop, IconMenu2 } from '@tabler/icons-react';
@@ -16,10 +16,54 @@ import {
 import { useTransition } from 'react';
 import { signOut } from '@/app/auth/actions';
 import { useToast } from '../ui/use-toast';
+import { createClient } from '@/utils/supabase/client';
+
+interface AccountProfile {
+    id: string;
+    billing_email: string | null;
+    full_name: string | null;
+    avatar_url: string | null;
+    provider: string;
+}
 
 export function MobileHeader() {
     const [open, setOpen] = React.useState(false);
     const [pending, startTransition] = useTransition();
+    const [account, setAccount] = useState<AccountProfile | null>(null);
+    const supabase = createClient();
+
+    useEffect(() => {
+        fetchAccount();
+    }, []);
+
+    const fetchAccount = async () => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const { data: accountData } = await supabase
+                .from('accounts')
+                .select('id, billing_email, full_name, avatar_url, provider')
+                .eq('owner_id', user.id)
+                .single();
+
+            if (accountData) {
+                setAccount(accountData);
+            }
+        } catch (error) {
+            console.error('Error fetching account:', error);
+        }
+    };
+
+    const handleSignOut = async () => {
+        startTransition(async () => {
+            try {
+                await signOut();
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        });
+    };
 
     return (
         <div className='flex md:hidden items-center justify-between px-4 py-2 border-b border-neutral-800'>
@@ -38,32 +82,37 @@ export function MobileHeader() {
                 <DropdownMenuTrigger asChild>
                     <Button variant='ghost' size='icon' className='rounded-full'>
                         <Avatar>
-                            <AvatarImage src='https://i.pravatar.cc/150?img=1' />
+                            <AvatarImage
+                                src={account?.avatar_url ?? undefined}
+                                alt={account?.full_name ?? 'User'}
+                            />
                             <AvatarFallback>
-                                <span className='sr-only'>User Menu</span>
-                                <IconDeviceLaptop className='h-5 w-5' />
+                                {account ? (
+                                    account.full_name?.[0]?.toUpperCase() ??
+                                    account.billing_email?.[0]?.toUpperCase() ??
+                                    'U'
+                                ) : (
+                                    <IconDeviceLaptop className='h-5 w-5' />
+                                )}
                             </AvatarFallback>
                         </Avatar>
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <div className='px-2 py-1.5 text-sm font-medium'>Mail</div>
+                    <div className='px-2 py-1.5 text-sm font-medium'>
+                        {account?.full_name || account?.billing_email || 'User'}
+                    </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                        <a href='/dashboard/settings'>Settings</a>
+                        <a href='/dashboard/profile'>Profile</a>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <form>
-                        <DropdownMenuItem asChild>
-                            <button
-                                formAction={signOut}
-                                disabled={pending}
-                                style={{ width: '100%' }}
-                            >
-                                Logout
-                            </button>
-                        </DropdownMenuItem>
-                    </form>
+                    <DropdownMenuItem
+                        onClick={handleSignOut}
+                        disabled={pending}
+                    >
+                        Logout
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
