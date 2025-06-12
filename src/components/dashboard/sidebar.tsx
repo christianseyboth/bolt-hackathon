@@ -14,6 +14,7 @@ import {
     IconLogout,
     IconDeviceLaptop,
     IconFileText,
+    IconCreditCard,
 } from '@tabler/icons-react';
 import { useToast } from '@/components/ui/use-toast';
 import { signOut } from '@/app/auth/actions';
@@ -95,6 +96,14 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
                 >
                     Reports
                 </SidebarItem>
+                <SidebarItem
+                    href='/dashboard/subscription'
+                    icon={<IconCreditCard className='h-5 w-5' />}
+                    isActive={pathname === '/dashboard/subscription'}
+                    onNavigate={onNavigate}
+                >
+                    Subscription
+                </SidebarItem>
             </nav>
 
             <div className='space-y-1 pt-6 mt-6 border-t border-neutral-800'>
@@ -104,8 +113,9 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
                     isActive={pathname === '/dashboard/profile'}
                     onNavigate={onNavigate}
                 >
-                    Settings
+                    Profile
                 </SidebarItem>
+
 
                 <button
                     onClick={handleLogout}

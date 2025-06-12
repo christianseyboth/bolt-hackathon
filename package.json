@@ -28,6 +28,7 @@
         "@radix-ui/react-switch": "^1.0.3",
         "@radix-ui/react-tabs": "^1.0.4",
         "@radix-ui/react-toast": "^1.2.14",
+        "@stripe/stripe-js": "^4.4.0",
         "@supabase/ssr": "^0.6.1",
         "@supabase/supabase-js": "^2.39.6",
         "@tabler/icons-react": "^3.33.0",
@@ -63,6 +64,7 @@
         "react-wrap-balancer": "^1.1.1",
         "recharts": "^2.12.2",
         "remark-gfm": "^4.0.1",
+        "stripe": "^17.5.0",
         "tailwind": "^4.0.0",
         "tailwind-merge": "^3.3.0",
         "tailwindcss-animate": "^1.0.7"
