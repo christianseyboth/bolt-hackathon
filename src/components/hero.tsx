@@ -41,21 +41,23 @@ export const Hero = () => {
     const rotate = useTransform(scrollYProgress, [0, 0.5], [20, 0]);
     const scale = useTransform(scrollYProgress, [0, 1], scaleDimensions());
     const translate = useTransform(scrollYProgress, [0, 1], [0, 100]);
+
     return (
-        <BackgroundBeam
+        <div
             ref={containerRef}
             className='flex flex-col min-h-[70rem] md:min-h-[100rem] pt-20 md:pt-40 relative overflow-hidden'
         >
-            <Container className='flex  flex-col items-center justify-center'>
+            <Container className='flex flex-col items-center justify-center'>
                 <Heading
                     as='h1'
-                    className='text-4xl md:text-4xl lg:text-8xl font-semibold max-w-6xl mx-auto text-center mt-6 relative z-10  py-6'
+                    className='text-4xl md:text-4xl lg:text-8xl font-semibold max-w-6xl mx-auto text-center mt-6 relative z-10 py-6'
                 >
-                    Never loose Money to Spam Emails.
+                    Never Lose Money to Email Attacks Again
                 </Heading>
                 <Subheading className='text-center mt-2 md:mt-6 text-base md:text-xl text-muted dark:text-white max-w-3xl mx-auto relative z-10'>
-                    We analyze your emails and detect spam, phishing, and scam with the help of
-                    modern AI algorithms.
+                    Advanced AI-powered email security software that detects phishing, malware, ransomware,
+                    and business email compromise (BEC) attacks in real-time. Protect your organization with
+                    99.9% accurate threat detection that works with Gmail, Outlook, and Office 365.
                 </Subheading>
                 <FeaturedImages
                     textClassName='lg:text-left text-center'
@@ -63,13 +65,15 @@ export const Hero = () => {
                     showStars
                 />
                 <div className='flex items-center gap-4 justify-center my-10 relative z-10'>
-                    <Button className='flex space-x-2 items-center group !text-lg'>
-                        <span>Test for Free</span>{' '}
-                        <HiArrowRight className='text-white group-hover:translate-x-1 stroke-[1px] h-3 w-3 mt-0.5 transition-transform duration-200' />
-                    </Button>
+                    <a href="/dashboard">
+                        <Button className='flex space-x-2 items-center group !text-lg'>
+                            <span>Start Free Email Security Trial</span>{' '}
+                            <HiArrowRight className='text-white group-hover:translate-x-1 stroke-[1px] h-3 w-3 mt-0.5 transition-transform duration-200' />
+                        </Button>
+                    </a>
                 </div>
             </Container>
-            <div className='flex  items-center justify-center relative p-2 md:p-20 cursor-pointer md:-mt-20' style={{ position: "relative" }}>
+            <div className='flex items-center justify-center relative p-2 md:p-20 cursor-pointer md:-mt-20' style={{ position: "relative" }}>
                 <div
                     className='w-full relative'
                     style={{
@@ -79,18 +83,18 @@ export const Hero = () => {
                 >
                     <Card rotate={rotate} translate={translate} scale={scale}>
                         <Image
-                            src={`/hero-screenshot.png`}
-                            alt='hero'
+                            src={`/hero-screenshot.avif`}
+                            alt='SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface'
                             height={720}
                             width={1400}
-                            className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full  md:object-left-top'
+                            className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full md:object-left-top'
                             draggable={false}
                             loading='lazy'
                         />
                     </Card>
                 </div>
             </div>
-        </BackgroundBeam>
+        </div>
     );
 };
 
@@ -127,7 +131,7 @@ export const Card = ({
             >
                 <VideoModal />
             </motion.div>
-            <div className=' h-full w-full  overflow-hidden rounded-2xl md:rounded-2xl md:p-4' style={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}>
+            <div className=' h-full w-full overflow-hidden rounded-2xl md:rounded-2xl md:p-4' style={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}>
                 {children}
             </div>
         </motion.div>

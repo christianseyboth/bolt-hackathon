@@ -33,7 +33,7 @@ export function SubscriptionInfo({
                         <div>
                             <div className='text-base font-medium'>{subscription?.plan_name || account?.plan || 'Free'}</div>
                             <div className='text-xs text-neutral-400'>
-                                renews on{' '}
+                                {subscription?.status === 'cancelled' || subscription?.cancel_at_period_end ? 'ends on' : 'renews on'}{' '}
                                 <span className='text-amber-400'>
                                     {(!subscription || subscription.plan_name === 'Free' || !date)
                                         ? 'N/A'

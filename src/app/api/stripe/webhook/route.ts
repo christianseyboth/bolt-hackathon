@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@/utils/supabase/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2025-04-30.basil',
+    apiVersion: '2025-02-24.acacia',
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
 
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supabase: any) {
     const customerId = subscription.customer as string;
+    console.log(`🔄 Processing subscription update for customer: ${customerId}, subscription: ${subscription.id}`);
 
     // Get account by Stripe customer ID
     const { data: account, error: accountError } = await supabase
@@ -70,13 +71,17 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
         .single();
 
     if (accountError || !account) {
-        console.error('Account not found for customer:', customerId);
+        console.error('❌ Account not found for customer:', customerId);
         return;
     }
 
+    console.log(`✅ Found account: ${account.id} for customer: ${customerId}`);
+
     // Get price details to determine plan
     const priceId = subscription.items.data[0]?.price.id;
+    console.log(`🔍 Processing price ID: ${priceId}`);
     const planName = await getPlanNameFromPriceId(priceId);
+    console.log(`📋 Mapped to plan: ${planName} with ${getSeatsFromPlan(planName)} seats`);
 
     // Update or create subscription record
     const subscriptionData = {
@@ -88,21 +93,44 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
         current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
         cancel_at_period_end: subscription.cancel_at_period_end,
         updated_at: new Date().toISOString(),
-        seats: 1, // Default to 1, adjust based on your pricing
+        seats: getSeatsFromPlan(planName),
         price_per_seat: subscription.items.data[0]?.price.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0,
         total_price: subscription.items.data[0]?.price.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0,
         analysis_amount: getAnalysisAmountFromPlan(planName),
         analysis_used: 0,
     };
 
-    const { error: upsertError } = await supabase
+    // For subscription upgrades, we want to update the existing subscription for this account
+    // rather than creating a new one. First try to update existing subscription by account_id.
+    const { data: existingSubscription } = await supabase
         .from('subscriptions')
-        .upsert(subscriptionData, {
-            onConflict: 'stripe_subscription_id'
-        });
+        .select('id')
+        .eq('account_id', account.id)
+        .single();
 
-    if (upsertError) {
-        console.error('Error upserting subscription:', upsertError);
+    if (existingSubscription) {
+        // Update existing subscription
+        const { error: updateError } = await supabase
+            .from('subscriptions')
+            .update(subscriptionData)
+            .eq('account_id', account.id);
+
+        if (updateError) {
+            console.error('Error updating existing subscription:', updateError);
+        } else {
+            console.log('✅ Updated existing subscription for account:', account.id);
+        }
+    } else {
+        // Create new subscription if none exists
+        const { error: insertError } = await supabase
+            .from('subscriptions')
+            .insert(subscriptionData);
+
+        if (insertError) {
+            console.error('Error creating new subscription:', insertError);
+        } else {
+            console.log('✅ Created new subscription for account:', account.id);
+        }
     }
 
     // Update account
@@ -216,4 +244,15 @@ function getAnalysisAmountFromPlan(planName: string): number {
     };
 
     return planLimits[planName] || 100;
+}
+
+function getSeatsFromPlan(planName: string): number {
+    const planSeats: Record<string, number> = {
+        'Free': 1,
+        'Solo': 1,
+        'Entrepreneur': 5,
+        'Team': 20,
+    };
+
+    return planSeats[planName] || 1;
 }

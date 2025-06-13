@@ -16,6 +16,8 @@ import {
     IconUsers
 } from '@tabler/icons-react';
 import { loadStripe } from '@stripe/stripe-js';
+import { SubscriptionUpgradeModal } from './subscription-upgrade-modal';
+import { SubscriptionCancelModal } from './subscription-cancel-modal';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -47,8 +49,12 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
     // Debug logging
     console.log('SubscriptionBilling received products:', products?.length || 0);
     console.log('Products data:', products);
-    console.log('Current subscription:', currentSubscription);
-    console.log('Account data:', account);
+    console.log('🔍 FULL Current subscription object:', JSON.stringify(currentSubscription, null, 2));
+    console.log('🔍 Subscription status:', currentSubscription?.status);
+    console.log('🔍 Subscription cancel_at_period_end:', currentSubscription?.cancel_at_period_end);
+    console.log('🔍 Should show "Ends on"?', currentSubscription?.status === 'cancelled' || currentSubscription?.cancel_at_period_end);
+    console.log('🔍 All subscription keys:', currentSubscription ? Object.keys(currentSubscription) : 'No subscription');
+    console.log('🔍 Account stripe_subscription_id:', account?.stripe_subscription_id);
 
     const handleSubscribe = async (priceId: string) => {
         setLoading(priceId);
@@ -192,6 +198,17 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
         }
     };
 
+    const getSeatsFromPlan = (planName: string): number => {
+        const planSeats: Record<string, number> = {
+            'Free': 1,
+            'Solo': 1,
+            'Entrepreneur': 5,
+            'Team': 20,
+        };
+
+        return planSeats[planName] || 1;
+    };
+
     return (
         <div className="space-y-6">
             {/* Current Subscription Card */}
@@ -226,11 +243,14 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
 
                         {currentSubscription.current_period_end && (
                             <p className="text-sm text-neutral-400 mb-4">
-                                Renews on {new Date(currentSubscription.current_period_end).toLocaleDateString()}
+                                {currentSubscription.status === 'cancelled' || currentSubscription.cancel_at_period_end
+                                    ? 'Ends on'
+                                    : 'Renews on'
+                                } {new Date(currentSubscription.current_period_end).toLocaleDateString()}
                             </p>
                         )}
 
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap gap-2">
                             <Button
                                 variant="outline"
                                 onClick={handleManageBilling}
@@ -240,6 +260,23 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
                                 <IconCreditCard className="h-4 w-4 mr-2" />
                                 Manage Billing
                             </Button>
+
+                            {/* Only show cancel button if subscription is not already cancelled */}
+                            {!(currentSubscription.status === 'cancelled' || currentSubscription.cancel_at_period_end) ? (
+                                <SubscriptionCancelModal
+                                    currentPlan={currentSubscription.plan_name}
+                                    currentSeats={currentSubscription.seats || 1}
+                                    currentPrice={currentSubscription.total_price || 0}
+                                    accountId={account.id}
+                                    subscriptionId={account.stripe_subscription_id}
+                                    periodEnd={currentSubscription.current_period_end}
+                                    onCancelComplete={() => window.location.reload()}
+                                />
+                            ) : (
+                                <Badge className="bg-amber-900/30 text-amber-400 border border-amber-700 px-3 py-1">
+                                    Subscription Cancelled
+                                </Badge>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -358,18 +395,22 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
                                         ))}
                                     </ul>
 
-                                    <Button
-                                        className={`w-full ${isPopular && !isCurrentPlan
-                                                ? 'bg-blue-600 hover:bg-blue-700'
-                                                : ''
-                                            }`}
-                                        variant={isCurrentPlan ? 'outline' : 'default'}
-                                        disabled={isCurrentPlan || loading === price.id}
-                                        onClick={() => handleSubscribe(price.id)}
-                                    >
-                                        {loading === price.id && <IconLoader className="h-4 w-4 mr-2 animate-spin" />}
-                                        {isCurrentPlan ? 'Current Plan' : `Subscribe to ${product.name}`}
-                                    </Button>
+                                    {isCurrentPlan ? (
+                                        <Button className="w-full" variant="outline" disabled>
+                                            Current Plan
+                                        </Button>
+                                    ) : (
+                                        <SubscriptionUpgradeModal
+                                            currentPlan={currentSubscription?.plan_name || 'Free'}
+                                            currentSeats={currentSubscription?.seats || 1}
+                                            targetPlan={product.name}
+                                            targetSeats={getSeatsFromPlan(product.name)}
+                                            targetPriceId={price.id}
+                                            accountId={account.id}
+                                            currentPeriodEnd={currentSubscription?.current_period_end || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()}
+                                            onUpgradeComplete={() => window.location.reload()}
+                                        />
+                                    )}
                                 </div>
                             );
                         })}

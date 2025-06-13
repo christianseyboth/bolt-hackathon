@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
                 current_period_end: endDate,
                 cancel_at_period_end: subscription.cancel_at_period_end,
                 updated_at: new Date().toISOString(),
-                seats: 1,
+                seats: getSeatsFromPlan(planName),
                 price_per_seat: subscription.items.data[0]?.price.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0,
                 total_price: subscription.items.data[0]?.price.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0,
                 analysis_amount: getAnalysisAmountFromPlan(planName),
@@ -227,6 +227,7 @@ export async function POST(request: NextRequest) {
                 .from('accounts')
                 .update({
                     plan: subscriptionData.plan_name,
+                    stripe_subscription_id: subscription.id, // ⭐ Fix: Store Stripe subscription ID
                     susbscription_status: subscription.status,
                     subscription_ends_at: subscriptionData.current_period_end,
                     updated_at: new Date().toISOString(),
@@ -295,4 +296,15 @@ function getAnalysisAmountFromPlan(planName: string): number {
     };
 
     return planLimits[planName] || 100;
+}
+
+function getSeatsFromPlan(planName: string): number {
+    const planSeats: Record<string, number> = {
+        'Free': 1,
+        'Solo': 1,
+        'Entrepreneur': 5,
+        'Team': 20,
+    };
+
+    return planSeats[planName] || 1;
 }

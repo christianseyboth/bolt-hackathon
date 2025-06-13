@@ -5,8 +5,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
-
 @theme inline {
     /* Configure your theme variables here */
     --font-display: 'Spinnaker', sans-serif;
@@ -95,7 +93,7 @@
     --primary-foreground: oklch(0.379 0.146 265.522);
     --secondary: oklch(0.274 0.006 286.033);
     --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.274 0.006 286.033);
+    --muted: oklch(0.58 0.0091 286.11);
     --muted-foreground: oklch(0.705 0.015 286.067);
     --accent: oklch(0.274 0.006 286.033);
     --accent-foreground: oklch(0.985 0 0);
@@ -135,6 +133,93 @@
 
     body {
         @apply bg-background text-foreground font-['Spinnaker'];
+    }
+}
+
+/* Custom background animations and patterns */
+@layer utilities {
+    /* Background patterns */
+    .bg-grid-pattern {
+        background-image: linear-gradient(rgba(16, 185, 129, 0.1) 2px, transparent 2px),
+            linear-gradient(90deg, rgba(16, 185, 129, 0.1) 2px, transparent 2px);
+        background-size: 50px 50px;
+    }
+
+    .bg-diagonal-pattern {
+        background-image: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 20px,
+            rgba(16, 185, 129, 0.06) 20px,
+            rgba(16, 185, 129, 0.06) 22px
+        );
+    }
+
+    .bg-glow-pattern {
+        background: radial-gradient(
+            circle,
+            rgba(16, 185, 129, 0.1) 0%,
+            rgba(16, 185, 129, 0.03) 40%,
+            transparent 70%
+        );
+        filter: blur(40px);
+    }
+
+    /* Animation keyframes */
+    @keyframes grid-flow {
+        0% {
+            transform: translateX(0) translateY(0);
+            opacity: 0.3;
+        }
+        50% {
+            opacity: 0.1;
+        }
+        100% {
+            transform: translateX(50px) translateY(50px);
+            opacity: 0.3;
+        }
+    }
+
+    @keyframes diagonal-flow {
+        0% {
+            transform: translateX(0) translateY(0);
+        }
+        100% {
+            transform: translateX(40px) translateY(40px);
+        }
+    }
+
+    @keyframes floating-glow {
+        0%,
+        100% {
+            transform: translate(20%, 20%) scale(1);
+            opacity: 0.3;
+        }
+        25% {
+            transform: translate(80%, 30%) scale(1.1);
+            opacity: 0.2;
+        }
+        50% {
+            transform: translate(70%, 80%) scale(0.9);
+            opacity: 0.4;
+        }
+        75% {
+            transform: translate(30%, 70%) scale(1.05);
+            opacity: 0.25;
+        }
+    }
+
+    /* Animation classes */
+    .animate-grid-flow {
+        animation: grid-flow 12s ease-in-out infinite;
+    }
+
+    .animate-diagonal-flow {
+        animation: diagonal-flow 15s linear infinite;
+    }
+
+    .animate-floating-glow {
+        animation: floating-glow 25s ease-in-out infinite;
     }
 }
 

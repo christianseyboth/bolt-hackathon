@@ -1,157 +1,227 @@
 "use client";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
-  FacebookIcon,
-  InstagramIcon,
-  LinkedInIcon,
-  MetaIcon,
-  SlackIcon,
-  TiktokIcon,
-  TwitterIcon,
-} from "@/components/icons/illustrations";
-import React from "react";
-import { IconContainer } from "../icon-container";
+  IconMail,
+  IconShieldCheck,
+  IconLock,
+  IconTrash,
+  IconEyeOff,
+  IconShield,
+} from "@tabler/icons-react";
+import React, { useState, useEffect } from "react";
 
 export const SkeletonOne = () => {
+  const [privacyPhase, setPrivacyPhase] = useState(0);
+  // 0: email arrives, 1: processing (no storage), 2: analysis complete, 3: data deleted, 4: privacy confirmed
+
+  useEffect(() => {
+    const sequence = async () => {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setPrivacyPhase(1); // Processing without storage
+      await new Promise(resolve => setTimeout(resolve, 3500));
+      setPrivacyPhase(2); // Analysis complete
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      setPrivacyPhase(3); // Data deletion
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      setPrivacyPhase(4); // Privacy confirmed
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      setPrivacyPhase(0); // Reset
+    };
+
+    const interval = setInterval(sequence, 13000);
+    sequence(); // Start immediately
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="p-8 overflow-hidden h-full">
-      <div className="flex flex-col gap-4 items-center justify-center h-full relative">
-        <div className="flex gap-4 items-center justify-center flex-shrink-0">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="62"
-            height="105"
-            viewBox="0 0 62 105"
-            fill="none"
-            className="absolute left-1/2 -translate-x-[60px]  -top-10 text-neutral-600"
-          >
-            <path
-              d="M1.00001 -69L1 57.5C1 64.1274 6.37258 69.5 13 69.5H49C55.6274 69.5 61 74.8726 61 81.5L61 105"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <motion.path
-              d="M1.00001 -69L1 57.5C1 64.1274 6.37258 69.5 13 69.5H49C55.6274 69.5 61 74.8726 61 81.5L61 105"
-              stroke="url(#gradient-1)"
-              strokeWidth="1.5"
-            />
-            <defs>
-              <motion.linearGradient
-                initial={{
-                  x1: "0%",
-                  y1: "0%",
-                  x2: "0%",
-                  y2: "0%",
-                }}
-                animate={{
-                  x1: "100%",
-                  y1: "90%",
-                  x2: "120%",
-                  y2: "120%",
-                }}
-                id="gradient-1"
-                transition={{
-                  duration: Math.random() * (7 - 2) + 2,
-                  ease: "linear",
-                  repeat: Infinity,
-                }}
-              >
-                <stop stopColor="#001AFF" stopOpacity={`0`} />
-                <stop offset="1" stopColor="#6DD4F5" />
-                <stop offset="1" stopColor="#6DD4F5" stopOpacity="0" />
-              </motion.linearGradient>
-            </defs>
-          </svg>
-          <svg
-            width="128"
-            height="69"
-            viewBox="0 0 128 69"
-            fill="none"
-            className="absolute left-1/2 translate-x-4  -bottom-2 text-neutral-600"
-          >
-            <path
-              d="M1.00002 0.5L1.00001 29.5862C1 36.2136 6.37259 41.5862 13 41.5862H115C121.627 41.5862 127 46.9588 127 53.5862L127 75"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <motion.path
-              d="M1.00002 0.5L1.00001 29.5862C1 36.2136 6.37259 41.5862 13 41.5862H115C121.627 41.5862 127 46.9588 127 53.5862L127 75"
-              stroke="url(#gradient-2)"
-              strokeWidth="1.5"
-            />
+    <div className="p-8 overflow-hidden h-full relative">
+      <div className="flex flex-col items-center justify-center h-full relative">
 
-            <defs>
-              <motion.linearGradient
-                initial={{
-                  x1: "0%",
-                  y1: "0%",
-                  x2: "0%",
-                  y2: "0%",
-                }}
-                animate={{
-                  x1: "100%",
-                  y1: "90%",
-                  x2: "120%",
-                  y2: "120%",
-                }}
-                id="gradient-2"
-                transition={{
-                  duration: Math.random() * (7 - 2) + 2,
-                  ease: "linear",
-                  repeat: Infinity,
-                }}
-              >
-                <stop stopColor="#001AFF" stopOpacity={`0`} />
-                <stop offset="1" stopColor="#6DD4F5" />
-                <stop offset="1" stopColor="#6DD4F5" stopOpacity="0" />
-              </motion.linearGradient>
-            </defs>
-          </svg>
+                {/* Privacy Flow Visualization */}
+        <div className="relative z-10 w-full max-w-sm">
 
-          <IconContainer>
-            <InstagramIcon />
-          </IconContainer>
-          <IconContainer>
-            <TiktokIcon />
-          </IconContainer>
-          <IconContainer>
-            <TwitterIcon />
-          </IconContainer>
-          <IconContainer>
-            <FacebookIcon />
-          </IconContainer>
-          <IconContainer>
-            <MetaIcon />
-          </IconContainer>
-          <IconContainer>
-            <LinkedInIcon />
-          </IconContainer>
-          <IconContainer>
-            <SlackIcon />
-          </IconContainer>
+          {/* Privacy Status Cards */}
+          <AnimatePresence mode="wait">
+            {privacyPhase === 1 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="space-y-3"
+              >
+                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <IconLock className="h-5 w-5 text-emerald-400" />
+                    <div className="text-sm text-emerald-400 font-medium">Memory-Only Processing</div>
+                  </div>
+                  <div className="text-xs text-neutral-300 leading-relaxed">
+                    Email content analyzed in temporary memory only. No data written to disk or database.
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { icon: IconTrash, label: "No Logs", color: "emerald" },
+                    { icon: IconEyeOff, label: "No Tracking", color: "blue" },
+                    { icon: IconShieldCheck, label: "Encrypted", color: "purple" }
+                  ].map((item, i) => (
+                                         <motion.div
+                       key={i}
+                       initial={{ scale: 0, opacity: 0 }}
+                       animate={{ scale: 1, opacity: 1 }}
+                       transition={{ delay: i * 0.3, duration: 0.5, ease: "easeOut" }}
+                       className={`bg-${item.color}-500/10 border border-${item.color}-500/30 rounded-lg p-2 text-center`}
+                     >
+                      <item.icon className={`h-4 w-4 text-${item.color}-400 mx-auto mb-1`} />
+                      <div className={`text-xs text-${item.color}-300 font-medium`}>{item.label}</div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {privacyPhase === 2 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="text-center"
+              >
+                <div className="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 border border-emerald-500/40 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <IconShieldCheck className="h-6 w-6 text-emerald-400" />
+                    <div className="text-sm text-emerald-400 font-semibold">Analysis Complete</div>
+                  </div>
+                  <div className="text-xs text-neutral-300">
+                    Security assessment finished. Results ready for delivery.
+                  </div>
+                </div>
+
+                <div className="text-xs text-neutral-400">
+                  <span className="text-emerald-400 font-medium">✓ Zero data retention</span> • Processing time: 0.3s
+                </div>
+              </motion.div>
+            )}
+
+            {privacyPhase === 3 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="text-center"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: [0, 1.1, 1] }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="w-20 h-20 bg-red-500/20 border border-red-500/40 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <motion.div
+                    animate={{ rotate: [0, 180, 360] }}
+                    transition={{ duration: 2, ease: "linear", repeat: Infinity }}
+                  >
+                    <IconTrash className="h-8 w-8 text-red-400" />
+                  </motion.div>
+                </motion.div>
+
+                <div className="text-sm text-red-400 font-semibold mb-1">Data Permanently Deleted</div>
+                <div className="text-xs text-neutral-400">
+                  All temporary data cleared from memory
+                </div>
+              </motion.div>
+            )}
+
+            {privacyPhase === 4 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.7, ease: "easeOut" }}
+                className="text-center"
+              >
+                <div className="bg-gradient-to-r from-emerald-500/20 to-green-500/20 border border-emerald-500/40 rounded-lg p-6 mb-4">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 15, duration: 1.2 }}
+                    className="flex items-center justify-center gap-3 mb-3"
+                  >
+                    <IconShieldCheck className="h-8 w-8 text-emerald-400" />
+                    <div className="text-lg text-emerald-400 font-bold">Privacy Protected</div>
+                  </motion.div>
+
+                  <div className="text-sm text-neutral-300 mb-3">
+                    Your email was analyzed without any data storage or retention.
+                  </div>
+
+                  <div className="flex justify-center gap-4">
+                    {[
+                      { icon: IconLock, label: "Encrypted" },
+                      { icon: IconEyeOff, label: "Private" },
+                      { icon: IconTrash, label: "Deleted" }
+                    ].map((item, i) => (
+                                               <motion.div
+                           key={i}
+                           initial={{ scale: 0, opacity: 0 }}
+                           animate={{ scale: 1, opacity: 1 }}
+                           transition={{ delay: 0.3 + i * 0.15, duration: 0.8, ease: "easeOut" }}
+                           className="flex flex-col items-center gap-1"
+                         >
+                        <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                          <item.icon className="h-4 w-4 text-emerald-400" />
+                        </div>
+                        <span className="text-xs text-emerald-300">{item.label}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <div className="flex gap-4 items-center justify-center flex-shrink-0 ml-8">
-          <IconContainer>
-            <MetaIcon />
-          </IconContainer>
-          <IconContainer>
-            <LinkedInIcon />
-          </IconContainer>
-          <IconContainer>
-            <SlackIcon />
-          </IconContainer>
-          <IconContainer>
-            <InstagramIcon />
-          </IconContainer>
-          <IconContainer>
-            <TiktokIcon />
-          </IconContainer>
-          <IconContainer>
-            <TwitterIcon />
-          </IconContainer>
-          <IconContainer>
-            <FacebookIcon />
-          </IconContainer>
+
+        {/* Privacy-focused Background */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="grid grid-cols-6 grid-rows-4 h-full w-full">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: privacyPhase >= 1 ? 0.1 : 0 }}
+                transition={{ delay: i * 0.02 }}
+                className="border border-emerald-500/20"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Privacy Shield Particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${25 + i * 20}%`,
+                top: `${20 + (i % 2) * 60}%`,
+              }}
+              animate={{
+                y: [-5, 5, -5],
+                opacity: [0.2, 0.6, 0.2],
+              }}
+              transition={{
+                duration: 6,
+                delay: i * 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <IconShield className="h-4 w-4 text-emerald-400/30" />
+            </motion.div>
+          ))}
         </div>
       </div>
     </div>

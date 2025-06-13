@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import { useToast } from '../ui/use-toast';
 import { Badge } from '../ui/badge';
 import { IconCreditCard, IconCrown, IconCheck, IconInfoCircle } from '@tabler/icons-react';
+import { SubscriptionCancelModal } from './subscription-cancel-modal';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { cn } from '@/lib/utils';
 
@@ -31,9 +32,11 @@ const planFeatures: PlanFeature[] = [
 export function SubscriptionSettings({
     subscriptionPlans,
     currentSubscription,
+    account,
 }: {
     subscriptionPlans: any;
     currentSubscription: any;
+    account: any;
 }) {
     const { toast } = useToast();
     const [currentPlan, setCurrentPlan] = useState(currentSubscription.plan_name);
@@ -106,7 +109,7 @@ export function SubscriptionSettings({
 
                             <div className='flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0'>
                                 <p className='text-sm text-neutral-400'>
-                                    Your plan renews on{' '}
+                                    Your plan {currentSubscription.status === 'cancelled' || currentSubscription.cancel_at_period_end ? 'ends on' : 'renews on'}{' '}
                                     <span className='text-neutral-200'>
                                         {date.toLocaleDateString()}
                                     </span>
@@ -120,13 +123,15 @@ export function SubscriptionSettings({
                                         Switch to{' '}
                                         {billingCycle === 'monthly' ? 'Yearly' : 'Monthly'} Billing
                                     </Button>
-                                    <Button
-                                        variant='outline'
-                                        size='sm'
-                                        className='text-red-400 hover:text-red-300 hover:bg-red-950/30 border-red-900/50'
-                                    >
-                                        Cancel Subscription
-                                    </Button>
+                                    <SubscriptionCancelModal
+                                        currentPlan={currentSubscription.plan_name}
+                                        currentSeats={currentSubscription.seats || 1}
+                                        currentPrice={currentSubscription.total_price || 0}
+                                        accountId={account.id}
+                                        subscriptionId={currentSubscription.stripe_subscription_id}
+                                        periodEnd={currentSubscription.current_period_end}
+                                        onCancelComplete={() => window.location.reload()}
+                                    />
                                 </div>
                             </div>
                         </div>

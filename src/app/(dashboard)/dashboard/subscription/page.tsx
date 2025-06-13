@@ -27,15 +27,25 @@ export default async function SettingsPage() {
         redirect('/login');
     }
 
-    // Get current subscription
+    // Get current subscription (including cancelled ones that are still active until period end)
+    // Force fresh data by adding timestamp to prevent caching
     const { data: currentSubscription } = await supabase
         .from('subscriptions')
         .select('*')
         .eq('account_id', account.id)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
+        .in('status', ['active', 'cancelled']) // Include cancelled subscriptions that might still be active
+        .order('updated_at', { ascending: false }) // Order by updated_at to get most recent changes
         .limit(1)
         .maybeSingle();
+
+    // Debug logging for subscription data
+    console.log('🔍 Current subscription data:', {
+        id: currentSubscription?.id,
+        status: currentSubscription?.status,
+        cancel_at_period_end: currentSubscription?.cancel_at_period_end,
+        plan_name: currentSubscription?.plan_name,
+        current_period_end: currentSubscription?.current_period_end
+    });
 
     // Fetch Stripe products
     let products = [];

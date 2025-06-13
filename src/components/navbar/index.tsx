@@ -6,16 +6,8 @@ import { motion } from 'motion/react';
 
 const navItems = [
     {
-        title: 'Features',
-        link: '/features',
-    },
-    {
         title: 'Pricing',
         link: '/pricing',
-    },
-    {
-        title: 'Blog',
-        link: '/blog',
     },
     {
         title: 'Contact',

@@ -11,7 +11,8 @@ export const Card = ({
   return (
     <div
       className={cn(
-        "p-8 rounded-xl border border-[rgba(255,255,255,0.10)] bg-[rgba(40,40,40,0.30)] shadow-[2px_4px_16px_0px_rgba(248,248,248,0.06)_inset] group",
+        "p-8 rounded-xl border border-[rgba(255,255,255,0.10)] bg-[rgba(40,40,40,0.30)] shadow-[2px_4px_16px_0px_rgba(248,248,248,0.06)_inset] group relative transition-all duration-300",
+        "hover:border-emerald-500/40 hover:shadow-[0_0_20px_rgba(16,185,129,0.15),2px_4px_16px_0px_rgba(248,248,248,0.06)_inset]",
         className
       )}
     >

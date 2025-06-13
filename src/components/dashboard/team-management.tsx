@@ -24,10 +24,12 @@ import {
     IconCheck,
     IconX,
     IconClock,
+    IconExclamationMark,
 } from '@tabler/icons-react';
 import { Badge } from '../ui/badge';
-import { addTeamMember, removeTeamMember } from '@/app/(dashboard)/dashboard/team/actions';
+import { addTeamMember, removeTeamMember, enforceTeamLimits } from '@/app/(dashboard)/dashboard/team/actions';
 import { useToast } from '../ui/use-toast';
+import { useRouter } from 'next/navigation';
 
 type TeamMember = {
     id: string;
@@ -57,11 +59,102 @@ export function TeamManagement({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [memberToDelete, setMemberToDelete] = useState<TeamMember | null>(null);
 
+    // Check if user is over their subscription limit
+    const isOverLimit = currentMemberCount > maxTeamMembers;
+    const excessMembers = isOverLimit ? currentMemberCount - maxTeamMembers : 0;
+
+    // Debug logging for subscription issues
+    console.log('TeamManagement Debug:', {
+        subscriptionId: subscription?.id,
+        subscriptionSeats: subscription?.seats,
+        maxTeamMembers,
+        currentMemberCount,
+        isOverLimit,
+        subscriptionStatus: subscription?.status,
+        subscriptionPlan: subscription?.plan_name
+    });
+
     const { toast } = useToast();
+    const router = useRouter();
 
     function handleSuccess() {
         formRef.current?.reset();
     }
+
+    // Handle manual enforcement of team limits
+    const handleEnforceLimits = async () => {
+        startTransition(async () => {
+            try {
+                const result = await enforceTeamLimits(subscription.id);
+                if (result.success) {
+                    const { results } = result;
+                    toast({
+                        title: 'Team limits enforced',
+                        description: `${results.members_enabled} members active, ${results.members_disabled} members disabled due to limits.`,
+                    });
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Error',
+                        description: result.error || 'Could not enforce team limits.',
+                    });
+                }
+            } catch (err: any) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error',
+                    description: err?.message || 'Could not enforce team limits.',
+                });
+            }
+        });
+    };
+
+    // Handle manual subscription sync from Stripe
+    const handleSyncSubscription = async () => {
+        startTransition(async () => {
+            try {
+                toast({
+                    title: 'Syncing subscription...',
+                    description: 'Fetching latest subscription data from Stripe.',
+                });
+
+                const response = await fetch('/api/debug/sync-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        accountId: account.id,
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    toast({
+                        title: 'Subscription synced!',
+                        description: `Updated to ${result.subscription.plan_name} plan. Refreshing page...`,
+                    });
+                    // Force a page refresh to show updated data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Sync failed',
+                        description: result.error || 'Could not sync subscription from Stripe.',
+                    });
+                }
+            } catch (err: any) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Sync error',
+                    description: err?.message || 'Could not connect to sync service.',
+                });
+            }
+        });
+    };
 
     // Helper for status badge
     function renderStatusBadge(status: string) {
@@ -73,27 +166,145 @@ export function TeamManagement({
                         <span>Active</span>
                     </Badge>
                 );
-            case 'pending':
+            case 'inactive':
+                return (
+                    <Badge className='bg-red-900/30 text-red-400 flex items-center space-x-1'>
+                        <IconX className='h-3 w-3 mr-1' />
+                        <span>Inactive</span>
+                    </Badge>
+                );
+            case 'cancelled':
+                return (
+                    <Badge className='bg-red-900/30 text-red-400 flex items-center space-x-1'>
+                        <IconX className='h-3 w-3 mr-1' />
+                        <span>Cancelled</span>
+                    </Badge>
+                );
+            case 'past_due':
                 return (
                     <Badge className='bg-amber-900/30 text-amber-400 flex items-center space-x-1'>
                         <IconClock className='h-3 w-3 mr-1' />
-                        <span>Pending</span>
-                    </Badge>
-                );
-            case 'disabled':
-                return (
-                    <Badge className='bg-neutral-800 text-neutral-400 flex items-center space-x-1'>
-                        <IconX className='h-3 w-3 mr-1' />
-                        <span>Disabled</span>
+                        <span>Past Due</span>
                     </Badge>
                 );
             default:
-                return null;
+                return (
+                    <Badge className='bg-neutral-800 text-neutral-400 flex items-center space-x-1'>
+                        <IconClock className='h-3 w-3 mr-1' />
+                        <span>Unknown</span>
+                    </Badge>
+                );
         }
     }
 
     return (
         <div className='space-y-6'>
+            {/* Over Limit Warning */}
+            {isOverLimit && (
+                <Card className='border-red-800 bg-red-950/20'>
+                    <CardHeader className='pb-3'>
+                        <div className='flex items-center space-x-2'>
+                            <div className='bg-red-900/50 p-2 rounded-md'>
+                                <IconExclamationMark className='h-5 w-5 text-red-400' />
+                            </div>
+                            <div>
+                                <CardTitle className='text-lg text-red-400'>Team Limit Exceeded</CardTitle>
+                                <CardDescription className='text-red-300/80'>
+                                    Your team has more members than your current subscription allows
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className='space-y-4'>
+                            <div className='bg-red-900/30 border border-red-900/50 text-red-300 px-4 py-3 rounded-md'>
+                                <div className='flex items-start'>
+                                    <IconAlertCircle className='h-5 w-5 mr-2 flex-shrink-0 mt-0.5' />
+                                    <div className='text-sm space-y-2'>
+                                        <p>
+                                            <strong>Action Required:</strong> You currently have {currentMemberCount} team members,
+                                            but your subscription only allows {maxTeamMembers}. You need to remove {excessMembers} member{excessMembers > 1 ? 's' : ''}
+                                            to comply with your subscription.
+                                        </p>
+                                        <p>
+                                            Until you reduce your team size, you won't be able to add new members, and some
+                                            features may be restricted.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                                                                                    <div className='flex flex-col sm:flex-row gap-3'>
+                                                                <Button
+                                    variant='outline'
+                                    className='border-amber-700 text-amber-400 hover:bg-amber-950/30'
+                                    onClick={handleEnforceLimits}
+                                    disabled={isPending}
+                                >
+                                    <IconCheck className='h-4 w-4 mr-2' />
+                                    {isPending ? 'Enforcing...' : 'Disable Excess Members'}
+                                </Button>
+                                <Button
+                                    variant='outline'
+                                    className='border-red-700 text-red-400 hover:bg-red-950/30'
+                                    onClick={() => {
+                                        // Scroll to team members section
+                                        const teamMembersSection = document.querySelector('[data-section="team-members"]');
+                                        if (teamMembersSection) {
+                                            teamMembersSection.scrollIntoView({
+                                                behavior: 'smooth',
+                                                block: 'start'
+                                            });
+                                        }
+                                    }}
+                                >
+                                    <IconTrash className='h-4 w-4 mr-2' />
+                                    Delete Members Below
+                                </Button>
+                                <Button
+                                    variant='outline'
+                                    className='border-cyan-700 text-cyan-400 hover:bg-cyan-950/30'
+                                    onClick={() => window.location.href = '/dashboard/subscription'}
+                                >
+                                    <IconUsers className='h-4 w-4 mr-2' />
+                                    Upgrade Subscription
+                                </Button>
+                                <Button
+                                    variant='outline'
+                                    className='border-green-700 text-green-400 hover:bg-green-950/30'
+                                    onClick={() => {
+                                        router.refresh();
+                                        window.location.reload();
+                                    }}
+                                >
+                                    <IconCheck className='h-4 w-4 mr-2' />
+                                    Refresh Page
+                                </Button>
+                                <Button
+                                    variant='outline'
+                                    className='border-purple-700 text-purple-400 hover:bg-purple-950/30'
+                                    onClick={handleSyncSubscription}
+                                    disabled={isPending}
+                                >
+                                    <IconUsers className='h-4 w-4 mr-2' />
+                                    {isPending ? 'Syncing...' : 'Sync from Stripe'}
+                                </Button>
+                                <Button
+                                    variant='outline'
+                                    className='border-orange-700 text-orange-400 hover:bg-orange-950/30'
+                                    onClick={() => {
+                                        // Force hard refresh - clears all caches
+                                        window.location.href = window.location.href + '?t=' + Date.now();
+                                    }}
+                                >
+                                    <IconCheck className='h-4 w-4 mr-2' />
+                                    Hard Refresh
+                                </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             {/* Team Usage */}
             <Card className='border-neutral-800 bg-neutral-900'>
                 <CardHeader className='pb-3'>
@@ -111,12 +322,15 @@ export function TeamManagement({
                     <div className='space-y-4'>
                         <div className='flex justify-between items-center'>
                             <div className='text-sm font-medium'>Team Members</div>
-                            <div className='text-sm text-neutral-400'>
-                                {currentMemberCount} of {maxTeamMembers} used
+                            <div className={`text-sm ${isOverLimit ? 'text-red-400 font-medium' : 'text-neutral-400'}`}>
+                                {currentMemberCount} of {maxTeamMembers} {isOverLimit ? '(Over Limit)' : 'used'}
                             </div>
                         </div>
-                        <Progress value={memberPercentage} className='h-2' />
-                        {currentMemberCount >= maxTeamMembers && (
+                        <Progress
+                            value={memberPercentage}
+                            className={`h-2 ${isOverLimit ? '[&>div]:bg-red-500' : ''}`}
+                        />
+                        {currentMemberCount >= maxTeamMembers && !isOverLimit && (
                             <div className='bg-amber-900/20 border border-amber-900/30 text-amber-400 px-4 py-3 rounded-md flex items-start mt-4'>
                                 <IconAlertCircle className='h-5 w-5 mr-2 flex-shrink-0 mt-0.5' />
                                 <div className='text-sm'>
@@ -178,11 +392,17 @@ export function TeamManagement({
                                     type='email'
                                     placeholder='team.member@example.com'
                                     required
+                                    disabled={isOverLimit}
                                 />
                             </div>
                             <div className='space-y-2'>
                                 <Label htmlFor='note'>Note (Optional)</Label>
-                                <Input id='note' name='note' placeholder='Role or department' />
+                                <Input
+                                    id='note'
+                                    name='note'
+                                    placeholder='Role or department'
+                                    disabled={isOverLimit}
+                                />
                             </div>
                         </div>
 
@@ -194,15 +414,34 @@ export function TeamManagement({
                             <IconPlus className='h-4 w-4 mr-2' />
                             {isPending ? 'Adding...' : 'Add Team Member'}
                         </Button>
+
+                        {isOverLimit && (
+                            <p className='text-sm text-red-400 flex items-center'>
+                                <IconAlertCircle className='h-4 w-4 mr-1' />
+                                Remove excess members before adding new ones
+                            </p>
+                        )}
                     </form>
                 </CardContent>
             </Card>
 
             {/* Team Members */}
-            <Card className='border-neutral-800 bg-neutral-900'>
+            <Card className='border-neutral-800 bg-neutral-900' data-section="team-members">
                 <CardHeader>
-                    <CardTitle className='text-lg'>Team Members</CardTitle>
-                    <CardDescription>Manage your existing team members</CardDescription>
+                    <CardTitle className='text-lg flex items-center justify-between'>
+                        <span>Team Members</span>
+                        {isOverLimit && (
+                            <Badge className='bg-red-900/30 text-red-400'>
+                                {excessMembers} over limit
+                            </Badge>
+                        )}
+                    </CardTitle>
+                    <CardDescription>
+                        {isOverLimit
+                            ? `Remove ${excessMembers} member${excessMembers > 1 ? 's' : ''} to comply with your subscription`
+                            : 'Manage your existing team members'
+                        }
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     {isPending ? (
@@ -223,33 +462,72 @@ export function TeamManagement({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {initialMembers.map((member) => (
-                                        <TableRow key={member.id}>
-                                            <TableCell className='font-medium'>
-                                                {member.email}
-                                            </TableCell>
-                                            <TableCell className='hidden sm:table-cell'>{renderStatusBadge(member.status)}</TableCell>
-                                            <TableCell className='hidden md:table-cell'>{member.label || '-'}</TableCell>
-                                            <TableCell className='hidden lg:table-cell'>
-                                                {new Date(member.created_at).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell className='text-right space-x-1'>
-                                                <Button
-                                                    type='button'
-                                                    variant='ghost'
-                                                    size='sm'
-                                                    className='text-red-400 hover:text-red-300 hover:bg-red-950/30 h-8 w-8 p-0'
-                                                    onClick={() => {
-                                                        setMemberToDelete(member);
-                                                        setShowDeleteDialog(true);
-                                                    }}
-                                                >
-                                                    <IconTrash className='h-4 w-4' />
-                                                    <span className='sr-only'>Delete</span>
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                                                                                            {initialMembers.map((member, index) => {
+                                        // Highlight members that exceed the limit (newest members first for removal suggestion)
+                                        const isExcessMember = isOverLimit && index >= maxTeamMembers;
+                                        const isDisabled = member.status === 'inactive';
+
+                                        return (
+                                            <TableRow
+                                                key={member.id}
+                                                className={
+                                                    isDisabled
+                                                        ? 'bg-red-950/30 border-red-900/50'
+                                                        : isExcessMember
+                                                            ? 'bg-red-950/20 border-red-900/30'
+                                                            : ''
+                                                }
+                                            >
+                                                <TableCell className='font-medium'>
+                                                    <div className='flex items-center space-x-2'>
+                                                        <span className={isDisabled ? 'text-neutral-400 line-through' : ''}>{member.email}</span>
+                                                                                                                {isDisabled && (
+                                                            <Badge
+                                                                variant='outline'
+                                                                className='border-red-700 text-red-400 text-xs px-1 py-0'
+                                                            >
+                                                                Inactive
+                                                            </Badge>
+                                                        )}
+                                                        {isExcessMember && !isDisabled && (
+                                                            <Badge
+                                                                variant='outline'
+                                                                className='border-amber-700 text-amber-400 text-xs px-1 py-0'
+                                                            >
+                                                                Over limit
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className='hidden sm:table-cell'>{renderStatusBadge(member.status)}</TableCell>
+                                                <TableCell className='hidden md:table-cell'>{member.label || '-'}</TableCell>
+                                                <TableCell className='hidden lg:table-cell'>
+                                                    {new Date(member.created_at).toLocaleDateString()}
+                                                </TableCell>
+                                                <TableCell className='text-right space-x-1'>
+                                                    <Button
+                                                        type='button'
+                                                        variant='ghost'
+                                                        size='sm'
+                                                        className={`h-8 w-8 p-0 ${
+                                                            isDisabled
+                                                                ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
+                                                                : isExcessMember
+                                                                    ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
+                                                                    : 'text-red-400 hover:text-red-300 hover:bg-red-950/30'
+                                                        }`}
+                                                        onClick={() => {
+                                                            setMemberToDelete(member);
+                                                            setShowDeleteDialog(true);
+                                                        }}
+                                                    >
+                                                        <IconTrash className='h-4 w-4' />
+                                                        <span className='sr-only'>Delete</span>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
                                 </TableBody>
                             </Table>
                         </div>
@@ -260,6 +538,7 @@ export function TeamManagement({
                     )}
                 </CardContent>
             </Card>
+
             {/* Delete Member Dialog */}
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <AlertDialogContent>
@@ -268,6 +547,11 @@ export function TeamManagement({
                         <AlertDialogDescription>
                             This will remove <b>{memberToDelete?.email}</b> from your team. This
                             action cannot be undone.
+                            {isOverLimit && (
+                                <span className='block mt-2 text-green-400'>
+                                    ✓ This will help bring your team within subscription limits.
+                                </span>
+                            )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -291,7 +575,9 @@ export function TeamManagement({
                                         await removeTeamMember(formData);
                                         toast({
                                             title: 'Team member removed',
-                                            description: 'The member was successfully removed.',
+                                            description: isOverLimit
+                                                ? 'The member was successfully removed. Your team is now closer to compliance.'
+                                                : 'The member was successfully removed.',
                                         });
                                     } catch (err: any) {
                                         toast({
