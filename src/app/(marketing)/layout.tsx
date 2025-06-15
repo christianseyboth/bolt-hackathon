@@ -1,6 +1,5 @@
-import '../globals.css';
-import { NavBar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
+import { NavBar } from '@/components/layout/navbar';
+import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { createClient } from '@/utils/supabase/server';
 
@@ -10,7 +9,6 @@ export default async function MarketingLayout({
     children: React.ReactNode;
 }>) {
     const supabase = await createClient();
-
     const { data, error } = await supabase.auth.getUser();
     const user = data.user;
 

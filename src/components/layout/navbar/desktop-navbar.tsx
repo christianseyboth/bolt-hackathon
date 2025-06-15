@@ -1,6 +1,6 @@
 'use client';
 import { Logo } from '@/components/logo';
-import { Button } from '../button';
+import { Button } from '@/components/button';
 import { NavBarItem } from './navbar-item';
 import { useMotionValueEvent, useScroll, motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
@@ -30,18 +30,23 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
     return (
         <motion.div
             className={cn(
-                'w-full flex relative justify-between px-4 py-3 rounded-[15px]  transition duration-200 bg-dark mx-auto'
+                'w-full flex relative justify-between px-4 py-3 rounded-[15px] transition duration-200 bg-dark mx-auto backdrop-blur-lg border border-white/10'
             )}
-            initial={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
+            initial={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(12px)' }}
             animate={{
                 width: showBackground ? '80%' : '100%',
-                backgroundColor: showBackground ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0)',
+                backgroundColor: showBackground ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.7)',
             }}
             transition={{
                 duration: 0.4,
-                ease: "easeInOut"
+                ease: 'easeInOut',
             }}
-            style={{ position: "relative" }}
+            style={{
+                position: 'relative',
+                backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
         >
             <AnimatePresence>
                 {showBackground && (
@@ -55,7 +60,8 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
                         className='absolute inset-0 h-full w-full pointer-events-none rounded-[15px]'
                         style={{
                             backgroundColor: 'rgb(23, 23, 23)',
-                            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1), transparent, rgba(255,255,255,1))'
+                            maskImage:
+                                'linear-gradient(to bottom, rgba(0,0,0,1), transparent, rgba(255,255,255,1))',
                         }}
                     />
                 )}
