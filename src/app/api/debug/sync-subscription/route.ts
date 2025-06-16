@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Database connection failed', step: 2 }, { status: 500 });
         }
 
-        // Step 3: Get account
-        let account;
+        // Step 3: Get account and subscription
+        let account, subscription_record;
         try {
             const { data: accountData, error: accountError } = await supabase
                 .from('accounts')
@@ -47,31 +47,57 @@ export async function POST(request: NextRequest) {
 
             if (accountError) throw accountError;
             account = accountData;
-            console.log('✅ Step 3: Account retrieved:', account?.email);
+            console.log('✅ Step 3a: Account retrieved:', account?.billing_email);
+
+            // Get subscription record (which has the stripe_customer_id)
+            const { data: subscriptionData, error: subscriptionError } = await supabase
+                .from('subscriptions')
+                .select('*')
+                .eq('account_id', accountId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (subscriptionError) throw subscriptionError;
+            subscription_record = subscriptionData;
+            console.log('✅ Step 3b: Subscription retrieved:', subscription_record?.plan_name);
         } catch (error) {
-            console.error('❌ Step 3 failed - Account fetch error:', error);
-            return NextResponse.json({ error: 'Account not found', step: 3 }, { status: 404 });
+            console.error('❌ Step 3 failed - Account/subscription fetch error:', error);
+            return NextResponse.json({ error: 'Account or subscription not found', step: 3 }, { status: 404 });
         }
 
-        if (!account?.stripe_customer_id) {
-            return NextResponse.json({ error: 'No Stripe customer ID found', step: 3 }, { status: 400 });
+        if (!subscription_record?.stripe_customer_id) {
+            return NextResponse.json({ error: 'No Stripe customer ID found in subscription', step: 3 }, { status: 400 });
         }
 
         // Step 4: Get Stripe subscription
         let subscription;
         try {
+            // First try to get all subscriptions (don't filter by status)
             const subscriptions = await stripe.subscriptions.list({
-                customer: account.stripe_customer_id,
-                status: 'active',
-                limit: 1,
+                customer: subscription_record.stripe_customer_id,
+                limit: 10,  // Get more to see all statuses
                 expand: ['data.items.data.price']
             });
 
+            console.log('🔍 Found subscriptions in Stripe:', subscriptions.data.map(sub => ({
+                id: sub.id,
+                status: sub.status,
+                cancel_at_period_end: sub.cancel_at_period_end
+            })));
+
             if (subscriptions.data.length === 0) {
-                return NextResponse.json({ error: 'No active subscriptions found in Stripe', step: 4 }, { status: 404 });
+                return NextResponse.json({ error: 'No subscriptions found in Stripe', step: 4 }, { status: 404 });
             }
 
-            subscription = subscriptions.data[0];
+            // Find the most relevant subscription (prefer active, then any other status)
+            subscription = subscriptions.data.find(sub => sub.status === 'active') || subscriptions.data[0];
+
+            console.log('🎯 Using subscription:', {
+                id: subscription.id,
+                status: subscription.status,
+                plan: subscription.items.data[0]?.price?.nickname || 'Unknown'
+            });
 
             // If timestamps are missing, fetch the subscription directly
             if (!subscription.current_period_start || !subscription.current_period_end) {
@@ -160,7 +186,7 @@ export async function POST(request: NextRequest) {
             subscriptionData = {
                 account_id: accountId,
                 stripe_subscription_id: subscription.id,
-                status: subscription.status,
+                subscription_status: subscription.status,
                 plan_name: planName,
                 current_period_start: startDate,
                 current_period_end: endDate,
@@ -192,7 +218,7 @@ export async function POST(request: NextRequest) {
 
             // Prepare data that matches the actual database schema
             const subscriptionUpdateData = {
-                status: subscription.status,
+                subscription_status: subscription.status,
                 plan_name: subscriptionData.plan_name,
                 current_period_start: subscriptionData.current_period_start,
                 current_period_end: subscriptionData.current_period_end,
@@ -221,23 +247,7 @@ export async function POST(request: NextRequest) {
 
             console.log('✅ Step 6a: Subscription updated successfully:', updateResult);
 
-            // Update account table
-            console.log('🔍 Step 6b: Updating account table...');
-            const { error: accountUpdateError } = await supabase
-                .from('accounts')
-                .update({
-                    plan: subscriptionData.plan_name,
-                    stripe_subscription_id: subscription.id, // ⭐ Fix: Store Stripe subscription ID
-                    susbscription_status: subscription.status,
-                    subscription_ends_at: subscriptionData.current_period_end,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('id', accountId);
-
-            if (accountUpdateError) {
-                console.error('❌ Account update error:', accountUpdateError);
-                throw accountUpdateError;
-            }
+            // ✅ REMOVED: No longer update accounts table - subscriptions table is single source of truth
 
             console.log('✅ Step 6: Database updated successfully');
         } catch (error) {

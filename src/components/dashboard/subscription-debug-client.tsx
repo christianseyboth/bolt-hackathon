@@ -9,7 +9,7 @@ import { IconUsers, IconRefresh } from '@tabler/icons-react';
 type Subscription = {
     id: string;
     plan_name: string;
-    status: string;
+    subscription_status: string;
     seats: number;
     created_at: string;
     updated_at: string;
@@ -86,7 +86,9 @@ export function SubscriptionDebugClient({
         startTransition(async () => {
             try {
                 toast({
-                    title: forceImmediate ? 'Forcing immediate upgrade...' : 'Analyzing all subscriptions...',
+                    title: forceImmediate
+                        ? 'Forcing immediate upgrade...'
+                        : 'Analyzing all subscriptions...',
                     description: 'Checking for active and scheduled subscriptions.',
                 });
 
@@ -146,7 +148,7 @@ export function SubscriptionDebugClient({
                     <CardTitle className='text-lg text-purple-400'>Sync Actions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                                        <div className='flex flex-wrap gap-3'>
+                    <div className='flex flex-wrap gap-3'>
                         <Button
                             variant='outline'
                             className='border-purple-700 text-purple-400 hover:bg-purple-950/30'
@@ -187,10 +189,21 @@ export function SubscriptionDebugClient({
                         </Button>
                     </div>
                     <div className='text-sm text-neutral-400 mt-3 space-y-1'>
-                        <p><strong>Standard Sync:</strong> Gets currently active subscription (may be old plan until period ends)</p>
-                        <p><strong>Analyze All:</strong> Shows all subscriptions (active + scheduled) without changes</p>
-                        <p><strong>Force Immediate:</strong> ⚠️ Immediately switches to new plan (cancels old subscription)</p>
-                        <p><strong>Hard Refresh:</strong> Clears browser cache if data seems stale</p>
+                        <p>
+                            <strong>Standard Sync:</strong> Gets currently active subscription (may
+                            be old plan until period ends)
+                        </p>
+                        <p>
+                            <strong>Analyze All:</strong> Shows all subscriptions (active +
+                            scheduled) without changes
+                        </p>
+                        <p>
+                            <strong>Force Immediate:</strong> ⚠️ Immediately switches to new plan
+                            (cancels old subscription)
+                        </p>
+                        <p>
+                            <strong>Hard Refresh:</strong> Clears browser cache if data seems stale
+                        </p>
                     </div>
                 </CardContent>
             </Card>
@@ -198,22 +211,47 @@ export function SubscriptionDebugClient({
             {/* Current Active Subscription */}
             <Card className='border-neutral-800 bg-neutral-900'>
                 <CardHeader>
-                    <CardTitle className='text-lg text-green-400'>Current Active Subscription</CardTitle>
+                    <CardTitle className='text-lg text-green-400'>
+                        Current Active Subscription
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     {initialCurrentSubscription ? (
                         <div className='space-y-2'>
-                            <div><strong>ID:</strong> {initialCurrentSubscription.id}</div>
-                            <div><strong>Plan:</strong> {initialCurrentSubscription.plan_name || 'N/A'}</div>
-                            <div><strong>Status:</strong> <Badge className={
-                                initialCurrentSubscription.status === 'active'
-                                    ? 'bg-green-900/30 text-green-400'
-                                    : 'bg-red-900/30 text-red-400'
-                            }>{initialCurrentSubscription.status}</Badge></div>
-                            <div><strong>Seats:</strong> {initialCurrentSubscription.seats}</div>
-                            <div><strong>Created:</strong> {new Date(initialCurrentSubscription.created_at).toLocaleString()}</div>
-                            <div><strong>Updated:</strong> {new Date(initialCurrentSubscription.updated_at).toLocaleString()}</div>
-                            <div><strong>Stripe Subscription ID:</strong> {initialCurrentSubscription.stripe_subscription_id || 'N/A'}</div>
+                            <div>
+                                <strong>ID:</strong> {initialCurrentSubscription.id}
+                            </div>
+                            <div>
+                                <strong>Plan:</strong>{' '}
+                                {initialCurrentSubscription.plan_name || 'N/A'}
+                            </div>
+                            <div>
+                                <strong>Status:</strong>{' '}
+                                <Badge
+                                    className={
+                                        initialCurrentSubscription.subscription_status === 'active'
+                                            ? 'bg-green-900/30 text-green-400'
+                                            : 'bg-red-900/30 text-red-400'
+                                    }
+                                >
+                                    {initialCurrentSubscription.subscription_status}
+                                </Badge>
+                            </div>
+                            <div>
+                                <strong>Seats:</strong> {initialCurrentSubscription.seats}
+                            </div>
+                            <div>
+                                <strong>Created:</strong>{' '}
+                                {new Date(initialCurrentSubscription.created_at).toLocaleString()}
+                            </div>
+                            <div>
+                                <strong>Updated:</strong>{' '}
+                                {new Date(initialCurrentSubscription.updated_at).toLocaleString()}
+                            </div>
+                            <div>
+                                <strong>Stripe Subscription ID:</strong>{' '}
+                                {initialCurrentSubscription.stripe_subscription_id || 'N/A'}
+                            </div>
                         </div>
                     ) : (
                         <div className='text-red-400'>
@@ -226,34 +264,56 @@ export function SubscriptionDebugClient({
             {/* All Subscriptions */}
             <Card className='border-neutral-800 bg-neutral-900'>
                 <CardHeader>
-                    <CardTitle className='text-lg'>All Subscriptions ({initialSubscriptions.length} total)</CardTitle>
+                    <CardTitle className='text-lg'>
+                        All Subscriptions ({initialSubscriptions.length} total)
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     {initialSubscriptions.length > 0 ? (
                         <div className='space-y-4'>
                             {initialSubscriptions.map((subscription, index) => (
-                                <div key={subscription.id} className={`p-4 rounded-lg border ${
-                                    subscription.status === 'active'
-                                        ? 'border-green-700 bg-green-950/20'
-                                        : 'border-neutral-700 bg-neutral-950/20'
-                                }`}>
+                                <div
+                                    key={subscription.id}
+                                    className={`p-4 rounded-lg border ${
+                                        subscription.subscription_status === 'active'
+                                            ? 'border-green-700 bg-green-950/20'
+                                            : 'border-neutral-700 bg-neutral-950/20'
+                                    }`}
+                                >
                                     <div className='flex justify-between items-start mb-2'>
                                         <h4 className='font-medium'>Subscription #{index + 1}</h4>
-                                        <Badge className={
-                                            subscription.status === 'active'
-                                                ? 'bg-green-900/30 text-green-400'
-                                                : 'bg-red-900/30 text-red-400'
-                                        }>
-                                            {subscription.status}
+                                        <Badge
+                                            className={
+                                                subscription.subscription_status === 'active'
+                                                    ? 'bg-green-900/30 text-green-400'
+                                                    : 'bg-red-900/30 text-red-400'
+                                            }
+                                        >
+                                            {subscription.subscription_status}
                                         </Badge>
                                     </div>
                                     <div className='grid grid-cols-2 gap-2 text-sm'>
-                                        <div><strong>ID:</strong> {subscription.id}</div>
-                                        <div><strong>Plan:</strong> {subscription.plan_name || 'N/A'}</div>
-                                        <div><strong>Seats:</strong> {subscription.seats}</div>
-                                        <div><strong>Stripe ID:</strong> {subscription.stripe_subscription_id || 'N/A'}</div>
-                                        <div><strong>Created:</strong> {new Date(subscription.created_at).toLocaleDateString()}</div>
-                                        <div><strong>Updated:</strong> {new Date(subscription.updated_at).toLocaleDateString()}</div>
+                                        <div>
+                                            <strong>ID:</strong> {subscription.id}
+                                        </div>
+                                        <div>
+                                            <strong>Plan:</strong> {subscription.plan_name || 'N/A'}
+                                        </div>
+                                        <div>
+                                            <strong>Seats:</strong> {subscription.seats}
+                                        </div>
+                                        <div>
+                                            <strong>Stripe ID:</strong>{' '}
+                                            {subscription.stripe_subscription_id || 'N/A'}
+                                        </div>
+                                        <div>
+                                            <strong>Created:</strong>{' '}
+                                            {new Date(subscription.created_at).toLocaleDateString()}
+                                        </div>
+                                        <div>
+                                            <strong>Updated:</strong>{' '}
+                                            {new Date(subscription.updated_at).toLocaleDateString()}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -277,15 +337,21 @@ export function SubscriptionDebugClient({
                         </div>
                         <div>
                             <div className='text-sm text-neutral-400'>Active Subscriptions</div>
-                            <div className='text-2xl font-bold text-green-400'>{activeSubscriptions.length}</div>
+                            <div className='text-2xl font-bold text-green-400'>
+                                {activeSubscriptions.length}
+                            </div>
                         </div>
                         <div>
                             <div className='text-sm text-neutral-400'>Inactive Subscriptions</div>
-                            <div className='text-2xl font-bold text-red-400'>{inactiveSubscriptions.length}</div>
+                            <div className='text-2xl font-bold text-red-400'>
+                                {inactiveSubscriptions.length}
+                            </div>
                         </div>
                         <div>
                             <div className='text-sm text-neutral-400'>Current Plan Seats</div>
-                            <div className='text-2xl font-bold text-cyan-400'>{initialCurrentSubscription?.seats || 0}</div>
+                            <div className='text-2xl font-bold text-cyan-400'>
+                                {initialCurrentSubscription?.seats || 0}
+                            </div>
                         </div>
                     </div>
                 </CardContent>
@@ -298,12 +364,27 @@ export function SubscriptionDebugClient({
                 </CardHeader>
                 <CardContent>
                     <div className='space-y-2'>
-                        <div><strong>Account ID:</strong> {account.id}</div>
-                        <div><strong>Owner ID:</strong> {account.owner_id}</div>
-                        <div><strong>Stripe Customer ID:</strong> {account.stripe_customer_id || 'N/A'}</div>
-                        <div><strong>Account Plan:</strong> {account.plan || 'N/A'}</div>
-                        <div><strong>Account Subscription Status:</strong> {account.susbscription_status || 'N/A'}</div>
-                        <div><strong>Created:</strong> {new Date(account.created_at).toLocaleString()}</div>
+                        <div>
+                            <strong>Account ID:</strong> {account.id}
+                        </div>
+                        <div>
+                            <strong>Owner ID:</strong> {account.owner_id}
+                        </div>
+                        <div>
+                            <strong>Stripe Customer ID:</strong>{' '}
+                            {account.stripe_customer_id || 'N/A'}
+                        </div>
+                        <div>
+                            <strong>Account Plan:</strong> {account.plan || 'N/A'}
+                        </div>
+                        <div>
+                            <strong>Account Subscription Status:</strong>{' '}
+                            {account.susbscription_status || 'N/A'}
+                        </div>
+                        <div>
+                            <strong>Created:</strong>{' '}
+                            {new Date(account.created_at).toLocaleString()}
+                        </div>
                     </div>
                 </CardContent>
             </Card>

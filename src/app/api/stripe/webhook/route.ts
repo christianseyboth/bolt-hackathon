@@ -6,23 +6,25 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2025-02-24.acacia',
 });
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
 export async function POST(request: NextRequest) {
-    const body = await request.text();
-    const signature = request.headers.get('stripe-signature')!;
+    const sig = request.headers.get('stripe-signature');
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!sig || !webhookSecret) {
+        return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
+    }
 
     let event: Stripe.Event;
 
     try {
-        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-        console.log(`🎯 Webhook received: ${event.type}`);
-    } catch (error) {
-        console.error('Webhook signature verification failed:', error);
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+        const body = await request.text();
+        event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+    } catch (err) {
+        console.error('Webhook signature verification failed:', err);
+        return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     try {
         switch (event.type) {
@@ -63,19 +65,21 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
     const customerId = subscription.customer as string;
     console.log(`🔄 Processing subscription update for customer: ${customerId}, subscription: ${subscription.id}`);
 
-    // Get account by Stripe customer ID
-    const { data: account, error: accountError } = await supabase
-        .from('accounts')
-        .select('id')
+    // Get account by Stripe customer ID from subscriptions table
+    const { data: existingSubscription, error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .select('account_id')
         .eq('stripe_customer_id', customerId)
         .single();
 
-    if (accountError || !account) {
-        console.error('❌ Account not found for customer:', customerId);
+    if (subscriptionError || !existingSubscription) {
+        console.error('❌ Subscription not found for customer:', customerId);
         return;
     }
 
-    console.log(`✅ Found account: ${account.id} for customer: ${customerId}`);
+    const accountId = existingSubscription.account_id;
+
+    console.log(`✅ Found account: ${accountId} for customer: ${customerId}`);
 
     // Get price details to determine plan
     const priceId = subscription.items.data[0]?.price.id;
@@ -85,9 +89,8 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
 
     // Update or create subscription record
     const subscriptionData = {
-        account_id: account.id,
-        stripe_subscription_id: subscription.id,
-        status: subscription.status,
+        account_id: accountId,
+        subscription_status: subscription.status,
         plan_name: planName,
         current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
         current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
@@ -98,122 +101,109 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
         total_price: subscription.items.data[0]?.price.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0,
         analysis_amount: getAnalysisAmountFromPlan(planName),
         analysis_used: 0,
+        stripe_subscription_id: subscription.id,
+        stripe_customer_id: customerId,
     };
 
-    // For subscription upgrades, we want to update the existing subscription for this account
-    // rather than creating a new one. First try to update existing subscription by account_id.
-    const { data: existingSubscription } = await supabase
+    // Update existing subscription (we already found it exists since we got the accountId from it)
+    const { error: updateError } = await supabase
         .from('subscriptions')
-        .select('id')
-        .eq('account_id', account.id)
-        .single();
+        .update(subscriptionData)
+        .eq('account_id', accountId);
 
-    if (existingSubscription) {
-        // Update existing subscription
-        const { error: updateError } = await supabase
-            .from('subscriptions')
-            .update(subscriptionData)
-            .eq('account_id', account.id);
-
-        if (updateError) {
-            console.error('Error updating existing subscription:', updateError);
-        } else {
-            console.log('✅ Updated existing subscription for account:', account.id);
-        }
+    if (updateError) {
+        console.error('Error updating existing subscription:', updateError);
     } else {
-        // Create new subscription if none exists
-        const { error: insertError } = await supabase
-            .from('subscriptions')
-            .insert(subscriptionData);
-
-        if (insertError) {
-            console.error('Error creating new subscription:', insertError);
-        } else {
-            console.log('✅ Created new subscription for account:', account.id);
-        }
+        console.log('✅ Updated existing subscription for account:', accountId);
     }
 
-    // Update account
-    await supabase
-        .from('accounts')
-        .update({
-            plan: planName,
-            stripe_subscription_id: subscription.id,
-            susbscription_status: subscription.status,
-            subscription_ends_at: new Date(subscription.current_period_end * 1000).toISOString(),
-            updated_at: new Date().toISOString(),
-        })
-        .eq('id', account.id);
+    // ✅ REMOVED: No longer update accounts table - subscriptions table is single source of truth
+    console.log('✅ Subscription data updated in subscriptions table only');
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription, supabase: any) {
     const customerId = subscription.customer as string;
+    console.log(`🗑️ Processing subscription deletion for customer: ${customerId}, subscription: ${subscription.id}`);
 
-    const { data: account, error: accountError } = await supabase
-        .from('accounts')
-        .select('id')
+    const { data: existingSubscription, error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .select('account_id')
         .eq('stripe_customer_id', customerId)
         .single();
 
-    if (accountError || !account) {
-        console.error('Account not found for customer:', customerId);
+    if (subscriptionError || !existingSubscription) {
+        console.error('❌ Subscription not found for customer:', customerId);
         return;
     }
 
-    // Update subscription status
-    await supabase
+    const accountId = existingSubscription.account_id;
+    console.log(`✅ Found account: ${accountId} for deleted subscription`);
+
+    // Update subscription to Free plan (not just "canceled")
+    const { error: updateError } = await supabase
         .from('subscriptions')
         .update({
-            status: 'canceled',
+            plan_name: 'Free',
+            subscription_status: 'active', // Free plan is active
+            cancel_at_period_end: false,
+            seats: 1,
+            price_per_seat: 0,
+            total_price: 0,
+            analysis_amount: 100,
+            current_period_start: new Date().toISOString(),
+            current_period_end: null,
+            stripe_subscription_id: null, // Clear the Stripe subscription ID
+            emails_left: 100,
             updated_at: new Date().toISOString(),
         })
-        .eq('stripe_subscription_id', subscription.id);
+        .eq('account_id', accountId);
 
-    // Revert account to free plan
-    await supabase
-        .from('accounts')
-        .update({
-            plan: 'Free',
-            stripe_subscription_id: null,
-            susbscription_status: 'active',
-            subscription_ends_at: null,
-            emails_left: 100, // Reset to free plan limit
-            updated_at: new Date().toISOString(),
-        })
-        .eq('id', account.id);
+    if (updateError) {
+        console.error('❌ Error updating subscription to Free plan:', updateError);
+    } else {
+        console.log('✅ Updated subscription to Free plan for account:', accountId);
+    }
+
+    // ✅ REMOVED: No longer update accounts table - subscriptions table is single source of truth
+    console.log('✅ Subscription deletion handled in subscriptions table only');
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice, supabase: any) {
     // Reset usage counters on successful payment
     const subscriptionId = invoice.subscription as string;
+    const customerId = invoice.customer as string;
 
-    if (subscriptionId) {
-        await supabase
+    if (subscriptionId && customerId) {
+        // Get account by customer ID from subscriptions table
+        const { data: subscription } = await supabase
             .from('subscriptions')
-            .update({
-                analysis_used: 0, // Reset usage counter
-                updated_at: new Date().toISOString(),
-            })
-            .eq('stripe_subscription_id', subscriptionId);
+            .select('account_id')
+            .eq('stripe_customer_id', customerId)
+            .single();
+
+        if (subscription) {
+            await supabase
+                .from('subscriptions')
+                .update({
+                    analysis_used: 0, // Reset usage counter
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('account_id', subscription.account_id);
+        }
     }
 
     console.log('Payment succeeded for invoice:', invoice.id);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice, supabase: any) {
-    // Handle failed payments - you might want to notify users or update status
+    // Handle failed payment
     console.log('Payment failed for invoice:', invoice.id);
-
-    const subscriptionId = invoice.subscription as string;
-    if (subscriptionId) {
-        // You could update subscription status or send notifications here
-        console.log('Subscription with failed payment:', subscriptionId);
-    }
 }
 
+// Helper functions for plan mapping
 async function getPlanNameFromPriceId(priceId: string): Promise<string> {
-    // Map price IDs to plan names - Updated with your actual Stripe price IDs
-    const priceToplanMap: Record<string, string> = {
+    const priceToPlans: Record<string, string> = {
+        // Current price IDs
         'price_1RZ9HkCsZBRpsVkXiDJ1KICM': 'Team', // Team YEARLY
         'price_1RZ9HkCsZBRpsVkXBQNNjw87': 'Team', // Team MONTHLY
         'price_1RZ9EoCsZBRpsVkXVniKqUeU': 'Entrepreneur', // Entrepreneur YEARLY
@@ -222,28 +212,7 @@ async function getPlanNameFromPriceId(priceId: string): Promise<string> {
         'price_1RZ9CfCsZBRpsVkXt0nTDOee': 'Solo', // Solo MONTHLY
     };
 
-    console.log(`🔍 Webhook: Looking up price ID: ${priceId}`);
-    console.log(`📋 Available price mappings:`, Object.keys(priceToplanMap));
-
-    const planName = priceToplanMap[priceId] || 'Free';
-    console.log(`✅ Mapped to plan: ${planName}`);
-
-    if (planName === 'Free') {
-        console.warn(`⚠️  Price ID ${priceId} not found in mapping! Add it to webhook handler.`);
-    }
-
-    return planName;
-}
-
-function getAnalysisAmountFromPlan(planName: string): number {
-    const planLimits: Record<string, number> = {
-        'Free': 100,
-        'Solo': 1000,
-        'Entrepreneur': 5000,
-        'Team': 20000,
-    };
-
-    return planLimits[planName] || 100;
+    return priceToPlans[priceId] || 'Free';
 }
 
 function getSeatsFromPlan(planName: string): number {
@@ -251,8 +220,17 @@ function getSeatsFromPlan(planName: string): number {
         'Free': 1,
         'Solo': 1,
         'Entrepreneur': 5,
-        'Team': 20,
+        'Team': 10,
     };
-
     return planSeats[planName] || 1;
+}
+
+function getAnalysisAmountFromPlan(planName: string): number {
+    const planAnalysis: Record<string, number> = {
+        'Free': 100,
+        'Solo': 500,
+        'Entrepreneur': 2000,
+        'Team': 5000,
+    };
+    return planAnalysis[planName] || 100;
 }

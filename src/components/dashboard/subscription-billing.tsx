@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { useToast } from '../ui/use-toast';
@@ -13,8 +13,10 @@ import {
     IconStar,
     IconShield,
     IconBolt,
-    IconUsers
+    IconUsers,
+    IconClock,
 } from '@tabler/icons-react';
+import { RefreshCw, Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { SubscriptionUpgradeModal } from './subscription-upgrade-modal';
 import { SubscriptionCancelModal } from './subscription-cancel-modal';
@@ -39,22 +41,114 @@ interface SubscriptionBillingProps {
     products: Plan[];
     currentSubscription: any;
     account: any;
+    shouldAutoSync?: boolean;
+    autoSyncReason?: string;
 }
 
-export function SubscriptionBilling({ products, currentSubscription, account }: SubscriptionBillingProps) {
+export function SubscriptionBilling({
+    products,
+    currentSubscription,
+    account,
+    shouldAutoSync,
+    autoSyncReason,
+}: SubscriptionBillingProps) {
     const [loading, setLoading] = useState<string | null>(null);
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+    const [hasAutoSynced, setHasAutoSynced] = useState(false);
+    const [lastAutoSyncTime, setLastAutoSyncTime] = useState<string>('Never');
     const { toast } = useToast();
+    const [isAutoSyncing, setIsAutoSyncing] = useState(false);
+
+    // Set last auto-sync time on client mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const lastSync = sessionStorage.getItem('lastAutoSync');
+            if (lastSync) {
+                setLastAutoSyncTime(new Date(parseInt(lastSync)).toLocaleTimeString());
+            }
+
+            // Check if user just returned from Stripe checkout
+            const urlParams = new URLSearchParams(window.location.search);
+            const checkoutSuccess = urlParams.get('success');
+            const checkoutCanceled = urlParams.get('canceled');
+
+            if (checkoutSuccess === 'true') {
+                console.log(
+                    '🎉 Returned from successful checkout, refreshing subscription data...'
+                );
+                toast({
+                    title: 'Payment successful!',
+                    description: 'Updating your subscription status...',
+                });
+
+                // Clear the URL parameters
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                // Trigger auto-sync after a short delay
+                setTimeout(() => {
+                    handleAutoSync();
+                }, 2000);
+            } else if (checkoutCanceled === 'true') {
+                console.log('❌ Checkout was canceled');
+                toast({
+                    title: 'Checkout canceled',
+                    description: 'Your subscription was not changed.',
+                    variant: 'destructive',
+                });
+
+                // Clear the URL parameters
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    }, []);
+
+    // Check if auto-sync should run based on server recommendation
+    const shouldAutoSyncFromServer = shouldAutoSync && typeof window !== 'undefined';
+
+    // Auto-sync effect
+    useEffect(() => {
+        if (shouldAutoSyncFromServer) {
+            console.log('🎯 Server recommended auto-sync:', autoSyncReason);
+
+            // Delay auto-sync slightly to allow page to load
+            const timer = setTimeout(() => {
+                handleAutoSync();
+            }, 1500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [shouldAutoSyncFromServer, autoSyncReason]);
 
     // Debug logging
     console.log('SubscriptionBilling received products:', products?.length || 0);
     console.log('Products data:', products);
-    console.log('🔍 FULL Current subscription object:', JSON.stringify(currentSubscription, null, 2));
-    console.log('🔍 Subscription status:', currentSubscription?.status);
+    console.log(
+        '🔍 FULL Current subscription object:',
+        JSON.stringify(currentSubscription, null, 2)
+    );
+    console.log('🔍 Subscription status:', currentSubscription?.subscription_status);
     console.log('🔍 Subscription cancel_at_period_end:', currentSubscription?.cancel_at_period_end);
-    console.log('🔍 Should show "Ends on"?', currentSubscription?.status === 'cancelled' || currentSubscription?.cancel_at_period_end);
-    console.log('🔍 All subscription keys:', currentSubscription ? Object.keys(currentSubscription) : 'No subscription');
-    console.log('🔍 Account stripe_subscription_id:', account?.stripe_subscription_id);
+    console.log(
+        '🔍 Should show "Ends on"?',
+        currentSubscription?.subscription_status === 'cancelled' ||
+            currentSubscription?.cancel_at_period_end
+    );
+    console.log(
+        '🔍 All subscription keys:',
+        currentSubscription ? Object.keys(currentSubscription) : 'No subscription'
+    );
+    console.log(
+        '🔍 Current subscription stripe_subscription_id:',
+        currentSubscription?.stripe_subscription_id
+    );
+    console.log('🔍 Auto-sync props:', { shouldAutoSync, autoSyncReason, hasAutoSynced });
+    console.log('🔍 Account data being passed to components:', {
+        account_id: account?.id,
+        account_email: account?.email,
+        account_type: typeof account?.id,
+        account_length: account?.id ? account.id.length : 'null',
+        full_account_keys: account ? Object.keys(account) : 'No account',
+    });
 
     const handleSubscribe = async (priceId: string) => {
         setLoading(priceId);
@@ -93,7 +187,8 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
             console.error('Error:', error);
             toast({
                 title: 'Error',
-                description: error instanceof Error ? error.message : 'Failed to start checkout process',
+                description:
+                    error instanceof Error ? error.message : 'Failed to start checkout process',
                 variant: 'destructive',
             });
         } finally {
@@ -111,7 +206,7 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    accountId: account.id
+                    accountId: account.id,
                 }),
             });
 
@@ -133,7 +228,293 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
             console.error('Error:', error);
             toast({
                 title: 'Error',
-                description: error instanceof Error ? error.message : 'Failed to open billing portal',
+                description:
+                    error instanceof Error ? error.message : 'Failed to open billing portal',
+                variant: 'destructive',
+            });
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleAutoSync = async () => {
+        if (isAutoSyncing) return;
+
+        console.log('🔄 Starting auto-sync for reason:', autoSyncReason);
+        setIsAutoSyncing(true);
+
+        try {
+            // Handle different auto-sync scenarios
+            if (autoSyncReason?.includes('subscription plan mismatch')) {
+                console.log('🔧 Detected table mismatch, fixing automatically...');
+                await handleTableMismatchSync();
+            } else if (autoSyncReason?.includes('expired but account plan')) {
+                console.log('🔧 Detected expired subscription, converting to Free...');
+                await handleExpiredSubscriptionSync();
+            } else if (autoSyncReason?.includes('No subscription found but account plan')) {
+                console.log('🔧 Detected missing subscription, syncing with Stripe...');
+                await handleMissingSubscriptionSync();
+            } else {
+                console.log('🔧 General sync case, checking Stripe...');
+                await handleGeneralStripeSync();
+            }
+        } catch (error) {
+            console.error('❌ Auto-sync failed:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            toast({
+                title: 'Sync failed',
+                description: `Could not update subscription status: ${errorMessage}`,
+                variant: 'destructive',
+            });
+        } finally {
+            setIsAutoSyncing(false);
+        }
+    };
+
+    const handleTableMismatchSync = async () => {
+        try {
+            console.log('🔧 Starting table mismatch sync...');
+
+            // Import Supabase client directly for table mismatch fix
+            const { createClient } = await import('@/utils/supabase/client');
+            const supabase = createClient();
+
+            console.log('✅ Supabase client created');
+
+            // Get current account data to sync subscription table to
+            console.log('🔍 Fetching account data for ID:', account.id);
+            const { data: accountData, error: accountError } = await supabase
+                .from('subscriptions')
+                .select('plan, stripe_subscription_id, subscription_status, emails_left')
+                .eq('id', account.id)
+                .single();
+
+            if (accountError) {
+                console.error('❌ Account fetch error:', accountError);
+                throw new Error('Failed to get account data: ' + accountError.message);
+            }
+
+            console.log('✅ Account data fetched:', accountData);
+
+            // Map plan to subscription details
+            const planDetails = {
+                Free: { seats: 1, analysis: 100, price: 0 },
+                Solo: { seats: 1, analysis: 1000, price: 9.9 },
+                Entrepreneur: { seats: 5, analysis: 5000, price: 29.9 },
+                Team: { seats: 20, analysis: 20000, price: 99.9 },
+            };
+
+            const details =
+                planDetails[accountData.plan as keyof typeof planDetails] || planDetails['Free'];
+            console.log('🔄 Using plan details:', details, 'for plan:', accountData.plan);
+
+            // Update subscription table to match account
+            console.log('🔄 Updating subscription table...');
+            const { data: subResult, error: subError } = await supabase
+                .from('subscriptions')
+                .update({
+                    plan_name: accountData.plan,
+                    subscription_status: accountData.subscription_status || 'active',
+                    cancel_at_period_end: false,
+                    seats: details.seats,
+                    price_per_seat: details.price,
+                    total_price: details.price,
+                    analysis_amount: details.analysis,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('account_id', account.id)
+                .select();
+
+            if (subError) {
+                console.error('❌ Subscription update error:', subError);
+                throw new Error('Failed to update subscription: ' + JSON.stringify(subError));
+            }
+
+            console.log('✅ Subscription table updated:', subResult);
+
+            toast({
+                title: 'Subscription updated',
+                description: `Automatically synced to ${accountData.plan} plan`,
+            });
+
+            // Store the sync time and refresh
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem('lastAutoSync', Date.now().toString());
+                setLastAutoSyncTime(new Date().toLocaleTimeString());
+            }
+
+            console.log('✅ Table mismatch sync completed, refreshing page...');
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            console.error('❌ Table mismatch sync error:', error);
+            throw error;
+        }
+    };
+
+    const handleExpiredSubscriptionSync = async () => {
+        try {
+            console.log('🔧 Starting expired subscription sync...');
+
+            const { createClient } = await import('@/utils/supabase/client');
+            const supabase = createClient();
+
+            console.log('✅ Supabase client created');
+
+            // Update subscription table to Free plan
+            console.log('🔄 Updating subscription table to Free...');
+            const { data: subResult, error: subError } = await supabase
+                .from('subscriptions')
+                .update({
+                    plan_name: 'Free',
+                    subscription_status: 'active',
+                    cancel_at_period_end: false,
+                    seats: 1,
+                    price_per_seat: 0,
+                    total_price: 0,
+                    analysis_amount: 0,
+                    current_period_start: new Date().toISOString(),
+                    current_period_end: null,
+                    stripe_subscription_id: null,
+                    emails_left: 0,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('account_id', account.id)
+                .select();
+
+            if (subError) {
+                console.error('❌ Subscription update error:', subError);
+                throw new Error('Failed to update subscription: ' + JSON.stringify(subError));
+            }
+
+            console.log('✅ Subscription updated to Free:', subResult);
+
+            toast({
+                title: 'Subscription expired',
+                description: 'Automatically converted to Free plan',
+            });
+
+            console.log('✅ Expired subscription sync completed, refreshing page...');
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (error) {
+            console.error('❌ Expired subscription sync error:', error);
+            throw error;
+        }
+    };
+
+    const handleMissingSubscriptionSync = async () => {
+        try {
+            console.log('🔧 Starting missing subscription sync...');
+            await handleGeneralStripeSync();
+        } catch (error) {
+            console.error('❌ Missing subscription sync error:', error);
+            throw error;
+        }
+    };
+
+    const handleGeneralStripeSync = async () => {
+        try {
+            console.log('🔧 Starting general Stripe sync...');
+
+            // Regular Stripe sync using the sync endpoint
+            const response = await fetch('/api/stripe/sync-subscription-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    accountId: account.id,
+                }),
+            });
+
+            console.log('📡 Stripe sync API response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Stripe sync API error:', errorText);
+                throw new Error(`Stripe sync failed: ${response.status} - ${errorText}`);
+            }
+
+            const result = await response.json();
+            console.log('✅ Stripe sync API result:', result);
+
+            if (result.success) {
+                // Store the sync time
+                if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('lastAutoSync', Date.now().toString());
+                    setLastAutoSyncTime(new Date().toLocaleTimeString());
+                }
+
+                toast({
+                    title: 'Subscription updated',
+                    description: result.message || 'Your subscription status has been refreshed.',
+                });
+
+                console.log('✅ General Stripe sync completed, refreshing page...');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                console.error('❌ Stripe sync API returned failure:', result);
+                throw new Error(result.error || 'Stripe sync failed');
+            }
+        } catch (error) {
+            console.error('❌ General Stripe sync error:', error);
+            throw error;
+        }
+    };
+
+    const handleSyncSubscription = async () => {
+        setLoading('sync');
+
+        try {
+            toast({
+                title: 'Syncing subscription...',
+                description: 'Checking latest subscription status from Stripe.',
+            });
+
+            const response = await fetch('/api/stripe/sync-subscription-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    accountId: account.id,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Mark successful sync
+                handleSyncComplete();
+
+                if (result.status === 'free') {
+                    toast({
+                        title: 'Subscription Updated',
+                        description:
+                            'Your subscription has ended and you are now on the Free plan.',
+                    });
+                } else {
+                    toast({
+                        title: 'Subscription Synced',
+                        description: result.message || 'Subscription status updated successfully.',
+                    });
+                }
+
+                // Force a page refresh to show updated data
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Sync failed',
+                    description: result.error || 'Could not sync subscription status.',
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            toast({
+                title: 'Error',
+                description: error instanceof Error ? error.message : 'Failed to sync subscription',
                 variant: 'destructive',
             });
         } finally {
@@ -151,15 +532,15 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
     // Default plan features for fallback
     const getDefaultFeatures = (planName: string) => {
         const defaultFeatures: Record<string, string[]> = {
-            'Solo': [
+            Solo: [
                 'Up to 1,000 email analyses per month',
                 'Real-time threat detection',
                 'Basic AI analysis',
                 'Email support',
                 'Standard security rules',
-                'Basic API access'
+                'Basic API access',
             ],
-            'Entrepreneur': [
+            Entrepreneur: [
                 'Up to 5,000 email analyses per month',
                 'Real-time threat detection',
                 'Advanced AI analysis',
@@ -167,9 +548,9 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
                 'Custom rules & policies',
                 'Full API access',
                 'Advanced reporting',
-                'Team collaboration'
+                'Team collaboration',
             ],
-            'Team': [
+            Team: [
                 'Up to 20,000 email analyses per month',
                 'Real-time threat detection',
                 'Advanced AI analysis',
@@ -179,8 +560,8 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
                 'HIPAA compliance',
                 'Dedicated account manager',
                 'Custom integrations',
-                'Multi-team management'
-            ]
+                'Multi-team management',
+            ],
         };
         return defaultFeatures[planName] || [];
     };
@@ -188,235 +569,630 @@ export function SubscriptionBilling({ products, currentSubscription, account }: 
     const getPlanIcon = (planName: string) => {
         switch (planName.toLowerCase()) {
             case 'solo':
-                return <IconBolt className="h-5 w-5 text-blue-400" />;
+                return <IconBolt className='h-5 w-5 text-blue-400' />;
             case 'entrepreneur':
-                return <IconStar className="h-5 w-5 text-purple-400" />;
+                return <IconStar className='h-5 w-5 text-purple-400' />;
             case 'team':
-                return <IconUsers className="h-5 w-5 text-emerald-400" />;
+                return <IconUsers className='h-5 w-5 text-emerald-400' />;
             default:
-                return <IconUsers className="h-5 w-5 text-neutral-400" />;
+                return <IconUsers className='h-5 w-5 text-neutral-400' />;
         }
     };
 
     const getSeatsFromPlan = (planName: string): number => {
         const planSeats: Record<string, number> = {
-            'Free': 1,
-            'Solo': 1,
-            'Entrepreneur': 5,
-            'Team': 20,
+            Free: 1,
+            Solo: 1,
+            Entrepreneur: 5,
+            Team: 20,
         };
 
         return planSeats[planName] || 1;
     };
 
+    // Clear session storage on successful manual sync
+    const handleSyncComplete = () => {
+        if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('autoSyncAttempted');
+            const timestamp = Date.now().toString();
+            sessionStorage.setItem('lastAutoSync', timestamp);
+            setLastAutoSyncTime(new Date(parseInt(timestamp)).toLocaleTimeString());
+        }
+    };
+
+    const handleManualRefresh = () => {
+        toast({
+            title: 'Refreshing subscription data...',
+            description: 'Getting the latest information from Stripe.',
+        });
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+    };
+
     return (
-        <div className="space-y-6">
+        <div className='space-y-6'>
+            {/* Auto-sync status banner */}
+            {loading === 'auto-sync' && (
+                <Card className='border-blue-500/50 bg-blue-950/20'>
+                    <CardContent className='pt-6'>
+                        <div className='flex items-center space-x-3'>
+                            <IconLoader className='h-5 w-5 text-blue-400 animate-spin' />
+                            <div>
+                                <p className='text-blue-400 font-medium'>
+                                    Updating subscription status...
+                                </p>
+                                <p className='text-blue-300/70 text-sm'>
+                                    Fetching the latest data from Stripe
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             {/* Current Subscription Card */}
             {currentSubscription && (
-                <Card className="border-neutral-800 bg-neutral-900">
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center space-x-2">
-                            <div className="bg-gradient-to-r from-amber-500 to-amber-300 rounded-full p-1.5">
-                                <IconCrown className="h-4 w-4 text-black" />
+                <Card className='border-neutral-800 bg-neutral-900'>
+                    <CardHeader className='pb-3'>
+                        <div className='flex items-center space-x-2'>
+                            <div className='bg-gradient-to-r from-amber-500 to-amber-300 rounded-full p-1.5'>
+                                <IconCrown className='h-4 w-4 text-black' />
                             </div>
                             <div>
-                                <CardTitle className="text-lg">Current Plan</CardTitle>
-                                <CardDescription>{currentSubscription.plan_name} Subscription</CardDescription>
+                                <CardTitle className='text-lg'>Current Plan</CardTitle>
+                                <CardDescription>
+                                    {currentSubscription.plan_name} Subscription
+                                </CardDescription>
                             </div>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex justify-between items-center mb-4">
-                            <div className="flex items-center space-x-3">
+                        <div className='flex justify-between items-start mb-4'>
+                            <div>
+                                <h3 className='text-lg font-semibold text-white'>
+                                    Subscription Status
+                                </h3>
+                                <p className='text-zinc-400 text-sm'>
+                                    Manage your subscription and billing
+                                </p>
+                            </div>
+                            <Button
+                                variant='outline'
+                                size='sm'
+                                onClick={handleManualRefresh}
+                                className='text-zinc-300 border-zinc-600 hover:bg-zinc-700'
+                                disabled={isAutoSyncing}
+                            >
+                                {isAutoSyncing ? (
+                                    <>
+                                        <Loader2 className='h-4 w-4 mr-1 animate-spin' />
+                                        Syncing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <RefreshCw className='h-4 w-4 mr-1' />
+                                        Refresh
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+
+                        <div className='flex justify-between items-center mb-4'>
+                            <div className='flex items-center space-x-3'>
                                 {getPlanIcon(currentSubscription.plan_name)}
                                 <div>
-                                    <h3 className="font-medium text-lg">{currentSubscription.plan_name}</h3>
-                                    <p className="text-sm text-neutral-400">
+                                    <h3 className='font-medium text-lg'>
+                                        {currentSubscription.plan_name}
+                                    </h3>
+                                    <p className='text-sm text-neutral-400'>
                                         ${currentSubscription.total_price}/month
                                     </p>
                                 </div>
                             </div>
-                            <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">
-                                {currentSubscription.status}
-                            </Badge>
+
+                            {(() => {
+                                const now = new Date();
+                                const endDate = new Date(currentSubscription.current_period_end);
+                                const isStillActive = endDate > now;
+                                const isCancelledAtPeriodEnd =
+                                    currentSubscription.cancel_at_period_end;
+
+                                if (isCancelledAtPeriodEnd && isStillActive) {
+                                    // Subscription is cancelled but still active until end date
+                                    return (
+                                        <Badge className='bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'>
+                                            Active (Ending Soon)
+                                        </Badge>
+                                    );
+                                } else if (isCancelledAtPeriodEnd && !isStillActive) {
+                                    // Subscription has ended
+                                    return (
+                                        <Badge className='bg-red-500/20 text-red-400 hover:bg-red-500/30'>
+                                            Expired
+                                        </Badge>
+                                    );
+                                } else {
+                                    // Active subscription
+                                    return (
+                                        <Badge className='bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'>
+                                            Active
+                                        </Badge>
+                                    );
+                                }
+                            })()}
                         </div>
 
                         {currentSubscription.current_period_end && (
-                            <p className="text-sm text-neutral-400 mb-4">
-                                {currentSubscription.status === 'cancelled' || currentSubscription.cancel_at_period_end
-                                    ? 'Ends on'
-                                    : 'Renews on'
-                                } {new Date(currentSubscription.current_period_end).toLocaleDateString()}
+                            <p className='text-sm text-neutral-400 mb-4'>
+                                {currentSubscription.cancel_at_period_end ? 'Ends on' : 'Renews on'}{' '}
+                                {new Date(
+                                    currentSubscription.current_period_end
+                                ).toLocaleDateString()}
                             </p>
                         )}
 
-                        <div className="flex flex-wrap gap-2">
+                        {/* Scheduled Plan Change Banner */}
+                        {currentSubscription.scheduled_plan_change &&
+                            currentSubscription.scheduled_change_date && (
+                                <div className='bg-blue-950/30 border border-blue-700/50 rounded-lg p-4 mb-4'>
+                                    <div className='flex items-center space-x-3'>
+                                        <div className='bg-blue-900/50 p-2 rounded-md'>
+                                            <IconClock className='h-5 w-5 text-blue-400' />
+                                        </div>
+                                        <div className='flex-1'>
+                                            <h4 className='font-medium text-blue-300'>
+                                                Scheduled Plan Change
+                                            </h4>
+                                            <p className='text-sm text-blue-400/80'>
+                                                Your plan will change to{' '}
+                                                <span className='font-medium text-blue-300'>
+                                                    {currentSubscription.scheduled_plan_change}
+                                                </span>{' '}
+                                                on{' '}
+                                                <span className='font-medium text-blue-300'>
+                                                    {new Date(
+                                                        currentSubscription.scheduled_change_date
+                                                    ).toLocaleDateString()}
+                                                </span>
+                                            </p>
+                                            <p className='text-xs text-blue-400/60 mt-1'>
+                                                You'll continue to have access to your current{' '}
+                                                {currentSubscription.plan_name} plan until then.
+                                            </p>
+                                        </div>
+                                        <Button
+                                            variant='outline'
+                                            size='sm'
+                                            className='text-blue-400 border-blue-600 hover:bg-blue-950/50'
+                                            onClick={async () => {
+                                                try {
+                                                    toast({
+                                                        title: 'Cancelling scheduled change...',
+                                                        description:
+                                                            'Removing the scheduled plan change.',
+                                                    });
+
+                                                    // Call API to cancel the scheduled change
+                                                    const response = await fetch(
+                                                        '/api/stripe/cancel-scheduled-change',
+                                                        {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                            },
+                                                            body: JSON.stringify({
+                                                                accountId: account.id,
+                                                                scheduleId:
+                                                                    currentSubscription.stripe_schedule_id,
+                                                            }),
+                                                        }
+                                                    );
+
+                                                    const result = await response.json();
+
+                                                    if (result.success) {
+                                                        toast({
+                                                            title: 'Scheduled change cancelled',
+                                                            description:
+                                                                'Your plan will remain as is. Refreshing...',
+                                                        });
+                                                        setTimeout(
+                                                            () => window.location.reload(),
+                                                            1500
+                                                        );
+                                                    } else {
+                                                        toast({
+                                                            variant: 'destructive',
+                                                            title: 'Error',
+                                                            description:
+                                                                result.error ||
+                                                                'Could not cancel scheduled change.',
+                                                        });
+                                                    }
+                                                } catch (error) {
+                                                    toast({
+                                                        variant: 'destructive',
+                                                        title: 'Error',
+                                                        description:
+                                                            'Could not cancel scheduled change.',
+                                                    });
+                                                }
+                                            }}
+                                        >
+                                            Cancel Change
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                        <div className='flex flex-wrap gap-2'>
                             <Button
-                                variant="outline"
+                                variant='outline'
                                 onClick={handleManageBilling}
                                 disabled={loading === 'portal'}
                             >
-                                {loading === 'portal' && <IconLoader className="h-4 w-4 mr-2 animate-spin" />}
-                                <IconCreditCard className="h-4 w-4 mr-2" />
+                                {loading === 'portal' && (
+                                    <IconLoader className='h-4 w-4 mr-2 animate-spin' />
+                                )}
                                 Manage Billing
                             </Button>
 
-                            {/* Only show cancel button if subscription is not already cancelled */}
-                            {!(currentSubscription.status === 'cancelled' || currentSubscription.cancel_at_period_end) ? (
-                                <SubscriptionCancelModal
-                                    currentPlan={currentSubscription.plan_name}
-                                    currentSeats={currentSubscription.seats || 1}
-                                    currentPrice={currentSubscription.total_price || 0}
-                                    accountId={account.id}
-                                    subscriptionId={account.stripe_subscription_id}
-                                    periodEnd={currentSubscription.current_period_end}
-                                    onCancelComplete={() => window.location.reload()}
-                                />
-                            ) : (
-                                <Badge className="bg-amber-900/30 text-amber-400 border border-amber-700 px-3 py-1">
-                                    Subscription Cancelled
-                                </Badge>
-                            )}
+                            {/* Manual sync button for troubleshooting */}
+                            <Button
+                                variant='outline'
+                                onClick={async () => {
+                                    setLoading('sync');
+                                    try {
+                                        toast({
+                                            title: 'Syncing subscription...',
+                                            description:
+                                                'Fetching latest subscription data from Stripe.',
+                                        });
+
+                                        const response = await fetch(
+                                            '/api/stripe/sync-subscription-status',
+                                            {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                body: JSON.stringify({
+                                                    accountId: account.id,
+                                                }),
+                                            }
+                                        );
+
+                                        const result = await response.json();
+
+                                        if (result.success) {
+                                            const planName =
+                                                result.planName ||
+                                                (result.status === 'free' ? 'Free' : 'Unknown');
+                                            toast({
+                                                title: 'Subscription synced!',
+                                                description: `Updated to ${planName} plan. Refreshing page...`,
+                                            });
+                                            // Force a page refresh to show updated data
+                                            setTimeout(() => {
+                                                window.location.reload();
+                                            }, 1500);
+                                        } else {
+                                            toast({
+                                                variant: 'destructive',
+                                                title: 'Sync failed',
+                                                description:
+                                                    result.error ||
+                                                    'Could not sync subscription from Stripe.',
+                                            });
+                                        }
+                                    } catch (error) {
+                                        console.error('Sync error:', error);
+                                        toast({
+                                            variant: 'destructive',
+                                            title: 'Sync error',
+                                            description:
+                                                error instanceof Error
+                                                    ? error.message
+                                                    : 'Could not connect to sync service.',
+                                        });
+                                    } finally {
+                                        setLoading(null);
+                                    }
+                                }}
+                                disabled={loading === 'sync'}
+                                className='text-green-400 border-green-600 hover:bg-green-950/30'
+                                title='Force sync subscription from Stripe'
+                            >
+                                {loading === 'sync' && (
+                                    <IconLoader className='h-4 w-4 mr-2 animate-spin' />
+                                )}
+                                <RefreshCw className='h-4 w-4 mr-2' />
+                                Force Sync
+                            </Button>
+
+                            {(() => {
+                                // Don't show cancel subscription button for Free plan
+                                if (currentSubscription.plan_name === 'Free') {
+                                    return null;
+                                }
+
+                                const now = new Date();
+                                const endDate = new Date(currentSubscription.current_period_end);
+                                const isStillActive = endDate > now;
+                                const isCancelledAtPeriodEnd =
+                                    currentSubscription.cancel_at_period_end;
+
+                                if (isCancelledAtPeriodEnd && isStillActive) {
+                                    // Show reactivate button for cancelled subscriptions that are still active
+                                    return (
+                                        <Button
+                                            variant='outline'
+                                            className='border-emerald-700 text-emerald-400 hover:bg-emerald-950/30'
+                                            onClick={async () => {
+                                                try {
+                                                    const response = await fetch(
+                                                        '/api/stripe/reactivate-subscription',
+                                                        {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                            },
+                                                            body: JSON.stringify({
+                                                                subscriptionId:
+                                                                    currentSubscription.stripe_subscription_id,
+                                                                accountId: account.id,
+                                                            }),
+                                                        }
+                                                    );
+
+                                                    const result = await response.json();
+
+                                                    if (result.success) {
+                                                        toast({
+                                                            title: 'Subscription reactivated!',
+                                                            description:
+                                                                'Your subscription will now continue past the end date. Refreshing page...',
+                                                            duration: 2000,
+                                                        });
+
+                                                        // Add a small delay to show the success message
+                                                        setTimeout(() => {
+                                                            console.log(
+                                                                '🔄 Reactivation success - refreshing page'
+                                                            );
+                                                            window.location.reload();
+                                                        }, 1500);
+                                                    } else {
+                                                        throw new Error(result.error);
+                                                    }
+                                                } catch (error) {
+                                                    toast({
+                                                        title: 'Reactivation failed',
+                                                        description:
+                                                            'Could not reactivate subscription. Please try again.',
+                                                        variant: 'destructive',
+                                                    });
+                                                }
+                                            }}
+                                        >
+                                            Reactivate Subscription
+                                        </Button>
+                                    );
+                                } else if (isCancelledAtPeriodEnd && !isStillActive) {
+                                    // Subscription has expired - show choose new plan button
+                                    return (
+                                        <Button
+                                            variant='outline'
+                                            className='border-blue-700 text-blue-400 hover:bg-blue-950/30'
+                                            onClick={() => {
+                                                const plansSection =
+                                                    document.getElementById('available-plans');
+                                                if (plansSection) {
+                                                    plansSection.scrollIntoView({
+                                                        behavior: 'smooth',
+                                                    });
+                                                }
+                                                toast({
+                                                    title: 'Choose a new plan',
+                                                    description:
+                                                        'Select from the available plans below to resubscribe.',
+                                                });
+                                            }}
+                                        >
+                                            Choose New Plan
+                                        </Button>
+                                    );
+                                } else {
+                                    // Active subscription - show cancel button
+                                    return (
+                                        <SubscriptionCancelModal
+                                            currentPlan={currentSubscription.plan_name}
+                                            currentSeats={currentSubscription.seats || 1}
+                                            currentPrice={currentSubscription.total_price || 0}
+                                            accountId={account.id}
+                                            subscriptionId={
+                                                currentSubscription.stripe_subscription_id
+                                            }
+                                            periodEnd={currentSubscription.current_period_end}
+                                            onCancelComplete={() => window.location.reload()}
+                                        />
+                                    );
+                                }
+                            })()}
                         </div>
                     </CardContent>
                 </Card>
             )}
 
             {/* Available Plans */}
-            <Card className="border-neutral-800 bg-neutral-900">
-                <CardHeader>
-                    <CardTitle>Available Plans</CardTitle>
-                    <CardDescription>Choose the plan that works best for your security needs</CardDescription>
+            <div className='mt-12'>
+                <div className='text-center mb-8'>
+                    <h2 className='text-3xl font-bold text-white mb-4'>Choose Your Plan</h2>
+                    <p className='text-zinc-400 text-lg max-w-2xl mx-auto'>
+                        Select the plan that best fits your needs. Upgrade or downgrade at any time.
+                    </p>
+                </div>
 
-                    {/* Billing Toggle */}
-                    <div className="flex items-center space-x-2 mt-4">
-                        <Button
-                            variant={billingCycle === 'monthly' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBillingCycle('monthly')}
-                        >
-                            Monthly
-                        </Button>
-                        <Button
-                            variant={billingCycle === 'yearly' ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => setBillingCycle('yearly')}
-                        >
-                            Yearly
-                        </Button>
-                        {billingCycle === 'yearly' && (
-                            <Badge variant="secondary" className="ml-2">
-                                <IconStar className="h-3 w-3 mr-1" />
-                                Save 20%
-                            </Badge>
-                        )}
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {/* Debug info */}
-                        {(!products || products.length === 0) && (
-                            <div className="col-span-full text-center py-8 text-neutral-400">
-                                <p>No products available. Check console for debug info.</p>
-                                <p className="text-xs mt-2">Products array: {products ? `${products.length} items` : 'null/undefined'}</p>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6' id='available-plans'>
+                    {products.map((product: Plan) => {
+                        console.log(`Processing product: ${product.name}`, product.prices);
+
+                        const price = product.prices.find(
+                            (p) => p.interval === (billingCycle === 'yearly' ? 'year' : 'month')
+                        );
+
+                        console.log(
+                            `Found price for ${product.name}:`,
+                            price,
+                            'for billing cycle:',
+                            billingCycle
+                        );
+
+                        if (!price) {
+                            console.log(
+                                `No price found for ${product.name} with interval ${billingCycle === 'yearly' ? 'year' : 'month'}`
+                            );
+                            return null;
+                        }
+
+                        const isCurrentPlan = currentSubscription?.plan_name === product.name;
+                        const features =
+                            product.metadata.features?.split(',') ||
+                            getDefaultFeatures(product.name);
+                        const isPopular = product.name.toLowerCase() === 'pro';
+
+                        return (
+                            <div
+                                key={product.id}
+                                className={`relative border rounded-lg p-6 ${
+                                    isCurrentPlan
+                                        ? 'border-amber-500 bg-amber-500/5'
+                                        : isPopular
+                                          ? 'border-blue-500 bg-blue-500/5'
+                                          : 'border-neutral-800 bg-neutral-900/50'
+                                }`}
+                            >
+                                {isPopular && !isCurrentPlan && (
+                                    <div className='absolute -top-3 left-1/2 transform -translate-x-1/2'>
+                                        <Badge className='bg-blue-500 text-white'>
+                                            Most Popular
+                                        </Badge>
+                                    </div>
+                                )}
+
+                                <div className='flex items-center justify-between mb-2'>
+                                    <div className='flex items-center space-x-2'>
+                                        {getPlanIcon(product.name)}
+                                        <h3 className='font-semibold text-lg'>{product.name}</h3>
+                                    </div>
+                                    {isCurrentPlan && (
+                                        <Badge className='bg-amber-500/20 text-amber-400'>
+                                            Current
+                                        </Badge>
+                                    )}
+                                </div>
+                                <p className='text-neutral-400 text-sm mb-4'>
+                                    {product.description}
+                                </p>
+
+                                <div className='mb-6'>
+                                    <span className='text-3xl font-bold'>
+                                        {formatPrice(price.amount, price.currency)}
+                                    </span>
+                                    <span className='text-neutral-400 ml-1'>
+                                        /{billingCycle === 'yearly' ? 'year' : 'month'}
+                                    </span>
+                                    {billingCycle === 'yearly' && price.amount > 0 && (
+                                        <div className='text-xs text-emerald-400 mt-1'>
+                                            Save 20% with annual billing
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Plan Features */}
+                                <ul className='space-y-2 mb-6'>
+                                    {features.map((feature: string, index: number) => (
+                                        <li key={index} className='flex items-start'>
+                                            <IconCheck className='h-5 w-5 text-emerald-400 mr-2 flex-shrink-0 mt-0.5' />
+                                            <span className='text-sm'>{feature.trim()}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                {isCurrentPlan ? (
+                                    <Button className='w-full' variant='outline' disabled>
+                                        Current Plan
+                                    </Button>
+                                ) : (
+                                    <SubscriptionUpgradeModal
+                                        currentPlan={currentSubscription?.plan_name || 'Free'}
+                                        currentSeats={currentSubscription?.seats || 1}
+                                        targetPlan={product.name}
+                                        targetSeats={getSeatsFromPlan(product.name)}
+                                        targetPriceId={price.id}
+                                        accountId={account.id}
+                                        currentPeriodEnd={
+                                            currentSubscription?.current_period_end ||
+                                            new Date(
+                                                Date.now() + 30 * 24 * 60 * 60 * 1000
+                                            ).toISOString()
+                                        }
+                                        onUpgradeComplete={() => window.location.reload()}
+                                    />
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Debug section - only show in development or when explicitly needed */}
+            {process.env.NODE_ENV === 'development' && (shouldAutoSync || hasAutoSynced) && (
+                <Card className='border-purple-500/50 bg-purple-950/20'>
+                    <CardHeader>
+                        <CardTitle className='text-purple-400 text-sm'>
+                            Auto-Sync Debug (Dev Only)
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className='space-y-2 text-xs'>
+                            <div>
+                                <strong>Should Auto-Sync:</strong> {shouldAutoSync ? 'Yes' : 'No'}
+                            </div>
+                            <div>
+                                <strong>Has Auto-Synced:</strong> {hasAutoSynced ? 'Yes' : 'No'}
+                            </div>
+                            <div>
+                                <strong>Auto-Sync Reason:</strong> {autoSyncReason || 'None'}
+                            </div>
+                            <div>
+                                <strong>Loading State:</strong> {loading || 'None'}
+                            </div>
+                            <div>
+                                <strong>Last Auto-Sync:</strong> {lastAutoSyncTime}
+                            </div>
+                        </div>
+
+                        {shouldAutoSync && !hasAutoSynced && (
+                            <div className='mt-3 p-2 bg-blue-900/30 rounded border border-blue-700'>
+                                <p className='text-blue-300 text-xs'>
+                                    🎯 Server recommended auto-sync: {autoSyncReason}
+                                </p>
                             </div>
                         )}
 
-                        {products && products.map((product) => {
-                            console.log(`Processing product: ${product.name}`, product.prices);
-
-                            const price = product.prices.find(p =>
-                                p.interval === (billingCycle === 'yearly' ? 'year' : 'month')
-                            );
-
-                            console.log(`Found price for ${product.name}:`, price, 'for billing cycle:', billingCycle);
-
-                            if (!price) {
-                                console.log(`No price found for ${product.name} with interval ${billingCycle === 'yearly' ? 'year' : 'month'}`);
-                                return null;
-                            }
-
-                            const isCurrentPlan = currentSubscription?.plan_name === product.name;
-                            const features = product.metadata.features?.split(',') || getDefaultFeatures(product.name);
-                            const isPopular = product.name.toLowerCase() === 'pro';
-
-                            return (
-                                <div
-                                    key={product.id}
-                                    className={`relative border rounded-lg p-6 ${isCurrentPlan
-                                            ? 'border-amber-500 bg-amber-500/5'
-                                            : isPopular
-                                                ? 'border-blue-500 bg-blue-500/5'
-                                                : 'border-neutral-800 bg-neutral-900/50'
-                                        }`}
-                                >
-                                    {isPopular && !isCurrentPlan && (
-                                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                            <Badge className="bg-blue-500 text-white">
-                                                Most Popular
-                                            </Badge>
-                                        </div>
-                                    )}
-
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center space-x-2">
-                                            {getPlanIcon(product.name)}
-                                            <h3 className="font-semibold text-lg">{product.name}</h3>
-                                        </div>
-                                        {isCurrentPlan && (
-                                            <Badge className="bg-amber-500/20 text-amber-400">
-                                                Current
-                                            </Badge>
-                                        )}
-                                    </div>
-                                    <p className="text-neutral-400 text-sm mb-4">{product.description}</p>
-
-                                    <div className="mb-6">
-                                        <span className="text-3xl font-bold">
-                                            {formatPrice(price.amount, price.currency)}
-                                        </span>
-                                        <span className="text-neutral-400 ml-1">
-                                            /{billingCycle === 'yearly' ? 'year' : 'month'}
-                                        </span>
-                                        {billingCycle === 'yearly' && price.amount > 0 && (
-                                            <div className="text-xs text-emerald-400 mt-1">
-                                                Save 20% with annual billing
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Plan Features */}
-                                    <ul className="space-y-2 mb-6">
-                                        {features.map((feature: string, index: number) => (
-                                            <li key={index} className="flex items-start">
-                                                <IconCheck className="h-5 w-5 text-emerald-400 mr-2 flex-shrink-0 mt-0.5" />
-                                                <span className="text-sm">{feature.trim()}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-
-                                    {isCurrentPlan ? (
-                                        <Button className="w-full" variant="outline" disabled>
-                                            Current Plan
-                                        </Button>
-                                    ) : (
-                                        <SubscriptionUpgradeModal
-                                            currentPlan={currentSubscription?.plan_name || 'Free'}
-                                            currentSeats={currentSubscription?.seats || 1}
-                                            targetPlan={product.name}
-                                            targetSeats={getSeatsFromPlan(product.name)}
-                                            targetPriceId={price.id}
-                                            accountId={account.id}
-                                            currentPeriodEnd={currentSubscription?.current_period_end || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()}
-                                            onUpgradeComplete={() => window.location.reload()}
-                                        />
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </CardContent>
-            </Card>
+                        {hasAutoSynced && (
+                            <div className='mt-3 p-2 bg-green-900/30 rounded border border-green-700'>
+                                <p className='text-green-300 text-xs'>
+                                    ✅ Auto-sync triggered. Page will refresh when complete.
+                                </p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }

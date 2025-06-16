@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         const planName = getPlanNameFromPriceId(priceId);
 
         const subscriptionData = {
-            status: forceImmediate ? 'active' : subscriptionToUse.status,
+            subscription_status: forceImmediate ? 'active' : subscriptionToUse.status,
             plan_name: planName,
             current_period_start: new Date(subscriptionToUse.current_period_start * 1000).toISOString(),
             current_period_end: new Date(subscriptionToUse.current_period_end * 1000).toISOString(),
@@ -115,16 +115,7 @@ export async function POST(request: NextRequest) {
             throw updateError;
         }
 
-        // Update account table
-        await supabase
-            .from('accounts')
-            .update({
-                plan: planName,
-                susbscription_status: subscriptionData.status,
-                subscription_ends_at: subscriptionData.current_period_end,
-                updated_at: new Date().toISOString(),
-            })
-            .eq('id', accountId);
+        // ✅ REMOVED: No longer update accounts table - subscriptions table is single source of truth
 
         // Step 6: Return detailed response
         return NextResponse.json({
@@ -132,7 +123,7 @@ export async function POST(request: NextRequest) {
             message: `Subscription synced successfully: ${reason}`,
             subscription: {
                 plan_name: planName,
-                status: subscriptionData.status,
+                status: subscriptionData.subscription_status,
                 stripe_subscription_id: subscriptionToUse.id,
                 seats: subscriptionData.seats
             },

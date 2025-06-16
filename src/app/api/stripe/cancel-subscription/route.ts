@@ -43,18 +43,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Verify the Stripe subscription ID matches (for security)
-        // Get it from accounts table
-        const { data: account, error: accountError } = await supabase
-            .from('accounts')
-            .select('stripe_subscription_id')
-            .eq('id', accountId)
-            .single();
-
-        if (accountError || account?.stripe_subscription_id !== subscriptionId) {
+        if (subscription.stripe_subscription_id !== subscriptionId) {
             console.log('❌ Stripe subscription ID mismatch:', {
                 expected: subscriptionId,
-                actual: account?.stripe_subscription_id,
-                accountError
+                actual: subscription.stripe_subscription_id,
             });
             return NextResponse.json({ error: 'Subscription ID mismatch' }, { status: 403 });
         }
@@ -79,7 +71,7 @@ export async function POST(request: NextRequest) {
 
         // Update subscription in database
         const subscriptionUpdate = {
-            status: cancelAtPeriodEnd ? 'active' : 'cancelled',
+            subscription_status: cancelAtPeriodEnd ? 'active' : 'cancelled',
             cancel_at_period_end: Boolean(cancelAtPeriodEnd), // Explicitly convert to boolean
             updated_at: new Date().toISOString(),
         };
@@ -121,17 +113,25 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Update account if cancelled immediately
+        // Update subscription to Free plan if cancelled immediately
         if (!cancelAtPeriodEnd) {
             await supabase
-                .from('accounts')
+                .from('subscriptions')
                 .update({
-                    plan: 'Free',
-                    susbscription_status: 'cancelled',
-                    subscription_ends_at: null,
+                    plan_name: 'Free',
+                    subscription_status: 'active', // Free plan is active
+                    cancel_at_period_end: false,
+                    seats: 1,
+                    price_per_seat: 0,
+                    total_price: 0,
+                    analysis_amount: 100,
+                    current_period_start: new Date().toISOString(),
+                    current_period_end: null,
+                    stripe_subscription_id: null,
+                    emails_left: 100,
                     updated_at: new Date().toISOString(),
                 })
-                .eq('id', accountId);
+                .eq('account_id', accountId);
         }
 
         return NextResponse.json({

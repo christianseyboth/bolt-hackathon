@@ -26,7 +26,9 @@ export function SubscriptionStatusBanner({
     const { toast } = useToast();
 
     const periodEndDate = new Date(periodEnd);
-    const daysUntilRenewal = Math.ceil((periodEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    const daysUntilRenewal = Math.ceil(
+        (periodEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
     const isNearRenewal = daysUntilRenewal <= 7;
 
     // Check for pending subscription changes
@@ -63,7 +65,9 @@ export function SubscriptionStatusBanner({
                     setPendingChanges({
                         hasScheduled: analysis.scheduled_subscriptions > 0,
                         totalSubscriptions: analysis.total_subscriptions,
-                        scheduledPlans: result.all_subscriptions?.filter(sub => sub.status !== 'active'),
+                        scheduledPlans: result.all_subscriptions?.filter(
+                            (sub) => sub.subscription_status !== 'active'
+                        ),
                     });
                 } else {
                     setPendingChanges(null);
@@ -134,8 +138,9 @@ export function SubscriptionStatusBanner({
                                     Subscription Upgrade Pending
                                 </div>
                                 <div className='text-sm text-blue-400/80'>
-                                    Your upgrade to {scheduledPlan?.plan || 'new plan'} will take effect on{' '}
-                                    {periodEndDate.toLocaleDateString()} ({daysUntilRenewal} days)
+                                    Your upgrade to {scheduledPlan?.plan || 'new plan'} will take
+                                    effect on {periodEndDate.toLocaleDateString()} (
+                                    {daysUntilRenewal} days)
                                 </div>
                             </div>
                         </div>
@@ -156,7 +161,9 @@ export function SubscriptionStatusBanner({
                                 onClick={checkPendingChanges}
                                 disabled={isChecking}
                             >
-                                <IconRefresh className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`} />
+                                <IconRefresh
+                                    className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`}
+                                />
                             </Button>
                         </div>
                     </div>
@@ -180,7 +187,8 @@ export function SubscriptionStatusBanner({
                                     Subscription Renewal Soon
                                 </div>
                                 <div className='text-sm text-amber-400/80'>
-                                    Your {currentPlan} plan will renew in {daysUntilRenewal} day{daysUntilRenewal !== 1 ? 's' : ''} on{' '}
+                                    Your {currentPlan} plan will renew in {daysUntilRenewal} day
+                                    {daysUntilRenewal !== 1 ? 's' : ''} on{' '}
                                     {periodEndDate.toLocaleDateString()}
                                 </div>
                             </div>

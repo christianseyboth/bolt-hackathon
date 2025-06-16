@@ -28,11 +28,12 @@ export default async function SettingsPage() {
         redirect('/login');
     }
 
-    // Get current subscription using the proper utility function
+    // Get current subscription using single source of truth
     const {
         subscription: currentSubscription,
         error: subscriptionError,
-        totalActiveSubscriptions,
+        isActive,
+        isExpired,
     } = await getCurrentActiveSubscription(account.id);
 
     // Log subscription status for debugging
@@ -40,19 +41,29 @@ export default async function SettingsPage() {
         console.log('🔍 Subscription error:', subscriptionError);
     }
 
-    if (totalActiveSubscriptions && totalActiveSubscriptions > 1) {
-        console.log(
-            `⚠️ Multiple active subscriptions found (${totalActiveSubscriptions}), using most recent`
-        );
+    // Auto-sync is no longer needed since we're using single source of truth
+    // The subscriptions table IS the truth, not the accounts table
+    let shouldAutoSync = false;
+    let autoSyncReason = '';
+
+    // Only auto-sync if we have Stripe integration issues (missing customer ID, etc.)
+    if (
+        currentSubscription &&
+        currentSubscription.stripe_subscription_id &&
+        !currentSubscription.stripe_customer_id
+    ) {
+        shouldAutoSync = true;
+        autoSyncReason = 'Subscription missing Stripe customer ID';
     }
 
-    // Debug logging for subscription data
-    console.log('🔍 Current subscription data:', {
-        id: currentSubscription?.id,
-        status: currentSubscription?.status,
-        cancel_at_period_end: currentSubscription?.cancel_at_period_end,
-        plan_name: currentSubscription?.plan_name,
-        current_period_end: currentSubscription?.current_period_end,
+    // Debug logging for auto-sync decision
+    console.log('🔍 Auto-sync check:', {
+        shouldAutoSync,
+        autoSyncReason,
+        currentSubscriptionStatus: currentSubscription?.status,
+        currentSubscriptionPlan: currentSubscription?.plan_name,
+        accountPlan: account.plan,
+        subscriptionUpdatedAt: currentSubscription?.updated_at,
     });
 
     // Fetch Stripe products
@@ -173,6 +184,8 @@ export default async function SettingsPage() {
                     products={products}
                     currentSubscription={currentSubscription}
                     account={account}
+                    shouldAutoSync={shouldAutoSync}
+                    autoSyncReason={autoSyncReason}
                 />
 
                 <InvoiceSection accountId={account.id} />

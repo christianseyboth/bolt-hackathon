@@ -21,8 +21,7 @@ import {
     IconX,
     IconArrowDown,
     IconCreditCard,
-    IconHeart,
-    IconMessageCircle
+    IconMessageCircle,
 } from '@tabler/icons-react';
 
 type SubscriptionCancelProps = {
@@ -40,7 +39,6 @@ const cancellationReasons = [
     { id: 'not-using', label: 'Not using it enough', icon: '📉' },
     { id: 'missing-features', label: 'Missing features I need', icon: '🔧' },
     { id: 'switching-competitor', label: 'Switching to a competitor', icon: '🔄' },
-    { id: 'temporary-pause', label: 'Temporary pause', icon: '⏸️' },
     { id: 'technical-issues', label: 'Technical issues', icon: '🐛' },
     { id: 'other', label: 'Other reason', icon: '💭' },
 ];
@@ -54,7 +52,6 @@ export function SubscriptionCancelModal({
     periodEnd,
     onCancelComplete,
 }: SubscriptionCancelProps) {
-
     // Debug props being passed to modal
     console.log('🔍 SubscriptionCancelModal props:', {
         currentPlan,
@@ -62,13 +59,12 @@ export function SubscriptionCancelModal({
         currentPrice,
         accountId,
         subscriptionId,
-        periodEnd
+        periodEnd,
     });
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [step, setStep] = useState<'reason' | 'options' | 'confirm'>('reason');
     const [selectedReason, setSelectedReason] = useState('');
     const [feedback, setFeedback] = useState('');
-    const [cancelOption, setCancelOption] = useState<'immediate' | 'end-of-period'>('end-of-period');
     const [isPending, startTransition] = useTransition();
     const { toast } = useToast();
 
@@ -78,7 +74,7 @@ export function SubscriptionCancelModal({
             showCancelDialog,
             step,
             selectedReason,
-            isPending
+            isPending,
         });
     }, [showCancelDialog, step, selectedReason, isPending]);
 
@@ -99,7 +95,7 @@ export function SubscriptionCancelModal({
                 const requestData = {
                     subscriptionId,
                     accountId,
-                    cancelAtPeriodEnd: cancelOption === 'end-of-period',
+                    cancelAtPeriodEnd: true, // Always cancel at period end
                     reason: selectedReason,
                     feedback,
                 };
@@ -118,28 +114,35 @@ export function SubscriptionCancelModal({
                     status: response.status,
                     result,
                     success: result.success,
-                    error: result.error
+                    error: result.error,
                 });
 
                 if (result.success) {
                     toast({
                         title: '✅ Subscription cancelled successfully',
-                        description: cancelOption === 'end-of-period'
-                            ? `Your ${currentPlan} plan will remain active until ${periodEndDate.toLocaleDateString()}. You can reactivate anytime before then.`
-                            : 'Your subscription has been cancelled immediately. You can resubscribe anytime from the plans page.',
-                        duration: 4000, // Show for 4 seconds
+                        description: `Your ${currentPlan} plan will remain active until ${periodEndDate.toLocaleDateString()}. Page will refresh to show changes.`,
+                        duration: 3000, // Show for 3 seconds
                     });
                     setShowCancelDialog(false);
                     // Reset form state
                     setStep('reason');
                     setSelectedReason('');
                     setFeedback('');
-                    setCancelOption('end-of-period');
 
-                    // Delay the page refresh to allow toast to show
+                    // Show refreshing toast and then refresh
                     setTimeout(() => {
-                        onCancelComplete?.();
-                    }, 2000); // Wait 2 seconds before reloading
+                        toast({
+                            title: 'Updating subscription status...',
+                            description: 'Refreshing page to show cancellation changes.',
+                            duration: 1000,
+                        });
+
+                        // Force page refresh after a short delay
+                        setTimeout(() => {
+                            console.log('🔄 Calling onCancelComplete to refresh page');
+                            onCancelComplete?.();
+                        }, 1000);
+                    }, 2000); // Wait 2 seconds, then show refresh toast and refresh after 1 more second
                 } else {
                     toast({
                         variant: 'destructive',
@@ -168,7 +171,9 @@ export function SubscriptionCancelModal({
                                 {cancellationReasons.map((reason) => (
                                     <Button
                                         key={reason.id}
-                                        variant={selectedReason === reason.id ? 'default' : 'outline'}
+                                        variant={
+                                            selectedReason === reason.id ? 'default' : 'outline'
+                                        }
                                         className={`w-full justify-start text-left h-auto p-3 ${
                                             selectedReason === reason.id
                                                 ? 'bg-blue-600 hover:bg-blue-700 border-blue-500'
@@ -204,60 +209,32 @@ export function SubscriptionCancelModal({
                         <h4 className='font-medium'>Before you go, consider these options:</h4>
 
                         {/* Downgrade Option */}
-                        {currentPlan !== 'Solo' && (
-                            <Card className='border-blue-700 bg-blue-950/20'>
-                                <CardContent className='p-4'>
-                                    <div className='flex items-start space-x-3'>
-                                        <IconArrowDown className='h-5 w-5 text-blue-400 mt-0.5' />
-                                        <div className='flex-1'>
-                                            <h5 className='font-medium text-blue-300'>Downgrade Instead</h5>
-                                            <p className='text-sm text-blue-400/80 mt-1'>
-                                                Switch to a lower plan and keep your account active
-                                            </p>
-                                            <Button
-                                                variant='outline'
-                                                size='sm'
-                                                className='mt-2 border-blue-600 text-blue-400 hover:bg-blue-950/30'
-                                                onClick={() => {
-                                                    setShowCancelDialog(false);
-                                                    // Could trigger downgrade modal here
-                                                    toast({
-                                                        title: 'Downgrade option',
-                                                        description: 'Visit the subscription page to downgrade your plan.',
-                                                    });
-                                                }}
-                                            >
-                                                View Downgrade Options
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {/* Pause Option */}
-                        <Card className='border-amber-700 bg-amber-950/20'>
+                        <Card className='border-blue-700 bg-blue-950/20'>
                             <CardContent className='p-4'>
                                 <div className='flex items-start space-x-3'>
-                                    <IconHeart className='h-5 w-5 text-amber-400 mt-0.5' />
+                                    <IconArrowDown className='h-5 w-5 text-blue-400 mt-0.5' />
                                     <div className='flex-1'>
-                                        <h5 className='font-medium text-amber-300'>Pause Subscription</h5>
-                                        <p className='text-sm text-amber-400/80 mt-1'>
-                                            Take a break for up to 3 months - your data stays safe
+                                        <h5 className='font-medium text-blue-300'>
+                                            Downgrade Instead
+                                        </h5>
+                                        <p className='text-sm text-blue-400/80 mt-1'>
+                                            Switch to a lower plan and keep your account active
                                         </p>
                                         <Button
                                             variant='outline'
                                             size='sm'
-                                            className='mt-2 border-amber-600 text-amber-400 hover:bg-amber-950/30'
+                                            className='mt-2 border-blue-600 text-blue-400 hover:bg-blue-950/30'
                                             onClick={() => {
-                                                // Could implement pause functionality
+                                                setShowCancelDialog(false);
+                                                // Could trigger downgrade modal here
                                                 toast({
-                                                    title: 'Pause feature',
-                                                    description: 'Contact support to pause your subscription.',
+                                                    title: 'Downgrade option',
+                                                    description:
+                                                        'Visit the subscription page to downgrade your plan.',
                                                 });
                                             }}
                                         >
-                                            Pause for 3 Months
+                                            View Downgrade Options
                                         </Button>
                                     </div>
                                 </div>
@@ -266,43 +243,32 @@ export function SubscriptionCancelModal({
 
                         {/* Continue with Cancellation */}
                         <div className='border-t border-neutral-700 pt-4'>
-                            <h5 className='font-medium mb-2'>Still want to cancel?</h5>
+                            <h5 className='font-medium mb-2'>Cancellation Details</h5>
                             <div className='space-y-2'>
-                                <Button
-                                    variant={cancelOption === 'end-of-period' ? 'default' : 'outline'}
-                                    className={`w-full justify-start text-left h-auto p-3 ${
-                                        cancelOption === 'end-of-period'
-                                            ? 'bg-green-600 hover:bg-green-700 border-green-500'
-                                            : 'hover:bg-neutral-800/50'
-                                    }`}
-                                    onClick={() => setCancelOption('end-of-period')}
-                                >
-                                    <div className='flex-1'>
+                                <Card className='border-green-700 bg-green-950/20'>
+                                    <CardContent className='p-3'>
                                         <div className='flex items-center justify-between'>
-                                            <div className='font-medium'>Cancel at period end</div>
-                                            <Badge className='bg-green-900/30 text-green-400 ml-2'>Recommended</Badge>
+                                            <div className='flex-1'>
+                                                <div className='flex items-center space-x-2'>
+                                                    <div className='font-medium'>
+                                                        Cancel at period end
+                                                    </div>
+                                                    <Badge className='bg-green-900/30 text-green-400'>
+                                                        Recommended
+                                                    </Badge>
+                                                </div>
+                                                <div className='text-sm text-neutral-400 mt-1'>
+                                                    Keep access until{' '}
+                                                    {periodEndDate.toLocaleDateString()} (
+                                                    {daysUntilEnd} days)
+                                                </div>
+                                                <div className='text-xs text-green-400 mt-1'>
+                                                    ✓ You can reactivate anytime before then
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className='text-sm text-neutral-400 mt-1'>
-                                            Keep access until {periodEndDate.toLocaleDateString()} ({daysUntilEnd} days)
-                                        </div>
-                                    </div>
-                                </Button>
-                                <Button
-                                    variant={cancelOption === 'immediate' ? 'default' : 'outline'}
-                                    className={`w-full justify-start text-left h-auto p-3 ${
-                                        cancelOption === 'immediate'
-                                            ? 'bg-red-600 hover:bg-red-700 border-red-500'
-                                            : 'hover:bg-neutral-800/50'
-                                    }`}
-                                    onClick={() => setCancelOption('immediate')}
-                                >
-                                    <div>
-                                        <div className='font-medium'>Cancel immediately</div>
-                                        <div className='text-sm text-neutral-400 mt-1'>
-                                            Lose access right away (no refund for remaining time)
-                                        </div>
-                                    </div>
-                                </Button>
+                                    </CardContent>
+                                </Card>
                             </div>
                         </div>
                     </div>
@@ -316,10 +282,9 @@ export function SubscriptionCancelModal({
                             <div>
                                 <h5 className='font-medium text-red-300'>Confirm Cancellation</h5>
                                 <p className='text-sm text-red-400/80 mt-1'>
-                                    {cancelOption === 'end-of-period'
-                                        ? `Your ${currentPlan} plan will be cancelled but remain active until ${periodEndDate.toLocaleDateString()}. You can reactivate anytime before then.`
-                                        : `Your ${currentPlan} plan will be cancelled immediately and you'll lose access to all features.`
-                                    }
+                                    Your ${currentPlan} plan will be cancelled but remain active
+                                    until ${periodEndDate.toLocaleDateString()}. You can reactivate
+                                    anytime before then.
                                 </p>
                             </div>
                         </div>
@@ -353,17 +318,19 @@ export function SubscriptionCancelModal({
                 Cancel Subscription
             </Button>
 
-            <AlertDialog open={showCancelDialog} onOpenChange={(open) => {
-                console.log('🔵 Modal open change:', open);
-                if (!open) {
-                    // Reset state when closing
-                    setStep('reason');
-                    setSelectedReason('');
-                    setFeedback('');
-                    setCancelOption('end-of-period');
-                }
-                setShowCancelDialog(open);
-            }}>
+            <AlertDialog
+                open={showCancelDialog}
+                onOpenChange={(open) => {
+                    console.log('🔵 Modal open change:', open);
+                    if (!open) {
+                        // Reset state when closing
+                        setStep('reason');
+                        setSelectedReason('');
+                        setFeedback('');
+                    }
+                    setShowCancelDialog(open);
+                }}
+            >
                 <AlertDialogContent className='max-w-2xl'>
                     <AlertDialogHeader>
                         <AlertDialogTitle className='flex items-center space-x-2'>
@@ -379,31 +346,36 @@ export function SubscriptionCancelModal({
                             </span>
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            {step === 'reason' && 'We\'re sorry to see you go. Help us understand why.'}
-                            {step === 'options' && 'Before cancelling, consider these alternatives that might work better for you.'}
-                            {step === 'confirm' && 'This action cannot be undone. Please review the details below.'}
+                            {step === 'reason' &&
+                                "We're sorry to see you go. Help us understand why."}
+                            {step === 'options' &&
+                                'Before cancelling, consider these alternatives that might work better for you.'}
+                            {step === 'confirm' &&
+                                'This action cannot be undone. Please review the details below.'}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
-                    <div className='py-4'>
-                        {renderStep()}
-                    </div>
+                    <div className='py-4'>{renderStep()}</div>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => {
-                            setShowCancelDialog(false);
-                            setStep('reason');
-                            setSelectedReason('');
-                            setFeedback('');
-                        }}>
+                        <AlertDialogCancel
+                            onClick={() => {
+                                setShowCancelDialog(false);
+                                setStep('reason');
+                                setSelectedReason('');
+                                setFeedback('');
+                            }}
+                        >
                             Keep Subscription
                         </AlertDialogCancel>
 
                         {step === 'reason' && (
-                            <Button onClick={() => {
-                                console.log('🔵 Continue clicked - going to options step');
-                                setStep('options');
-                            }}>
+                            <Button
+                                onClick={() => {
+                                    console.log('🔵 Continue clicked - going to options step');
+                                    setStep('options');
+                                }}
+                            >
                                 Continue
                             </Button>
                         )}

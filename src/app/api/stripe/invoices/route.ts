@@ -20,21 +20,23 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get the account
-        const { data: account, error: accountError } = await supabase
-            .from('accounts')
+        // Get the subscription (single source of truth for Stripe data)
+        const { data: subscription, error: subscriptionError } = await supabase
+            .from('subscriptions')
             .select('stripe_customer_id')
-            .eq('id', accountId)
+            .eq('account_id', accountId)
+            .order('created_at', { ascending: false })
+            .limit(1)
             .single();
 
-        if (accountError || !account) {
+        if (subscriptionError || !subscription) {
             return NextResponse.json(
                 { error: 'Account not found' },
                 { status: 404 }
             );
         }
 
-        if (!account.stripe_customer_id) {
+        if (!subscription.stripe_customer_id) {
             return NextResponse.json(
                 { error: 'No Stripe customer found' },
                 { status: 400 }
@@ -43,7 +45,7 @@ export async function POST(request: NextRequest) {
 
         // Fetch invoices from Stripe
         const invoices = await stripe.invoices.list({
-            customer: account.stripe_customer_id,
+            customer: subscription.stripe_customer_id,
             limit: 10,
             expand: ['data.subscription']
         });
