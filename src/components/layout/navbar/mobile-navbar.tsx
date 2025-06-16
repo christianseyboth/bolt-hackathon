@@ -24,9 +24,7 @@ export const MobileNavbar = ({ navItems, user }: any) => {
 
     return (
         <motion.div
-            className={cn(
-                'flex justify-between items-center w-full rounded-md px-2.5 py-1.5'
-            )}
+            className={cn('flex justify-between items-center w-full rounded-md px-2.5 py-1.5')}
             initial={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
             animate={{
                 backgroundColor: showBackground ? 'rgb(23, 23, 23)' : 'rgba(0, 0, 0, 0)',
@@ -35,7 +33,7 @@ export const MobileNavbar = ({ navItems, user }: any) => {
             style={{
                 boxShadow: showBackground
                     ? '0px -2px 0px 0px rgb(38, 38, 38), 0px 2px 0px 0px rgb(38, 38, 38)'
-                    : 'none'
+                    : 'none',
             }}
         >
             <Logo />

@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import { NextRequest } from 'next/server';
 
 export interface ApiAuthResult {
@@ -22,10 +22,20 @@ export async function validateApiKey(request: NextRequest): Promise<ApiAuthResul
             return { success: false, error: 'API key is required' };
         }
 
-        // Validate the API key using Supabase function
-        const supabase = createClient();
+        // Validate the API key using Supabase function with service role
+        const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            }
+        );
+
         const { data, error } = await supabase
-            .rpc('validate_api_key', { api_key: apiKey });
+            .rpc('validate_api_key', { api_key_param: apiKey });
 
         if (error) {
             console.error('API key validation error:', error);

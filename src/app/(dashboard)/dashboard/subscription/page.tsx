@@ -2,6 +2,7 @@ import React from 'react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { SubscriptionBilling } from '@/components/dashboard/subscription-billing';
 import { InvoiceSection } from '@/components/dashboard/invoice-section';
+import { getCurrentActiveSubscription } from '@/lib/subscription-utils';
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
@@ -27,16 +28,23 @@ export default async function SettingsPage() {
         redirect('/login');
     }
 
-    // Get current subscription (including cancelled ones that are still active until period end)
-    // Force fresh data by adding timestamp to prevent caching
-    const { data: currentSubscription } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .eq('account_id', account.id)
-        .in('status', ['active', 'cancelled']) // Include cancelled subscriptions that might still be active
-        .order('updated_at', { ascending: false }) // Order by updated_at to get most recent changes
-        .limit(1)
-        .maybeSingle();
+    // Get current subscription using the proper utility function
+    const {
+        subscription: currentSubscription,
+        error: subscriptionError,
+        totalActiveSubscriptions,
+    } = await getCurrentActiveSubscription(account.id);
+
+    // Log subscription status for debugging
+    if (subscriptionError) {
+        console.log('🔍 Subscription error:', subscriptionError);
+    }
+
+    if (totalActiveSubscriptions && totalActiveSubscriptions > 1) {
+        console.log(
+            `⚠️ Multiple active subscriptions found (${totalActiveSubscriptions}), using most recent`
+        );
+    }
 
     // Debug logging for subscription data
     console.log('🔍 Current subscription data:', {
@@ -44,7 +52,7 @@ export default async function SettingsPage() {
         status: currentSubscription?.status,
         cancel_at_period_end: currentSubscription?.cancel_at_period_end,
         plan_name: currentSubscription?.plan_name,
-        current_period_end: currentSubscription?.current_period_end
+        current_period_end: currentSubscription?.current_period_end,
     });
 
     // Fetch Stripe products
@@ -52,7 +60,8 @@ export default async function SettingsPage() {
     let usingMockData = false;
 
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+        const baseUrl =
+            process.env.NEXT_PUBLIC_SITE_URL ||
             (process.env.NODE_ENV === 'production'
                 ? `https://${process.env.VERCEL_URL}`
                 : 'http://localhost:3000');
@@ -60,7 +69,7 @@ export default async function SettingsPage() {
         console.log('Fetching products from:', `${baseUrl}/api/stripe/products`);
 
         const response = await fetch(`${baseUrl}/api/stripe/products`, {
-            cache: 'no-store'
+            cache: 'no-store',
         });
 
         console.log('Products API response status:', response.status);
@@ -85,9 +94,21 @@ export default async function SettingsPage() {
                 description: 'Perfect for individual professionals',
                 metadata: {},
                 prices: [
-                    { id: 'price_mock_solo_monthly', amount: 1900, currency: 'usd', interval: 'month', interval_count: 1 },
-                    { id: 'price_mock_solo_yearly', amount: 19000, currency: 'usd', interval: 'year', interval_count: 1 }
-                ]
+                    {
+                        id: 'price_mock_solo_monthly',
+                        amount: 1900,
+                        currency: 'usd',
+                        interval: 'month',
+                        interval_count: 1,
+                    },
+                    {
+                        id: 'price_mock_solo_yearly',
+                        amount: 19000,
+                        currency: 'usd',
+                        interval: 'year',
+                        interval_count: 1,
+                    },
+                ],
             },
             {
                 id: 'prod_mock_entrepreneur',
@@ -95,9 +116,21 @@ export default async function SettingsPage() {
                 description: 'Ideal for growing businesses',
                 metadata: {},
                 prices: [
-                    { id: 'price_mock_entrepreneur_monthly', amount: 4900, currency: 'usd', interval: 'month', interval_count: 1 },
-                    { id: 'price_mock_entrepreneur_yearly', amount: 49000, currency: 'usd', interval: 'year', interval_count: 1 }
-                ]
+                    {
+                        id: 'price_mock_entrepreneur_monthly',
+                        amount: 4900,
+                        currency: 'usd',
+                        interval: 'month',
+                        interval_count: 1,
+                    },
+                    {
+                        id: 'price_mock_entrepreneur_yearly',
+                        amount: 49000,
+                        currency: 'usd',
+                        interval: 'year',
+                        interval_count: 1,
+                    },
+                ],
             },
             {
                 id: 'prod_mock_team',
@@ -105,10 +138,22 @@ export default async function SettingsPage() {
                 description: 'Advanced features for teams',
                 metadata: {},
                 prices: [
-                    { id: 'price_mock_team_monthly', amount: 9900, currency: 'usd', interval: 'month', interval_count: 1 },
-                    { id: 'price_mock_team_yearly', amount: 99000, currency: 'usd', interval: 'year', interval_count: 1 }
-                ]
-            }
+                    {
+                        id: 'price_mock_team_monthly',
+                        amount: 9900,
+                        currency: 'usd',
+                        interval: 'month',
+                        interval_count: 1,
+                    },
+                    {
+                        id: 'price_mock_team_yearly',
+                        amount: 99000,
+                        currency: 'usd',
+                        interval: 'year',
+                        interval_count: 1,
+                    },
+                ],
+            },
         ];
     }
 
@@ -135,3 +180,4 @@ export default async function SettingsPage() {
         </>
     );
 }
+

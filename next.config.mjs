@@ -1,6 +1,7 @@
 import rehypePrism from '@mapbox/rehype-prism';
 import nextMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm';
+import lingoCompiler from 'lingo.dev/compiler';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -53,5 +54,15 @@ const withMDX = nextMDX({
     },
 });
 
+const withLingo = lingoCompiler.next({
+    sourceLocale: 'en',
+    targetLocales: ['es', 'fr', 'de'],
+    sourceRoot: './src',
+    rsc: false, // Disable React Server Components support (default: false)
+    debug: true, // Enable debug mode for troubleshooting
+    models: 'lingo.dev',
+    useDirective: true, // Enable "use i18n" directive for file-by-file control
+});
+
 // Export the configured Next.js setup
-export default withMDX(nextConfig);
+export default withMDX(withLingo(nextConfig));

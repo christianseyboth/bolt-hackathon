@@ -134,6 +134,12 @@
     body {
         @apply bg-background text-foreground font-['Spinnaker'];
     }
+
+    /* Ensure proper positioning for scroll calculations */
+    html,
+    body {
+        position: relative;
+    }
 }
 
 /* Custom background animations and patterns */

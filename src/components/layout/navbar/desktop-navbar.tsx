@@ -1,4 +1,5 @@
 'use client';
+
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/button';
 import { NavBarItem } from './navbar-item';
@@ -30,9 +31,9 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
     return (
         <motion.div
             className={cn(
-                'w-full flex relative justify-between px-4 py-3 rounded-[15px] transition duration-200 bg-dark mx-auto backdrop-blur-lg border border-white/10'
+                'w-full flex relative justify-between px-4 py-3 rounded-[15px] transition duration-200 mx-auto backdrop-blur-lg border border-white/10'
             )}
-            initial={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(12px)' }}
+            initial={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
             animate={{
                 width: showBackground ? '80%' : '100%',
                 backgroundColor: showBackground ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.7)',
@@ -43,9 +44,6 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
             }}
             style={{
                 position: 'relative',
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
             }}
         >
             <AnimatePresence>
@@ -76,7 +74,7 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
                     ))}
                 </div>
             </div>
-            <div className='flex space-x-2 items-center'>
+            <div className='flex space-x-2 items-center' data-lingo-skip>
                 {user ? (
                     <Button variant='primary' as={Link} href='/dashboard'>
                         Dashboard

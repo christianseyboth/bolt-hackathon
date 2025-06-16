@@ -18,7 +18,7 @@ export default async function Home() {
     return (
         <>
             <NavBar user={user} />
-            <main className='relative min-h-screen bg-neutral-950'>
+            <main className='relative min-h-screen bg-neutral-950' style={{ position: 'relative' }}>
                 {/* Enhanced unified background with subtle animations */}
                 <div className='fixed inset-0 pointer-events-none'>
                     {/* Main background gradient */}

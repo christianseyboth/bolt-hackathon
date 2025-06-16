@@ -29,7 +29,7 @@ export async function createApiKey(
     expiresAt?: string
 ): Promise<CreateApiKeyResult> {
     try {
-        const supabase = createClient();
+        const supabase = await createClient();
 
         // Get current user and account
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -122,7 +122,7 @@ export async function createApiKey(
 
 export async function listApiKeys(): Promise<{ success: boolean; keys?: ApiKey[]; error?: string }> {
     try {
-        const supabase = createClient();
+        const supabase = await createClient();
 
         // Get current user and account
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -141,11 +141,12 @@ export async function listApiKeys(): Promise<{ success: boolean; keys?: ApiKey[]
             return { success: false, error: 'Account not found' };
         }
 
-        // Fetch API keys
+        // Fetch API keys (only active ones since revoked keys are now deleted)
         const { data: keys, error: keysError } = await supabase
             .from('api_keys')
             .select('id, name, key_prefix, permissions, last_used_at, created_at, expires_at, is_active, rate_limit')
             .eq('account_id', account.id)
+            .eq('is_active', true)
             .order('created_at', { ascending: false });
 
         if (keysError) {
@@ -162,7 +163,7 @@ export async function listApiKeys(): Promise<{ success: boolean; keys?: ApiKey[]
 
 export async function revokeApiKey(keyId: string): Promise<{ success: boolean; error?: string }> {
     try {
-        const supabase = createClient();
+        const supabase = await createClient();
 
         // Get current user and account
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -181,22 +182,22 @@ export async function revokeApiKey(keyId: string): Promise<{ success: boolean; e
             return { success: false, error: 'Account not found' };
         }
 
-        // Revoke the API key (soft delete by setting is_active to false)
-        const { error: revokeError } = await supabase
+        // Permanently delete the API key from database
+        const { error: deleteError } = await supabase
             .from('api_keys')
-            .update({ is_active: false })
+            .delete()
             .eq('id', keyId)
             .eq('account_id', account.id);
 
-        if (revokeError) {
-            return { success: false, error: 'Failed to revoke API key' };
+        if (deleteError) {
+            return { success: false, error: 'Failed to delete API key' };
         }
 
         revalidatePath('/dashboard/profile');
         return { success: true };
 
     } catch (error) {
-        console.error('Error revoking API key:', error);
+        console.error('Error deleting API key:', error);
         return { success: false, error: 'Internal server error' };
     }
 }
@@ -206,7 +207,7 @@ export async function updateApiKeyName(
     newName: string
 ): Promise<{ success: boolean; error?: string }> {
     try {
-        const supabase = createClient();
+        const supabase = await createClient();
 
         // Get current user and account
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -253,10 +254,10 @@ export async function validateApiKeyAction(apiKey: string): Promise<{
     error?: string;
 }> {
     try {
-        const supabase = createClient();
+        const supabase = await createClient();
 
         const { data, error } = await supabase
-            .rpc('validate_api_key', { api_key: apiKey });
+            .rpc('validate_api_key', { api_key_param: apiKey });
 
         if (error) {
             return { success: false, error: 'Invalid API key' };

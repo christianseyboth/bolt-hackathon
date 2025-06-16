@@ -13,11 +13,11 @@ export default async function MarketingLayout({
     const user = data.user;
 
     return (
-        <>
+        <div style={{ position: 'relative', minHeight: '100vh' }}>
             <NavBar user={user} />
-            <main>{children}</main>
+            <main style={{ position: 'relative' }}>{children}</main>
             <Footer />
             <Toaster />
-        </>
+        </div>
     );
 }

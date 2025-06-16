@@ -46,7 +46,13 @@ import {
     IconShield,
     IconActivity,
 } from '@tabler/icons-react';
-import { createApiKey, listApiKeys, revokeApiKey, updateApiKeyName, type ApiKey } from '@/app/api-keys/actions';
+import {
+    createApiKey,
+    listApiKeys,
+    revokeApiKey,
+    updateApiKeyName,
+    type ApiKey,
+} from '@/app/api-keys/actions';
 
 export function ApiKeyManagement() {
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -139,27 +145,27 @@ export function ApiKeyManagement() {
         }
     };
 
-    const handleRevokeApiKey = async (keyId: string, keyName: string) => {
+    const handleDeleteApiKey = async (keyId: string, keyName: string) => {
         try {
             const result = await revokeApiKey(keyId);
             if (result.success) {
                 await fetchApiKeys();
                 toast({
                     title: 'Success',
-                    description: `API key "${keyName}" has been revoked`,
+                    description: `API key "${keyName}" has been permanently deleted`,
                 });
             } else {
                 toast({
                     title: 'Error',
-                    description: result.error || 'Failed to revoke API key',
+                    description: result.error || 'Failed to delete API key',
                     variant: 'destructive',
                 });
             }
         } catch (error) {
-            console.error('Error revoking API key:', error);
+            console.error('Error deleting API key:', error);
             toast({
                 title: 'Error',
-                description: 'Failed to revoke API key',
+                description: 'Failed to delete API key',
                 variant: 'destructive',
             });
         }
@@ -183,27 +189,31 @@ export function ApiKeyManagement() {
 
     const getPermissionBadgeColor = (permission: string) => {
         switch (permission) {
-            case 'read': return 'bg-blue-500/20 text-blue-400';
-            case 'write': return 'bg-green-500/20 text-green-400';
-            case 'admin': return 'bg-red-500/20 text-red-400';
-            default: return 'bg-gray-500/20 text-gray-400';
+            case 'read':
+                return 'bg-blue-500/20 text-blue-400';
+            case 'write':
+                return 'bg-green-500/20 text-green-400';
+            case 'admin':
+                return 'bg-red-500/20 text-red-400';
+            default:
+                return 'bg-gray-500/20 text-gray-400';
         }
     };
 
     if (loading) {
         return (
-            <Card className="border border-neutral-800 bg-neutral-900">
+            <Card className='border border-neutral-800 bg-neutral-900'>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <IconKey className="h-5 w-5" />
+                    <CardTitle className='flex items-center gap-2'>
+                        <IconKey className='h-5 w-5' />
                         API Keys
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="animate-pulse space-y-4">
-                        <div className="h-10 bg-neutral-800 rounded"></div>
-                        <div className="h-20 bg-neutral-800 rounded"></div>
-                        <div className="h-20 bg-neutral-800 rounded"></div>
+                    <div className='animate-pulse space-y-4'>
+                        <div className='h-10 bg-neutral-800 rounded'></div>
+                        <div className='h-20 bg-neutral-800 rounded'></div>
+                        <div className='h-20 bg-neutral-800 rounded'></div>
                     </div>
                 </CardContent>
             </Card>
@@ -212,36 +222,36 @@ export function ApiKeyManagement() {
 
     return (
         <>
-            <Card className="border border-neutral-800 bg-neutral-900">
+            <Card className='border border-neutral-800 bg-neutral-900'>
                 <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2">
-                            <IconKey className="h-5 w-5" />
+                    <div className='flex items-center justify-between'>
+                        <CardTitle className='flex items-center gap-2'>
+                            <IconKey className='h-5 w-5' />
                             API Keys
                         </CardTitle>
                         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                             <DialogTrigger asChild>
-                                <Button size="sm">
-                                    <IconPlus className="h-4 w-4 mr-2" />
+                                <Button size='sm'>
+                                    <IconPlus className='h-4 w-4 mr-2' />
                                     Create API Key
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="bg-neutral-900 border-neutral-800">
+                            <DialogContent className='bg-neutral-900 border-neutral-800'>
                                 <DialogHeader>
                                     <DialogTitle>Create New API Key</DialogTitle>
                                     <DialogDescription>
-                                        Create a new API key to access ProActiv programmatically.
+                                        Create a new API key to access SecPilot programmatically.
                                     </DialogDescription>
                                 </DialogHeader>
-                                <div className="space-y-4">
+                                <div className='space-y-4'>
                                     <div>
-                                        <Label htmlFor="keyName">Key Name</Label>
+                                        <Label htmlFor='keyName'>Key Name</Label>
                                         <Input
-                                            id="keyName"
+                                            id='keyName'
                                             value={newKeyName}
                                             onChange={(e) => setNewKeyName(e.target.value)}
-                                            placeholder="e.g., Production API, Development Key"
-                                            className="mt-1"
+                                            placeholder='e.g., Production API, Development Key'
+                                            className='mt-1'
                                         />
                                     </div>
                                     <div>
@@ -250,38 +260,35 @@ export function ApiKeyManagement() {
                                             value={newKeyPermissions[0] || 'read'}
                                             onValueChange={(value) => setNewKeyPermissions([value])}
                                         >
-                                            <SelectTrigger className="mt-1">
+                                            <SelectTrigger className='mt-1'>
                                                 <SelectValue />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="read">Read Only</SelectItem>
-                                                <SelectItem value="write">Read & Write</SelectItem>
-                                                <SelectItem value="admin">Full Access</SelectItem>
+                                                <SelectItem value='read'>Read Only</SelectItem>
+                                                <SelectItem value='write'>Read & Write</SelectItem>
+                                                <SelectItem value='admin'>Full Access</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
                                     <div>
-                                        <Label htmlFor="expiry">Expiry Date (Optional)</Label>
+                                        <Label htmlFor='expiry'>Expiry Date (Optional)</Label>
                                         <Input
-                                            id="expiry"
-                                            type="date"
+                                            id='expiry'
+                                            type='date'
                                             value={newKeyExpiry}
                                             onChange={(e) => setNewKeyExpiry(e.target.value)}
-                                            className="mt-1"
+                                            className='mt-1'
                                         />
                                     </div>
                                 </div>
                                 <DialogFooter>
                                     <Button
-                                        variant="outline"
+                                        variant='outline'
                                         onClick={() => setShowCreateDialog(false)}
                                     >
                                         Cancel
                                     </Button>
-                                    <Button
-                                        onClick={handleCreateApiKey}
-                                        disabled={creating}
-                                    >
+                                    <Button onClick={handleCreateApiKey} disabled={creating}>
                                         {creating ? 'Creating...' : 'Create API Key'}
                                     </Button>
                                 </DialogFooter>
@@ -291,70 +298,65 @@ export function ApiKeyManagement() {
                 </CardHeader>
                 <CardContent>
                     {apiKeys.length === 0 ? (
-                        <div className="text-center py-8">
-                            <IconKey className="h-12 w-12 text-neutral-600 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-neutral-300 mb-2">No API Keys</h3>
-                            <p className="text-neutral-500 mb-4">
-                                Create your first API key to start using ProActiv programmatically.
+                        <div className='text-center py-8'>
+                            <IconKey className='h-12 w-12 text-neutral-600 mx-auto mb-4' />
+                            <h3 className='text-lg font-medium text-neutral-300 mb-2'>
+                                No API Keys
+                            </h3>
+                            <p className='text-neutral-500 mb-4'>
+                                Create your first API key to start using SecPilot programmatically.
                             </p>
                         </div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className='space-y-4'>
                             {apiKeys.map((key) => (
                                 <div
                                     key={key.id}
-                                    className="p-4 border border-neutral-800 rounded-lg bg-neutral-800/50"
+                                    className='p-4 border border-neutral-800 rounded-lg bg-neutral-800/50'
                                 >
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <h4 className="font-medium text-neutral-200">{key.name}</h4>
-                                                {!key.is_active && (
-                                                    <Badge variant="destructive" className="text-xs">
-                                                        Revoked
-                                                    </Badge>
-                                                )}
+                                    <div className='flex items-start justify-between'>
+                                        <div className='flex-1'>
+                                            <div className='flex items-center gap-3 mb-2'>
+                                                <h4 className='font-medium text-neutral-200'>
+                                                    {key.name}
+                                                </h4>
                                             </div>
 
-                                            <div className="flex items-center gap-2 mb-3">
-                                                <code className="text-sm bg-neutral-700 px-2 py-1 rounded font-mono">
+                                            <div className='flex items-center gap-2 mb-3'>
+                                                <code className='text-sm bg-neutral-700 px-2 py-1 rounded font-mono'>
                                                     {key.key_prefix}
                                                 </code>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => copyToClipboard(key.key_prefix)}
-                                                >
-                                                    <IconCopy className="h-3 w-3" />
-                                                </Button>
+                                                <span className='text-xs text-neutral-500 ml-2'>
+                                                    (Full key hidden for security)
+                                                </span>
                                             </div>
 
-                                            <div className="flex flex-wrap gap-2 mb-3">
+                                            <div className='flex flex-wrap gap-2 mb-3'>
                                                 {key.permissions.map((permission) => (
                                                     <Badge
                                                         key={permission}
                                                         className={`text-xs ${getPermissionBadgeColor(permission)}`}
                                                     >
-                                                        <IconShield className="h-3 w-3 mr-1" />
+                                                        <IconShield className='h-3 w-3 mr-1' />
                                                         {permission}
                                                     </Badge>
                                                 ))}
                                             </div>
 
-                                            <div className="text-xs text-neutral-500 space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <IconCalendar className="h-3 w-3" />
+                                            <div className='text-xs text-neutral-500 space-y-1'>
+                                                <div className='flex items-center gap-2'>
+                                                    <IconCalendar className='h-3 w-3' />
                                                     Created: {formatDate(key.created_at)}
                                                 </div>
                                                 {key.last_used_at && (
-                                                    <div className="flex items-center gap-2">
-                                                        <IconActivity className="h-3 w-3" />
+                                                    <div className='flex items-center gap-2'>
+                                                        <IconActivity className='h-3 w-3' />
                                                         Last used: {formatDate(key.last_used_at)}
                                                     </div>
                                                 )}
                                                 {key.expires_at && (
-                                                    <div className="flex items-center gap-2">
-                                                        <IconCalendar className="h-3 w-3" />
+                                                    <div className='flex items-center gap-2'>
+                                                        <IconCalendar className='h-3 w-3' />
                                                         Expires: {formatDate(key.expires_at)}
                                                     </div>
                                                 )}
@@ -362,35 +364,41 @@ export function ApiKeyManagement() {
                                             </div>
                                         </div>
 
-                                        <div className="flex gap-2">
-                                            {key.is_active && (
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button variant="outline" size="sm">
-                                                            <IconTrash className="h-4 w-4" />
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent className="bg-neutral-900 border-neutral-800">
-                                                        <AlertDialogHeader>
-                                                            <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
-                                                            <AlertDialogDescription>
-                                                                Are you sure you want to revoke the API key "{key.name}"?
-                                                                This action cannot be undone and will immediately stop all
-                                                                requests using this key.
-                                                            </AlertDialogDescription>
-                                                        </AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction
-                                                                onClick={() => handleRevokeApiKey(key.id, key.name)}
-                                                                className="bg-red-600 hover:bg-red-700"
-                                                            >
-                                                                Revoke Key
-                                                            </AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            )}
+                                        <div className='flex gap-2'>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant='outline' size='sm'>
+                                                        <IconTrash className='h-4 w-4' />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent className='bg-neutral-900 border-neutral-800'>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>
+                                                            Delete API Key
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Are you sure you want to permanently
+                                                            delete the API key "{key.name}"? This
+                                                            action cannot be undone and will
+                                                            immediately stop all requests using this
+                                                            key.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>
+                                                            Cancel
+                                                        </AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            onClick={() =>
+                                                                handleDeleteApiKey(key.id, key.name)
+                                                            }
+                                                            className='bg-red-600 hover:bg-red-700'
+                                                        >
+                                                            Delete Key
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
                                         </div>
                                     </div>
                                 </div>
@@ -402,40 +410,43 @@ export function ApiKeyManagement() {
 
             {/* Show newly created API key */}
             <Dialog open={showNewKey} onOpenChange={setShowNewKey}>
-                <DialogContent className="bg-neutral-900 border-neutral-800">
+                <DialogContent className='bg-neutral-900 border-neutral-800'>
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <IconKey className="h-5 w-5" />
+                        <DialogTitle className='flex items-center gap-2'>
+                            <IconKey className='h-5 w-5' />
                             API Key Created Successfully
                         </DialogTitle>
                         <DialogDescription>
                             Your API key has been created. Copy it now as it won't be shown again.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4">
-                        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                            <div className="flex items-center gap-2 mb-2">
-                                <IconShield className="h-4 w-4 text-amber-400" />
-                                <span className="text-sm font-medium text-amber-400">Security Notice</span>
+                    <div className='space-y-4'>
+                        <div className='p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg'>
+                            <div className='flex items-center gap-2 mb-2'>
+                                <IconShield className='h-4 w-4 text-amber-400' />
+                                <span className='text-sm font-medium text-amber-400'>
+                                    Security Notice
+                                </span>
                             </div>
-                            <p className="text-sm text-neutral-300">
-                                Store this API key securely. You won't be able to see it again after closing this dialog.
+                            <p className='text-sm text-neutral-300'>
+                                Store this API key securely. You won't be able to see it again after
+                                closing this dialog.
                             </p>
                         </div>
 
                         <div>
                             <Label>Your API Key</Label>
-                            <div className="flex gap-2 mt-1">
+                            <div className='flex gap-2 mt-1'>
                                 <Input
                                     value={newlyCreatedKey || ''}
                                     readOnly
-                                    className="font-mono text-sm"
+                                    className='font-mono text-sm'
                                 />
                                 <Button
-                                    variant="outline"
+                                    variant='outline'
                                     onClick={() => copyToClipboard(newlyCreatedKey || '')}
                                 >
-                                    <IconCopy className="h-4 w-4" />
+                                    <IconCopy className='h-4 w-4' />
                                 </Button>
                             </div>
                         </div>

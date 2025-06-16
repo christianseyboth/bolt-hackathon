@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useRef } from 'react';
 import { MotionValue, motion, useScroll, useTransform } from 'motion/react';
 import { useRouter } from 'next/navigation';
@@ -11,12 +12,8 @@ import { Subheading } from '@/components/subheading';
 import { VideoModal } from '@/components/video-modal';
 import { FeaturedImages } from '@/components/featured-images';
 import Beam from '@/components/beam';
-import { BackgroundBeam } from '@/components/beam/background/background-beam';
-import { HexagonBackground } from '@/components/beam/background/background-hexagon';
 
 export const Hero = () => {
-    const router = useRouter();
-
     const containerRef = useRef<any>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,

@@ -48,6 +48,7 @@
         "fast-glob": "^3.3.3",
         "html2canvas": "^1.4.1",
         "jspdf": "^3.0.1",
+        "lingo.dev": "^0.99.3",
         "lucide-react": "^0.511.0",
         "mini-svg-data-uri": "^1.4.4",
         "motion": "^12.12.2",
@@ -66,8 +67,8 @@
         "recharts": "^2.12.2",
         "remark-gfm": "^4.0.1",
         "stripe": "^17.5.0",
-        "tailwindcss": "^4.1.7",
         "tailwind-merge": "^3.3.0",
+        "tailwindcss": "^4.1.7",
         "tailwindcss-animate": "^1.0.7"
     },
     "devDependencies": {
