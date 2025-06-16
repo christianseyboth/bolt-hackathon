@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         console.log('🔍 Fetching account data for accountId:', accountId);
         const { data: account, error: accountError } = await supabase
             .from('accounts')
-            .select('id, billing_email, owner_id')
+            .select('*')
             .eq('id', accountId)
             .single();
 
@@ -68,18 +68,56 @@ export async function POST(request: NextRequest) {
             if (!subscription) {
                 console.log('🆕 No subscription record found, creating initial free subscription...');
 
-                // Create Stripe customer (since no subscription exists yet)
-                console.log('🆕 Creating Stripe customer...');
+                // Create Stripe customer with billing information (since no subscription exists yet)
+                console.log('🆕 Creating Stripe customer with billing info...');
                 let stripeCustomerId;
                 try {
-                    const customer = await stripe.customers.create({
+                    const customerData: Stripe.CustomerCreateParams = {
                         email: account.billing_email,
                         metadata: {
-                            account_id: accountId
+                            account_id: accountId,
+                            billing_type: account.billing_type || 'individual',
                         }
-                    });
+                    };
+
+                    // Set name and address based on billing type
+                    if (account.billing_type === 'business' && account.company_name) {
+                        customerData.name = account.company_name;
+
+                        // Add business address if available
+                        if (account.company_address_line1) {
+                            customerData.address = {
+                                line1: account.company_address_line1,
+                                line2: account.company_address_line2 || undefined,
+                                city: account.company_city || undefined,
+                                state: account.company_state || undefined,
+                                postal_code: account.company_postal_code || undefined,
+                                country: account.company_country || 'US',
+                            };
+                        }
+
+                        // Add tax ID if available
+                        if (account.company_tax_id) {
+                            (customerData.metadata as any).tax_id = account.company_tax_id;
+                        }
+
+                        // Add VAT number if available
+                        if (account.vat_number) {
+                            (customerData.metadata as any).vat_number = account.vat_number;
+                        }
+                    } else {
+                        // Individual billing
+                        customerData.name = account.full_name || account.billing_email;
+                    }
+
+                    const customer = await stripe.customers.create(customerData);
                     stripeCustomerId = customer.id;
-                    console.log('✅ Stripe customer created:', stripeCustomerId);
+                    console.log('✅ Stripe customer created with billing info:', {
+                        customerId: stripeCustomerId,
+                        billingType: account.billing_type,
+                        companyName: account.company_name,
+                        hasAddress: !!account.company_address_line1,
+                    });
                 } catch (error) {
                     console.error('❌ Failed to create Stripe customer:', error);
                     return NextResponse.json({
@@ -137,6 +175,60 @@ export async function POST(request: NextRequest) {
             stripe_customer_id: currentSubscription.stripe_customer_id,
             current_plan: currentSubscription.plan_name
         });
+
+        // Sync billing information to Stripe customer before processing upgrade
+        console.log('🔄 Syncing billing information to Stripe...');
+        try {
+            const updateData: Stripe.CustomerUpdateParams = {
+                email: account.billing_email,
+                metadata: {
+                    account_id: accountId,
+                    billing_type: account.billing_type || 'individual',
+                },
+            };
+
+            if (account.billing_type === 'business' && account.company_name) {
+                // Business billing
+                updateData.name = account.company_name;
+
+                // Add business address if available
+                if (account.company_address_line1) {
+                    updateData.address = {
+                        line1: account.company_address_line1,
+                        line2: account.company_address_line2 || undefined,
+                        city: account.company_city || undefined,
+                        state: account.company_state || undefined,
+                        postal_code: account.company_postal_code || undefined,
+                        country: account.company_country || 'US',
+                    };
+                }
+
+                // Add tax ID if available
+                if (account.company_tax_id) {
+                    (updateData.metadata as any).tax_id = account.company_tax_id;
+                }
+
+                // Add VAT number if available
+                if (account.vat_number) {
+                    (updateData.metadata as any).vat_number = account.vat_number;
+                }
+            } else {
+                // Individual billing
+                updateData.name = account.full_name || account.billing_email;
+            }
+
+            await stripe.customers.update(currentSubscription.stripe_customer_id, updateData);
+
+            console.log('✅ Billing info synced to Stripe:', {
+                customerId: currentSubscription.stripe_customer_id,
+                billingType: account.billing_type,
+                companyName: account.company_name,
+                hasAddress: !!account.company_address_line1,
+            });
+        } catch (error) {
+            console.error('⚠️ Failed to sync billing info, but continuing:', error);
+            // Don't fail the upgrade if billing sync fails
+        }
 
         // Check if customer has a default payment method
         console.log('🔍 Checking customer payment methods...');

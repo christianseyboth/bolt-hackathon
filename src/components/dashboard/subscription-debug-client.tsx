@@ -375,7 +375,7 @@ export function SubscriptionDebugClient({
                             {account.stripe_customer_id || 'N/A'}
                         </div>
                         <div>
-                            <strong>Account Plan:</strong> {account.plan || 'N/A'}
+                            <strong>Account Plan (deprecated):</strong> {account.plan || 'N/A'}
                         </div>
                         <div>
                             <strong>Account Subscription Status:</strong>{' '}

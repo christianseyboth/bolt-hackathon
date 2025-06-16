@@ -240,30 +240,50 @@ export function SubscriptionBilling({
     const handleAutoSync = async () => {
         if (isAutoSyncing) return;
 
-        console.log('🔄 Starting auto-sync for reason:', autoSyncReason);
+        console.log('🎯 Auto-sync triggered');
         setIsAutoSyncing(true);
 
         try {
-            // Handle different auto-sync scenarios
-            if (autoSyncReason?.includes('subscription plan mismatch')) {
-                console.log('🔧 Detected table mismatch, fixing automatically...');
-                await handleTableMismatchSync();
-            } else if (autoSyncReason?.includes('expired but account plan')) {
-                console.log('🔧 Detected expired subscription, converting to Free...');
-                await handleExpiredSubscriptionSync();
-            } else if (autoSyncReason?.includes('No subscription found but account plan')) {
-                console.log('🔧 Detected missing subscription, syncing with Stripe...');
-                await handleMissingSubscriptionSync();
+            const response = await fetch('/api/debug/sync-subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ accountId: account.id }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                toast({
+                    title: 'Sync successful!',
+                    description: 'Your subscription status has been updated.',
+                });
+
+                // Store the auto-sync time
+                if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('lastAutoSync', Date.now().toString());
+                    setLastAutoSyncTime(new Date().toLocaleTimeString());
+                    setHasAutoSynced(true);
+                }
+
+                // Refresh the page after successful sync
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             } else {
-                console.log('🔧 General sync case, checking Stripe...');
-                await handleGeneralStripeSync();
+                console.error('Auto-sync failed:', result);
+                toast({
+                    title: 'Sync failed',
+                    description: result.error || 'Failed to sync subscription status.',
+                    variant: 'destructive',
+                });
             }
         } catch (error) {
-            console.error('❌ Auto-sync failed:', error);
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('Auto-sync error:', error);
             toast({
-                title: 'Sync failed',
-                description: `Could not update subscription status: ${errorMessage}`,
+                title: 'Sync error',
+                description: 'Failed to sync subscription status.',
                 variant: 'destructive',
             });
         } finally {
@@ -271,250 +291,36 @@ export function SubscriptionBilling({
         }
     };
 
-    const handleTableMismatchSync = async () => {
-        try {
-            console.log('🔧 Starting table mismatch sync...');
-
-            // Import Supabase client directly for table mismatch fix
-            const { createClient } = await import('@/utils/supabase/client');
-            const supabase = createClient();
-
-            console.log('✅ Supabase client created');
-
-            // Get current account data to sync subscription table to
-            console.log('🔍 Fetching account data for ID:', account.id);
-            const { data: accountData, error: accountError } = await supabase
-                .from('subscriptions')
-                .select('plan, stripe_subscription_id, subscription_status, emails_left')
-                .eq('id', account.id)
-                .single();
-
-            if (accountError) {
-                console.error('❌ Account fetch error:', accountError);
-                throw new Error('Failed to get account data: ' + accountError.message);
-            }
-
-            console.log('✅ Account data fetched:', accountData);
-
-            // Map plan to subscription details
-            const planDetails = {
-                Free: { seats: 1, analysis: 100, price: 0 },
-                Solo: { seats: 1, analysis: 1000, price: 9.9 },
-                Entrepreneur: { seats: 5, analysis: 5000, price: 29.9 },
-                Team: { seats: 20, analysis: 20000, price: 99.9 },
-            };
-
-            const details =
-                planDetails[accountData.plan as keyof typeof planDetails] || planDetails['Free'];
-            console.log('🔄 Using plan details:', details, 'for plan:', accountData.plan);
-
-            // Update subscription table to match account
-            console.log('🔄 Updating subscription table...');
-            const { data: subResult, error: subError } = await supabase
-                .from('subscriptions')
-                .update({
-                    plan_name: accountData.plan,
-                    subscription_status: accountData.subscription_status || 'active',
-                    cancel_at_period_end: false,
-                    seats: details.seats,
-                    price_per_seat: details.price,
-                    total_price: details.price,
-                    analysis_amount: details.analysis,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('account_id', account.id)
-                .select();
-
-            if (subError) {
-                console.error('❌ Subscription update error:', subError);
-                throw new Error('Failed to update subscription: ' + JSON.stringify(subError));
-            }
-
-            console.log('✅ Subscription table updated:', subResult);
-
-            toast({
-                title: 'Subscription updated',
-                description: `Automatically synced to ${accountData.plan} plan`,
-            });
-
-            // Store the sync time and refresh
-            if (typeof window !== 'undefined') {
-                sessionStorage.setItem('lastAutoSync', Date.now().toString());
-                setLastAutoSyncTime(new Date().toLocaleTimeString());
-            }
-
-            console.log('✅ Table mismatch sync completed, refreshing page...');
-            setTimeout(() => window.location.reload(), 1000);
-        } catch (error) {
-            console.error('❌ Table mismatch sync error:', error);
-            throw error;
-        }
-    };
-
-    const handleExpiredSubscriptionSync = async () => {
-        try {
-            console.log('🔧 Starting expired subscription sync...');
-
-            const { createClient } = await import('@/utils/supabase/client');
-            const supabase = createClient();
-
-            console.log('✅ Supabase client created');
-
-            // Update subscription table to Free plan
-            console.log('🔄 Updating subscription table to Free...');
-            const { data: subResult, error: subError } = await supabase
-                .from('subscriptions')
-                .update({
-                    plan_name: 'Free',
-                    subscription_status: 'active',
-                    cancel_at_period_end: false,
-                    seats: 1,
-                    price_per_seat: 0,
-                    total_price: 0,
-                    analysis_amount: 0,
-                    current_period_start: new Date().toISOString(),
-                    current_period_end: null,
-                    stripe_subscription_id: null,
-                    emails_left: 0,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('account_id', account.id)
-                .select();
-
-            if (subError) {
-                console.error('❌ Subscription update error:', subError);
-                throw new Error('Failed to update subscription: ' + JSON.stringify(subError));
-            }
-
-            console.log('✅ Subscription updated to Free:', subResult);
-
-            toast({
-                title: 'Subscription expired',
-                description: 'Automatically converted to Free plan',
-            });
-
-            console.log('✅ Expired subscription sync completed, refreshing page...');
-            setTimeout(() => window.location.reload(), 1000);
-        } catch (error) {
-            console.error('❌ Expired subscription sync error:', error);
-            throw error;
-        }
-    };
-
-    const handleMissingSubscriptionSync = async () => {
-        try {
-            console.log('🔧 Starting missing subscription sync...');
-            await handleGeneralStripeSync();
-        } catch (error) {
-            console.error('❌ Missing subscription sync error:', error);
-            throw error;
-        }
-    };
-
-    const handleGeneralStripeSync = async () => {
-        try {
-            console.log('🔧 Starting general Stripe sync...');
-
-            // Regular Stripe sync using the sync endpoint
-            const response = await fetch('/api/stripe/sync-subscription-status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    accountId: account.id,
-                }),
-            });
-
-            console.log('📡 Stripe sync API response status:', response.status);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Stripe sync API error:', errorText);
-                throw new Error(`Stripe sync failed: ${response.status} - ${errorText}`);
-            }
-
-            const result = await response.json();
-            console.log('✅ Stripe sync API result:', result);
-
-            if (result.success) {
-                // Store the sync time
-                if (typeof window !== 'undefined') {
-                    sessionStorage.setItem('lastAutoSync', Date.now().toString());
-                    setLastAutoSyncTime(new Date().toLocaleTimeString());
-                }
-
-                toast({
-                    title: 'Subscription updated',
-                    description: result.message || 'Your subscription status has been refreshed.',
-                });
-
-                console.log('✅ General Stripe sync completed, refreshing page...');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            } else {
-                console.error('❌ Stripe sync API returned failure:', result);
-                throw new Error(result.error || 'Stripe sync failed');
-            }
-        } catch (error) {
-            console.error('❌ General Stripe sync error:', error);
-            throw error;
-        }
-    };
-
-    const handleSyncSubscription = async () => {
-        setLoading('sync');
+    const handleSyncBillingInfo = async () => {
+        setLoading('billing-sync');
 
         try {
-            toast({
-                title: 'Syncing subscription...',
-                description: 'Checking latest subscription status from Stripe.',
-            });
-
-            const response = await fetch('/api/stripe/sync-subscription-status', {
+            const response = await fetch('/api/stripe/sync-billing-info', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    accountId: account.id,
-                }),
+                body: JSON.stringify({ accountId: account.id }),
             });
 
-            const result = await response.json();
+            const data = await response.json();
 
-            if (result.success) {
-                // Mark successful sync
-                handleSyncComplete();
-
-                if (result.status === 'free') {
-                    toast({
-                        title: 'Subscription Updated',
-                        description:
-                            'Your subscription has ended and you are now on the Free plan.',
-                    });
-                } else {
-                    toast({
-                        title: 'Subscription Synced',
-                        description: result.message || 'Subscription status updated successfully.',
-                    });
-                }
-
-                // Force a page refresh to show updated data
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Sync failed',
-                    description: result.error || 'Could not sync subscription status.',
-                });
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to sync billing information');
             }
-        } catch (error) {
-            console.error('Error:', error);
+
             toast({
-                title: 'Error',
-                description: error instanceof Error ? error.message : 'Failed to sync subscription',
+                title: 'Billing info synced!',
+                description: 'Your company information has been updated in Stripe for invoices.',
+            });
+
+            console.log('✅ Billing info synced:', data);
+        } catch (error) {
+            console.error('Error syncing billing info:', error);
+            toast({
+                title: 'Sync failed',
+                description:
+                    error instanceof Error ? error.message : 'Failed to sync billing information',
                 variant: 'destructive',
             });
         } finally {
@@ -910,6 +716,20 @@ export function SubscriptionBilling({
                                 )}
                                 <RefreshCw className='h-4 w-4 mr-2' />
                                 Force Sync
+                            </Button>
+
+                            <Button
+                                variant='outline'
+                                onClick={handleSyncBillingInfo}
+                                disabled={loading === 'billing-sync'}
+                                className='text-blue-400 border-blue-600 hover:bg-blue-950/30'
+                                title='Sync company information to Stripe for invoices'
+                            >
+                                {loading === 'billing-sync' && (
+                                    <IconLoader className='h-4 w-4 mr-2 animate-spin' />
+                                )}
+                                <IconCreditCard className='h-4 w-4 mr-2' />
+                                Sync Billing Info
                             </Button>
 
                             {(() => {

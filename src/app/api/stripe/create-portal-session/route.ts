@@ -22,35 +22,44 @@ export async function POST(request: NextRequest) {
             console.log('⚠️ No request body, falling back to user lookup');
         }
 
-        let account;
+        let stripeCustomerId: string | null = null;
 
         if (accountId) {
-            console.log('🔍 Looking up account by ID:', accountId);
-            // Use provided account ID
-            const { data: accountData, error: accountError } = await supabase
-                .from('accounts')
+            console.log('🔍 Looking up subscription by account ID:', accountId);
+            // Get stripe_customer_id from subscriptions table (single source of truth)
+            const { data: subscriptionData, error: subscriptionError } = await supabase
+                .from('subscriptions')
                 .select('stripe_customer_id')
-                .eq('id', accountId)
+                .eq('account_id', accountId)
+                .order('created_at', { ascending: false })
+                .limit(1)
                 .single();
 
-            if (accountError) {
-                console.error('❌ Account lookup error:', accountError);
-                return NextResponse.json(
-                    { error: 'Account not found', details: accountError },
-                    { status: 404 }
-                );
-            }
+            if (subscriptionError) {
+                console.error('❌ Subscription lookup error:', subscriptionError);
 
-            if (!accountData) {
-                console.error('❌ No account data returned');
-                return NextResponse.json(
-                    { error: 'Account not found' },
-                    { status: 404 }
-                );
-            }
+                // Fallback: try to get from accounts table in case it's still there
+                console.log('🔄 Trying fallback lookup in accounts table...');
+                const { data: accountData, error: accountError } = await supabase
+                    .from('accounts')
+                    .select('stripe_customer_id')
+                    .eq('id', accountId)
+                    .single();
 
-            account = accountData;
-            console.log('✅ Account found:', { stripe_customer_id: account.stripe_customer_id });
+                if (accountError || !accountData?.stripe_customer_id) {
+                    console.error('❌ Account lookup also failed:', accountError);
+                    return NextResponse.json(
+                        { error: 'No subscription or Stripe customer found. Please subscribe to a plan first.' },
+                        { status: 404 }
+                    );
+                }
+
+                stripeCustomerId = accountData.stripe_customer_id;
+                console.log('✅ Found stripe_customer_id in accounts table (fallback):', stripeCustomerId);
+            } else {
+                stripeCustomerId = subscriptionData?.stripe_customer_id;
+                console.log('✅ Found stripe_customer_id in subscriptions table:', stripeCustomerId);
+            }
         } else {
             console.log('🔍 Looking up account by user');
             // Fall back to finding account by user
@@ -72,14 +81,14 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            // Get the account for this user
+            // Get the account ID first
             const { data: accountData, error: accountError } = await supabase
                 .from('accounts')
-                .select('stripe_customer_id')
+                .select('id')
                 .eq('owner_id', user.id)
                 .single();
 
-            if (accountError) {
+            if (accountError || !accountData) {
                 console.error('❌ Account lookup by user error:', accountError);
                 return NextResponse.json(
                     { error: 'Account not found', details: accountError },
@@ -87,19 +96,46 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            if (!accountData) {
-                console.error('❌ No account data for user');
-                return NextResponse.json(
-                    { error: 'Account not found' },
-                    { status: 404 }
-                );
-            }
+            accountId = accountData.id;
+            console.log('✅ Found account ID for user:', accountId);
 
-            account = accountData;
-            console.log('✅ Account found by user:', { stripe_customer_id: account.stripe_customer_id });
+            // Now get stripe_customer_id from subscriptions table
+            const { data: subscriptionData, error: subscriptionError } = await supabase
+                .from('subscriptions')
+                .select('stripe_customer_id')
+                .eq('account_id', accountId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (subscriptionError) {
+                console.error('❌ Subscription lookup by account error:', subscriptionError);
+
+                // Fallback: try to get from accounts table
+                console.log('🔄 Trying fallback lookup in accounts table for user...');
+                const { data: accountDataWithCustomer, error: accountCustomerError } = await supabase
+                    .from('accounts')
+                    .select('stripe_customer_id')
+                    .eq('owner_id', user.id)
+                    .single();
+
+                if (accountCustomerError || !accountDataWithCustomer?.stripe_customer_id) {
+                    console.error('❌ No Stripe customer found in accounts table either:', accountCustomerError);
+                    return NextResponse.json(
+                        { error: 'No subscription or Stripe customer found. Please subscribe to a plan first.' },
+                        { status: 404 }
+                    );
+                }
+
+                stripeCustomerId = accountDataWithCustomer.stripe_customer_id;
+                console.log('✅ Found stripe_customer_id in accounts table (user fallback):', stripeCustomerId);
+            } else {
+                stripeCustomerId = subscriptionData?.stripe_customer_id;
+                console.log('✅ Found stripe_customer_id in subscriptions table for user:', stripeCustomerId);
+            }
         }
 
-        if (!account.stripe_customer_id) {
+        if (!stripeCustomerId) {
             console.error('❌ No Stripe customer ID found');
             return NextResponse.json(
                 { error: 'No Stripe customer found. Please subscribe to a plan first.' },
@@ -107,11 +143,11 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log('🔍 Creating Stripe portal session for customer:', account.stripe_customer_id);
+        console.log('🔍 Creating Stripe portal session for customer:', stripeCustomerId);
 
         // Create portal session
         const portalSession = await stripe.billingPortal.sessions.create({
-            customer: account.stripe_customer_id,
+            customer: stripeCustomerId,
             return_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/subscription`,
         });
 

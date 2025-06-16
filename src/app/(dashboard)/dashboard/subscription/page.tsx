@@ -60,9 +60,9 @@ export default async function SettingsPage() {
     console.log('🔍 Auto-sync check:', {
         shouldAutoSync,
         autoSyncReason,
-        currentSubscriptionStatus: currentSubscription?.status,
+        currentSubscriptionStatus: currentSubscription?.subscription_status,
         currentSubscriptionPlan: currentSubscription?.plan_name,
-        accountPlan: account.plan,
+        accountPlan: 'deprecated', // account.plan is deprecated, use currentSubscription.plan_name
         subscriptionUpdatedAt: currentSubscription?.updated_at,
     });
 

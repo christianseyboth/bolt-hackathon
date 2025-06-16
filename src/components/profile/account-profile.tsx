@@ -24,9 +24,7 @@ interface AccountProfile {
     full_name: string | null;
     avatar_url: string | null;
     provider: string;
-    plan: string;
     role: string;
-    emails_left: number;
     created_at: string;
     updated_at: string;
     // Company billing fields
@@ -40,6 +38,10 @@ interface AccountProfile {
     company_tax_id: string | null;
     billing_type: 'individual' | 'business';
     vat_number: string | null;
+    // Subscription data (from subscriptions table)
+    plan_name?: string;
+    emails_left?: number;
+    subscription_status?: string;
 }
 
 export function AccountProfile() {
@@ -71,6 +73,7 @@ export function AccountProfile() {
                 return;
             }
 
+            // Fetch account data
             const { data: accountData, error } = await supabase
                 .from('accounts')
                 .select('*')
@@ -84,10 +87,33 @@ export function AccountProfile() {
                     title: 'Error',
                     description: 'Failed to load account data.',
                 });
-            } else {
-                setAccount(accountData);
-                setEditedAccount(accountData);
+                setLoading(false);
+                return;
             }
+
+            // Fetch subscription data
+            const { data: subscriptionData, error: subscriptionError } = await supabase
+                .from('subscriptions')
+                .select('plan_name, emails_left, subscription_status')
+                .eq('account_id', accountData.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (subscriptionError) {
+                console.log('No subscription found, using defaults:', subscriptionError);
+            }
+
+            // Combine account and subscription data
+            const combinedData = {
+                ...accountData,
+                plan_name: subscriptionData?.plan_name || 'Free',
+                emails_left: subscriptionData?.emails_left || 0,
+                subscription_status: subscriptionData?.subscription_status || 'active',
+            };
+
+            setAccount(combinedData);
+            setEditedAccount(combinedData);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -346,10 +372,18 @@ export function AccountProfile() {
         }
     };
 
-    const getPlanColor = (plan: string) => {
+    const getPlanColor = (plan?: string) => {
+        if (!plan) return 'bg-gray-600';
+
         switch (plan.toLowerCase()) {
             case 'free':
                 return 'bg-gray-600';
+            case 'solo':
+                return 'bg-blue-600';
+            case 'entrepreneur':
+                return 'bg-purple-600';
+            case 'team':
+                return 'bg-emerald-600';
             case 'pro':
                 return 'bg-blue-600';
             case 'enterprise':
@@ -446,12 +480,12 @@ export function AccountProfile() {
                     </div>
                     <p className='text-neutral-400 mb-2'>{account.billing_email || 'No email'}</p>
                     <div className='flex items-center gap-2'>
-                        <Badge className={`text-xs ${getPlanColor(account.plan)}`}>
-                            {account.plan !== 'free' && <IconCrown className='h-3 w-3 mr-1' />}
-                            {account.plan.toUpperCase()}
+                        <Badge className={`text-xs ${getPlanColor(account.plan_name)}`}>
+                            {account.plan_name !== 'Free' && <IconCrown className='h-3 w-3 mr-1' />}
+                            {(account.plan_name || 'Free').toUpperCase()}
                         </Badge>
                         <span className='text-xs text-neutral-500'>
-                            {account.emails_left} emails left
+                            {account.emails_left || 0} emails left
                         </span>
                     </div>
                     {canEditAvatar && (
@@ -900,7 +934,7 @@ export function AccountProfile() {
                         </div>
                         <div>
                             <Label className='text-neutral-400'>Plan</Label>
-                            <p className='capitalize'>{account.plan}</p>
+                            <p className='capitalize'>{account.plan_name || 'Free'}</p>
                         </div>
                         <div>
                             <Label className='text-neutral-400'>Role</Label>
