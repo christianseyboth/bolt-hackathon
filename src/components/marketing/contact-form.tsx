@@ -30,7 +30,7 @@ export const ContactForm = () => {
             <div className='space-y-8'>
                 <div>
                     <Heading className='text-left text-2xl lg:text-3xl mt-12'>
-                        Let's Secure Your Email Together
+                        Let&apos;s Secure Your Email Together
                     </Heading>
                     <Subheading className='text-left text-neutral-400 mt-4'>
                         Ready to protect your organization from email threats? Our cybersecurity
@@ -125,8 +125,8 @@ export const ContactForm = () => {
                 <div className='w-full relative z-20'>
                     <h3 className='text-lg font-semibold text-white mb-2'>Send us a message</h3>
                     <p className='text-sm text-neutral-400 mb-6'>
-                        Tell us about your email security needs and we'll get back to you within 24
-                        hours.
+                        Tell us about your email security needs and we&apos;ll get back to you
+                        within 24 hours.
                     </p>
                 </div>
 
@@ -145,7 +145,7 @@ export const ContactForm = () => {
                     {/* Honeypot field - hidden from users */}
                     <div className='hidden'>
                         <label>
-                            Don't fill this out if you're human:
+                            Don&apos;t fill this out if you&apos;re human:
                             <input name='bot-field' />
                         </label>
                     </div>
@@ -284,8 +284,8 @@ export const ContactForm = () => {
                 </form>
 
                 <p className='text-xs text-neutral-500 text-center w-full relative z-20'>
-                    By submitting this form, you agree to our privacy policy. We'll only use your
-                    information to respond to your inquiry.
+                    By submitting this form, you agree to our privacy policy. We&apos;ll only use
+                    your information to respond to your inquiry.
                 </p>
             </div>
         </Container>

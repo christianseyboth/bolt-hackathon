@@ -32,8 +32,8 @@ export default function ContactSuccessPage() {
                     <Heading className='mb-4 text-2xl'>Message Sent Successfully! 🎉</Heading>
 
                     <Subheading className='mb-8 text-neutral-400'>
-                        Thank you for contacting SecPilot. We've received your message and will get
-                        back to you within 24 hours.
+                        Thank you for contacting SecPilot. We&apos;ve received your message and will
+                        get back to you within 24 hours.
                     </Subheading>
 
                     {/* What happens next */}
@@ -49,11 +49,11 @@ export default function ContactSuccessPage() {
                             </li>
                             <li className='flex items-start'>
                                 <span className='w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0'></span>
-                                You'll receive a personalized response within 24 hours
+                                You&apos;ll receive a personalized response within 24 hours
                             </li>
                             <li className='flex items-start'>
                                 <span className='w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0'></span>
-                                For urgent matters, we'll prioritize your request
+                                For urgent matters, we&apos;ll prioritize your request
                             </li>
                         </ul>
                     </div>

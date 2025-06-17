@@ -34,12 +34,17 @@ const nextConfig = {
         ],
     },
 
-    // Add ESLint configuration (optional but recommended)
+    // Add ESLint configuration
     eslint: {
         // Directories to run ESLint on during production builds
         dirs: ['pages', 'components', 'lib', 'src', 'mdx'],
-        // Don't run ESLint during builds if you want to handle it separately
+        // Allow warnings but not errors
         ignoreDuringBuilds: false,
+    },
+
+    // TypeScript configuration
+    typescript: {
+        ignoreBuildErrors: false,
     },
 };
 
