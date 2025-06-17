@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { validateApiKey, hasPermission, createApiResponse, createApiError } from '@/lib/api-auth';
 import { createClient } from '@supabase/supabase-js';
+import { getApiBaseUrl } from '@/lib/api-config';
 
 export async function GET(request: NextRequest) {
     try {
@@ -178,7 +179,7 @@ export async function POST(request: NextRequest) {
             metadata: 'object'
         },
         example: {
-            curl: `curl -X GET "https://api.secpilot.ai/v1/usage?period=7d" \\
+            curl: `curl -X GET "${getApiBaseUrl()}/api/v1/usage?period=7d" \\
   -H "Authorization: Bearer YOUR_API_KEY"`
         }
     };

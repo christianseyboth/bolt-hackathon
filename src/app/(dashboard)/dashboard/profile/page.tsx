@@ -31,6 +31,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { AccountProfile } from '@/components/profile/account-profile';
 import { ApiKeyManagement } from '@/components/profile/api-key-management';
 import { SecuritySettings } from '@/components/profile/security-settings';
+import { getApiBaseUrl, getApiDocumentationExample } from '@/lib/api-config';
 
 export default function ProfilePage() {
     const [user, setUser] = useState<any>(null);
@@ -276,10 +277,7 @@ export default function ProfilePage() {
                                     <div>
                                         <Label className='text-neutral-400'>Base URL</Label>
                                         <code className='block bg-neutral-800 p-2 rounded mt-1 font-mono text-xs'>
-                                            {typeof window !== 'undefined'
-                                                ? window.location.origin
-                                                : 'http://localhost:3000'}
-                                            /api/v1
+                                            {getApiBaseUrl()}/api/v1
                                         </code>
                                     </div>
                                     <div>
@@ -313,8 +311,11 @@ export default function ProfilePage() {
                                                 View example
                                             </summary>
                                             <pre className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs'>
-                                                {`curl -X GET "${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/api/v1/analyses?threat_level=critical&limit=10" \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}
+                                                {getApiDocumentationExample(
+                                                    '/analyses',
+                                                    'GET',
+                                                    '?threat_level=critical&limit=10'
+                                                )}
                                             </pre>
                                         </details>
                                     </div>
@@ -335,8 +336,7 @@ export default function ProfilePage() {
                                                 View example
                                             </summary>
                                             <pre className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs'>
-                                                {`curl -X GET ${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/api/v1/account \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}
+                                                {getApiDocumentationExample('/account')}
                                             </pre>
                                         </details>
                                     </div>
@@ -357,8 +357,11 @@ export default function ProfilePage() {
                                                 View example
                                             </summary>
                                             <pre className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs'>
-                                                {`curl -X GET ${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/api/v1/usage?period=7d \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}
+                                                {getApiDocumentationExample(
+                                                    '/usage',
+                                                    'GET',
+                                                    '?period=7d'
+                                                )}
                                             </pre>
                                         </details>
                                     </div>
@@ -391,11 +394,7 @@ export default function ProfilePage() {
                                     <Button
                                         variant='outline'
                                         size='sm'
-                                        onClick={() =>
-                                            copyToClipboard(
-                                                `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/api/v1`
-                                            )
-                                        }
+                                        onClick={() => copyToClipboard(`${getApiBaseUrl()}/api/v1`)}
                                     >
                                         <IconCopy className='h-4 w-4 mr-1' />
                                         Copy Base URL
