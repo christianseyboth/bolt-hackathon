@@ -31,7 +31,7 @@ export const metadata: Metadata = {
             'Advanced email threat protection for businesses. Detect phishing, malware & ransomware with 99.9% accuracy. Free trial available.',
         images: ['/banner.png'],
         type: 'website',
-        url: 'https://secpilot.com',
+        url: 'https://secpilot.io',
     },
     twitter: {
         card: 'summary_large_image',
@@ -82,9 +82,9 @@ export default function RootLayout({
         provider: {
             '@type': 'Organization',
             name: 'SecPilot',
-            url: 'https://secpilot.com',
+            url: 'https://secpilot.io',
         },
-        screenshot: 'https://secpilot.com/hero-screenshot.avif',
+        screenshot: 'https://secpilot.io/hero-screenshot.avif',
         softwareVersion: '2.0',
         aggregateRating: {
             '@type': 'AggregateRating',
