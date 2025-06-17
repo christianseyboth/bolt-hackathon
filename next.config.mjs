@@ -42,13 +42,16 @@ const nextConfig = {
         ],
     },
 };
+
 const withLingo = lingoCompiler.next({
     sourceLocale: 'en',
     targetLocales: ['es', 'fr', 'de'],
     useDirective: true,
     models: 'lingo.dev',
-    sourceRoot: 'src', // Default for Next.js
-    lingoDir: 'lingo', // Translation files directory
-    debug: true, // Enable debug logging
+    sourceRoot: 'src',
+    lingoDir: 'lingo',
+    debug: true,
+    rsc: true,
 });
+
 export default withLingo(withMDX(nextConfig));

@@ -7,6 +7,7 @@ import { useMotionValueEvent, useScroll, motion, AnimatePresence } from 'motion/
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Link } from 'next-view-transitions';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 type Props = {
     user: any;
@@ -75,6 +76,8 @@ export const DesktopNavbar = ({ navItems, user }: Props) => {
                 </div>
             </div>
             <div className='flex space-x-2 items-center' data-lingo-skip>
+                <LanguageSwitcher />
+
                 {user ? (
                     <Button variant='primary' as={Link} href='/dashboard'>
                         Dashboard
