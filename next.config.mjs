@@ -35,27 +35,6 @@ const nextConfig = {
             },
         ],
     },
-
-    // Properly handle Motion/Framer Motion
-    transpilePackages: ['motion'],
-
-    webpack: (config, { isServer }) => {
-        if (isServer) {
-            // Handle Motion on server-side
-            config.externals.push({
-                'motion/react': 'motion/react',
-                'framer-motion': 'framer-motion',
-            });
-        }
-
-        // Handle Motion module resolution
-        config.resolve.alias = {
-            ...config.resolve.alias,
-            'motion/react': require.resolve('motion/react'),
-        };
-
-        return config;
-    },
 };
 
 export default withMDX(nextConfig);
