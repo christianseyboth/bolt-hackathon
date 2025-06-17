@@ -1,6 +1,7 @@
 import rehypePrism from '@mapbox/rehype-prism';
 import nextMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm';
+import lingoCompiler from 'lingo.dev/compiler';
 
 const withMDX = nextMDX({
     extension: /\.mdx?$/,
@@ -33,8 +34,23 @@ const nextConfig = {
                 hostname: 'api.microlink.io',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'i.pravatar.cc',
+                pathname: '/**',
+            },
         ],
     },
 };
+const withLingo = lingoCompiler.next({
+    sourceLocale: 'en',
+    targetLocales: ['es', 'fr', 'de'],
+    useDirective: true,
+    models: 'lingo.dev',
+    sourceRoot: 'src', // Default for Next.js
+    lingoDir: 'lingo', // Translation files directory
+    rsc: true,
+    debug: true, // Enable debug logging
+});
 
-export default withMDX(nextConfig);
+export default withMDX(withLingo(nextConfig));

@@ -1,3 +1,4 @@
+'use i18n';
 import { CTA } from '@/components/marketing/cta';
 import { FAQs } from '@/components/marketing/faqs';
 import { Features } from '@/components/features';

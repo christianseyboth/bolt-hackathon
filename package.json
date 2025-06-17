@@ -51,7 +51,7 @@
         "lingo.dev": "^0.99.3",
         "lucide-react": "^0.511.0",
         "mini-svg-data-uri": "^1.4.4",
-        "motion": "^12.12.2",
+        "motion": "^12.18.1",
         "next": "^15.3.2",
         "next-view-transitions": "^0.3.4",
         "puppeteer": "^24.10.0",

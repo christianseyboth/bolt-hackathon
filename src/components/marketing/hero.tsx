@@ -1,5 +1,5 @@
 'use client';
-
+'use i18n';
 import React, { useRef } from 'react';
 import { MotionValue, motion, useScroll, useTransform } from 'motion/react';
 import { useRouter } from 'next/navigation';
@@ -144,4 +144,3 @@ export const Card = ({
         </motion.div>
     );
 };
-

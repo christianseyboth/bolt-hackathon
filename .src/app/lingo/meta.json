@@ -1,67 +1,7 @@
 {
   "version": 0.1,
   "files": {
-    "app/layout.tsx": {
-      "scopes": {
-        "10/declaration/body/1/argument/1/1/0/3/1/openingElement/0/value/expression": {
-          "type": "element",
-          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Loading..."
-        },
-        "10/declaration/body/3/argument/1/1/0/3/1/openingElement/0/value/expression": {
-          "type": "element",
-          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Loading..."
-        },
-        "9/declaration/body/1/argument/1/0/3/1/openingElement/0/value/expression": {
-          "type": "element",
-          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Loading..."
-        },
-        "9/declaration/body/1/argument/1/1/0/3/1/openingElement/0/value/expression": {
-          "type": "element",
-          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Loading..."
-        },
-        "9/declaration/body/2/argument/1/0/3/1/openingElement/0/value/expression": {
-          "type": "element",
-          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Loading..."
-        },
-        "9/declaration/body/2/argument/1/1/0/3/1/openingElement/0/value/expression": {
-          "type": "element",
-          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Loading..."
-        },
-        "9/declaration/body/3/argument/1/1/0/3/1/openingElement/0/value/expression": {
-          "type": "element",
-          "hash": "82b4ea7ed1439094d7c4be13aaba9a66",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Loading..."
-        }
-      }
-    },
-    "app/page.tsx": {
+    "../../src/app/page.tsx": {
       "scopes": {
         "10/declaration/body/0/argument/3/5/11-aria-label": {
           "type": "attribute",
@@ -102,874 +42,10 @@
           "skip": false,
           "overrides": {},
           "content": "Frequently asked questions"
-        },
-        "12/declaration/body/3/argument/3/7/11-aria-label": {
-          "type": "attribute",
-          "hash": "7c4ff368b285e32aac6f33bdad6f5c5e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Get started with SecPilot"
-        },
-        "12/declaration/body/3/argument/3/7/3-aria-label": {
-          "type": "attribute",
-          "hash": "19ebb4f3f0fd8ed7bd099273954ef679",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email security features"
-        },
-        "12/declaration/body/3/argument/3/7/5-aria-label": {
-          "type": "attribute",
-          "hash": "0b795d22ac7f6ed3124e11d120e5db86",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "SecPilot platform overview"
-        },
-        "12/declaration/body/3/argument/3/7/7-aria-label": {
-          "type": "attribute",
-          "hash": "56ab62c5db88fa94e7b7a62f8fad47f1",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Customer testimonials"
-        },
-        "12/declaration/body/3/argument/3/7/9-aria-label": {
-          "type": "attribute",
-          "hash": "5f3f4a2d061bb559ada5d1b7eb8d7378",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Frequently asked questions"
-        },
-        "13/declaration/body/3/argument/3/7/11-aria-label": {
-          "type": "attribute",
-          "hash": "56ab62c5db88fa94e7b7a62f8fad47f1",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Customer testimonials"
-        },
-        "13/declaration/body/3/argument/3/7/13-aria-label": {
-          "type": "attribute",
-          "hash": "5f3f4a2d061bb559ada5d1b7eb8d7378",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Frequently asked questions"
-        },
-        "13/declaration/body/3/argument/3/7/15-aria-label": {
-          "type": "attribute",
-          "hash": "7c4ff368b285e32aac6f33bdad6f5c5e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Get started with SecPilot"
-        },
-        "13/declaration/body/3/argument/3/7/3-aria-label": {
-          "type": "attribute",
-          "hash": "19ebb4f3f0fd8ed7bd099273954ef679",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email security features"
-        },
-        "13/declaration/body/3/argument/3/7/3/1": {
-          "type": "element",
-          "hash": "8928c9bf6064093742727ca8d9b0e152",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Welcome to SecPilot"
-        },
-        "13/declaration/body/3/argument/3/7/3/3": {
-          "type": "element",
-          "hash": "4687fac2c08788f2bd3264955ea5c6e2",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Advanced Email Security Solution"
-        },
-        "13/declaration/body/3/argument/3/7/3/5": {
-          "type": "element",
-          "hash": "5b4826e60aa175aef032ab3cbdd6e5be",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "This is a test message"
-        },
-        "13/declaration/body/3/argument/3/7/3/7": {
-          "type": "element",
-          "hash": "1f1c71a546d3f23678cb0c2668e33732",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Current page: Home"
-        },
-        "13/declaration/body/3/argument/3/7/3/9": {
-          "type": "element",
-          "hash": "e8abeb317b7ae2f1050bf5341c876818",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Status: Testing Lingo translations"
-        },
-        "13/declaration/body/3/argument/3/7/5-aria-label": {
-          "type": "attribute",
-          "hash": "0b795d22ac7f6ed3124e11d120e5db86",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "SecPilot platform overview"
-        },
-        "13/declaration/body/3/argument/3/7/7-aria-label": {
-          "type": "attribute",
-          "hash": "19ebb4f3f0fd8ed7bd099273954ef679",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email security features"
-        },
-        "13/declaration/body/3/argument/3/7/9-aria-label": {
-          "type": "attribute",
-          "hash": "0b795d22ac7f6ed3124e11d120e5db86",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "SecPilot platform overview"
-        },
-        "14/declaration/body/3/argument/3/7/11-aria-label": {
-          "type": "attribute",
-          "hash": "56ab62c5db88fa94e7b7a62f8fad47f1",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Customer testimonials"
-        },
-        "14/declaration/body/3/argument/3/7/13-aria-label": {
-          "type": "attribute",
-          "hash": "5f3f4a2d061bb559ada5d1b7eb8d7378",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Frequently asked questions"
-        },
-        "14/declaration/body/3/argument/3/7/15-aria-label": {
-          "type": "attribute",
-          "hash": "7c4ff368b285e32aac6f33bdad6f5c5e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Get started with SecPilot"
-        },
-        "14/declaration/body/3/argument/3/7/3/1": {
-          "type": "element",
-          "hash": "8928c9bf6064093742727ca8d9b0e152",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Welcome to SecPilot"
-        },
-        "14/declaration/body/3/argument/3/7/3/3": {
-          "type": "element",
-          "hash": "4687fac2c08788f2bd3264955ea5c6e2",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Advanced Email Security Solution"
-        },
-        "14/declaration/body/3/argument/3/7/7-aria-label": {
-          "type": "attribute",
-          "hash": "19ebb4f3f0fd8ed7bd099273954ef679",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email security features"
-        },
-        "14/declaration/body/3/argument/3/7/9-aria-label": {
-          "type": "attribute",
-          "hash": "0b795d22ac7f6ed3124e11d120e5db86",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "SecPilot platform overview"
-        },
-        "15/declaration/body/3/argument/3/7/11-aria-label": {
-          "type": "attribute",
-          "hash": "56ab62c5db88fa94e7b7a62f8fad47f1",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Customer testimonials"
-        },
-        "15/declaration/body/3/argument/3/7/13-aria-label": {
-          "type": "attribute",
-          "hash": "5f3f4a2d061bb559ada5d1b7eb8d7378",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Frequently asked questions"
-        },
-        "15/declaration/body/3/argument/3/7/15-aria-label": {
-          "type": "attribute",
-          "hash": "7c4ff368b285e32aac6f33bdad6f5c5e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Get started with SecPilot"
-        },
-        "15/declaration/body/3/argument/3/7/3/1": {
-          "type": "element",
-          "hash": "8928c9bf6064093742727ca8d9b0e152",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Welcome to SecPilot"
-        },
-        "15/declaration/body/3/argument/3/7/3/3": {
-          "type": "element",
-          "hash": "4687fac2c08788f2bd3264955ea5c6e2",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Advanced Email Security Solution"
-        },
-        "15/declaration/body/3/argument/3/7/7-aria-label": {
-          "type": "attribute",
-          "hash": "19ebb4f3f0fd8ed7bd099273954ef679",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email security features"
-        },
-        "15/declaration/body/3/argument/3/7/9-aria-label": {
-          "type": "attribute",
-          "hash": "0b795d22ac7f6ed3124e11d120e5db86",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "SecPilot platform overview"
         }
       }
     },
-    "components/dashboard/NotificationBell.tsx": {
-      "scopes": {
-        "10/declaration/0/init/body/10/argument/1/3/1/1/1": {
-          "type": "element",
-          "hash": "f4322e4733ff11b1e6b6f3806396b125",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Threat Notifications"
-        },
-        "10/declaration/0/init/body/10/argument/1/3/1/3/1/expression/consequent/3": {
-          "type": "element",
-          "hash": "c5b494e7fdc5b11a98ec876401dbb66f",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "No notifications"
-        },
-        "10/declaration/0/init/body/10/argument/1/3/1/3/1/expression/consequent/5": {
-          "type": "element",
-          "hash": "4b27caa55e126c204788895b008b8da0",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "You're all caught up!"
-        }
-      }
-    },
-    "components/dashboard/email-analytics.tsx": {
-      "scopes": {
-        "6/declaration/body/2/argument/1/1": {
-          "type": "element",
-          "hash": "85511ce650747822c5eca86344677464",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email Analysis"
-        },
-        "6/declaration/body/2/argument/3/1/1/3/1": {
-          "type": "element",
-          "hash": "58026d01600a2aba957ee0048ae60f03",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Weekly"
-        },
-        "6/declaration/body/2/argument/3/1/1/3/3": {
-          "type": "element",
-          "hash": "278c84547062bdd7abbc4771fc94a6a6",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Monthly"
-        },
-        "6/declaration/body/2/argument/3/1/3/3/1/3": {
-          "type": "element",
-          "hash": "7d5bb1246853dd8c2b94695325d0cc14",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Emails Scanned"
-        },
-        "6/declaration/body/2/argument/3/1/3/3/3/3": {
-          "type": "element",
-          "hash": "09996cc95403cddc634ec7098aa983da",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Threats Detected"
-        },
-        "6/declaration/body/2/argument/3/1/5/3/1/3": {
-          "type": "element",
-          "hash": "7d5bb1246853dd8c2b94695325d0cc14",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Emails Scanned"
-        },
-        "6/declaration/body/2/argument/3/1/5/3/3/3": {
-          "type": "element",
-          "hash": "09996cc95403cddc634ec7098aa983da",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Threats Detected"
-        }
-      }
-    },
-    "components/dashboard/email/email-filter-bar.tsx": {
-      "scopes": {
-        "10/declaration/body/1/argument/3/1/3-placeholder": {
-          "type": "attribute",
-          "hash": "b370aa152641cde755218b7fde550ca3",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Search for an Email..."
-        },
-        "10/declaration/body/1/argument/7/1/1": {
-          "type": "element",
-          "hash": "8e5ba7a85dab9e105b21b41fdbbbca18",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:IconFilter></element:IconFilter> Filter:"
-        },
-        "10/declaration/body/1/argument/7/3/1/1/5": {
-          "type": "element",
-          "hash": "56f41c5d30a76295bb087b20b7bee4c3",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Date"
-        },
-        "10/declaration/body/1/argument/7/5/1/1/1": {
-          "type": "element",
-          "hash": "1b0340cd175aa5a2be745a0d54908466",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Category"
-        },
-        "10/declaration/body/1/argument/7/5/1/1/3": {
-          "type": "element",
-          "hash": "24fad4f6ef7661c2c83be8ef58290c46",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Cat"
-        },
-        "10/declaration/body/1/argument/7/7/1/1/1": {
-          "type": "element",
-          "hash": "d4c9ed5809feff8c20d9482532f0a2f0",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Threat Level"
-        },
-        "10/declaration/body/1/argument/7/7/1/1/3": {
-          "type": "element",
-          "hash": "1e3bf31d5c6083e898dd3e3359fbb0c2",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Level"
-        }
-      }
-    },
-    "components/dashboard/email/email-list.tsx": {
-      "scopes": {
-        "7/declaration/body/14/argument/1/1/1": {
-          "type": "element",
-          "hash": "85511ce650747822c5eca86344677464",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email Analysis"
-        },
-        "7/declaration/body/14/argument/3/1/1/1/1/1": {
-          "type": "element",
-          "hash": "1b0340cd175aa5a2be745a0d54908466",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Category"
-        },
-        "7/declaration/body/14/argument/3/1/1/1/1/11": {
-          "type": "element",
-          "hash": "d4c9ed5809feff8c20d9482532f0a2f0",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Threat Level"
-        },
-        "7/declaration/body/14/argument/3/1/1/1/1/3": {
-          "type": "element",
-          "hash": "a2d18a44b4320d124f6f33a32023e74f",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Sender"
-        },
-        "7/declaration/body/14/argument/3/1/1/1/1/5": {
-          "type": "element",
-          "hash": "cccd041f08a57c1ae658324b5073fc7d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Recipient"
-        },
-        "7/declaration/body/14/argument/3/1/1/1/1/7": {
-          "type": "element",
-          "hash": "de5b885eb327b2f233f3b67aab4c4c0a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Subject"
-        },
-        "7/declaration/body/14/argument/3/1/1/1/1/9": {
-          "type": "element",
-          "hash": "fcf3cc658c8d4be28b865398d5efa4fc",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Received"
-        },
-        "7/declaration/body/14/argument/3/1/1/3/1/expression/alternate/1/1": {
-          "type": "element",
-          "hash": "b6afccd0fa9a8528e3d1b996dae77285",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Keine Emails gefunden."
-        },
-        "7/declaration/body/14/argument/7/expression/right/1/1/1/1": {
-          "type": "element",
-          "hash": "1e492ce58d8cc9c7ec34ca1c8ef629d4",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Page <element:span>{page}</element:span> of <element:span>{totalPages}</element:span> ({totalResults} Emails)"
-        },
-        "7/declaration/body/14/argument/7/expression/right/1/1/1/3": {
-          "type": "element",
-          "hash": "0fe5d1f91bea46077d91baa4d7470733",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "{page}/{totalPages} ({totalResults} emails)"
-        },
-        "7/declaration/body/14/argument/7/expression/right/1/1/3/1/1": {
-          "type": "element",
-          "hash": "f541015a827e37cb3b1234e56bc2aa3c",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Back"
-        },
-        "7/declaration/body/14/argument/7/expression/right/1/1/3/1/3": {
-          "type": "element",
-          "hash": "840b1b1547f4b394a2747e440462332a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "←"
-        },
-        "7/declaration/body/14/argument/7/expression/right/1/1/3/3/1": {
-          "type": "element",
-          "hash": "89ddbcf710eba274963494f312bdc8a9",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Next"
-        },
-        "7/declaration/body/14/argument/7/expression/right/1/1/3/3/3": {
-          "type": "element",
-          "hash": "1b8ccf0bbbf07c2595f012ef4987ae4e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "→"
-        }
-      }
-    },
-    "components/dashboard/mobile-header.tsx": {
-      "scopes": {
-        "14/declaration/body/7/argument/1/3/1": {
-          "type": "element",
-          "hash": "307c87de1cb4d48596238fc68243816a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Navigation Menu"
-        },
-        "14/declaration/body/7/argument/1/3/3": {
-          "type": "element",
-          "hash": "6055b96e2153feabec81f122685a0593",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Access dashboard navigation and menu items"
-        },
-        "14/declaration/body/7/argument/5/3/1/3/5/1": {
-          "type": "element",
-          "hash": "d7878693f91303a438852d617f6d35df",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Profile"
-        },
-        "14/declaration/body/7/argument/5/3/1/3/9": {
-          "type": "element",
-          "hash": "90187161e2734a46818982c6510c7c2d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Logout"
-        }
-      }
-    },
-    "components/dashboard/phishing-attempts.tsx": {
-      "scopes": {
-        "2/body/1/1/0/argument": {
-          "type": "element",
-          "hash": "ddd7cbc88914976edefdfe8cba35ad83",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "High Risk"
-        },
-        "2/body/1/2/0/argument": {
-          "type": "element",
-          "hash": "dc15fdece1d3ca74f14423883bd2836c",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Medium Risk"
-        },
-        "2/body/1/3/0/argument": {
-          "type": "element",
-          "hash": "1148f3a8dd3c6375fd8773a9b2ac36a9",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Low Risk"
-        },
-        "4/declaration/body/0/argument/1/1": {
-          "type": "element",
-          "hash": "c6297bd90714a36cfd85b14a3d62b6b4",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Recent Phishing Attempts"
-        },
-        "4/declaration/body/0/argument/3/1/expression/consequent": {
-          "type": "element",
-          "hash": "2d0cba7951ecf88764e8c8c6b1a74bea",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "No phishing attempts detected recently."
-        }
-      }
-    },
-    "components/dashboard/recent-activity.tsx": {
-      "scopes": {
-        "3/declaration/body/3/argument/1/1": {
-          "type": "element",
-          "hash": "d4b07b3b4faedbd20762ab8a665d979d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Recent Activity"
-        },
-        "3/declaration/body/3/argument/3/1/1/expression/right": {
-          "type": "element",
-          "hash": "e72c0c8423a8148711ace130a218ac9a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "No recent activity."
-        }
-      }
-    },
-    "components/dashboard/security-score.tsx": {
-      "scopes": {
-        "9/declaration/body/6/consequent/0/argument/1/1": {
-          "type": "element",
-          "hash": "d011a2a6f36a64cc2cbd0ad89378cbf7",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:IconShieldCheck></element:IconShieldCheck> Security Score"
-        },
-        "9/declaration/body/6/consequent/0/argument/3/1/1": {
-          "type": "element",
-          "hash": "9f39060a747ff1eab251d823a50094da",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "–"
-        },
-        "9/declaration/body/6/consequent/0/argument/3/1/3": {
-          "type": "element",
-          "hash": "6bb4aacd841ffafa837acb6892fb1d5c",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "No data available yet"
-        },
-        "9/declaration/body/6/consequent/0/argument/3/1/5": {
-          "type": "element",
-          "hash": "b5c23a08df533a456fa7fdc41a89fd6a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Start forwarding emails for analysis to see your security score!"
-        },
-        "9/declaration/body/6/consequent/0/argument/3/1/7/1": {
-          "type": "element",
-          "hash": "05ae3997f0e5c893dcb678a96fbf0409",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "What is Security Score?"
-        },
-        "9/declaration/body/6/consequent/0/argument/3/1/7/3": {
-          "type": "element",
-          "hash": "519431c2cc80d7f4006cba3a0de85911",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "A 0-100 rating of your email security health based on threat detection, risk levels, and false positives over the last 30 days."
-        },
-        "9/declaration/body/7/argument/1/1": {
-          "type": "element",
-          "hash": "246364ca3d599b7dfdd54f6ca0d2af3b",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:IconShieldCheck></element:IconShieldCheck> Security Score<element:span><element:IconInfoCircle></element:IconInfoCircle><element:div><element:div><element:strong>How is this calculated?</element:strong></element:div><element:div><element:div>• Starts at 100 points</element:div><element:div>• Deducts points for high-risk emails</element:div><element:div>• Penalties for critical threats (-5 each)</element:div><element:div>• Penalties for high threats (-2 each)</element:div><element:div>• Penalties for false positives (-2 each)</element:div><element:div>• Based on last 30 days of activity</element:div></element:div><element:div>100 - (avg_risk × 0.5) - (false_pos × 2) - (critical × 5) - (high × 2) - (threats × 1.5)</element:div></element:div></element:span>"
-        },
-        "9/declaration/body/7/argument/3/1/13/1/1": {
-          "type": "element",
-          "hash": "44b5c8579341bbe6a273d81d8fd30cbc",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Critical Threats:"
-        },
-        "9/declaration/body/7/argument/3/1/13/3/1": {
-          "type": "element",
-          "hash": "6d2c0f61700ad96ddb6207548403d703",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "High Risk:"
-        },
-        "9/declaration/body/7/argument/3/1/13/5/1": {
-          "type": "element",
-          "hash": "2a5486e91f48abd8780dece3e7ca3ef5",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Total Events:"
-        },
-        "9/declaration/body/7/argument/3/1/13/7/1": {
-          "type": "element",
-          "hash": "f8d93b586958484f7de6fd906093cc39",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Avg Risk:"
-        },
-        "9/declaration/body/7/argument/3/1/15": {
-          "type": "element",
-          "hash": "0f72686cd06e41ad2bd5176c6d3057b3",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Last updated: <function:formatDate/>"
-        },
-        "9/declaration/body/7/argument/3/1/9/1/3": {
-          "type": "element",
-          "hash": "975d5222b7a6acae07aaff6d97f05a33",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "What this means:"
-        },
-        "9/declaration/body/7/argument/3/1/9/5/1": {
-          "type": "element",
-          "hash": "7a5ec245cf7b70cc438c350eb1c057fe",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Recommendation:"
-        }
-      }
-    },
-    "components/dashboard/sidebar.tsx": {
-      "scopes": {
-        "9/declaration/body/3/argument/3/1": {
-          "type": "element",
-          "hash": "412822977c2946a1cbbdf67ff83dc047",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Dashboard"
-        },
-        "9/declaration/body/3/argument/3/11": {
-          "type": "element",
-          "hash": "aa86a85634a6f9b9b22bdb332dade4db",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Subscription"
-        },
-        "9/declaration/body/3/argument/3/3": {
-          "type": "element",
-          "hash": "92b5b397e5a453b8cf2fcf475e11b5b0",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email Analysis"
-        },
-        "9/declaration/body/3/argument/3/5": {
-          "type": "element",
-          "hash": "acda5e5f9b22ca353b99093f45c8e99e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Security Analytics"
-        },
-        "9/declaration/body/3/argument/3/7": {
-          "type": "element",
-          "hash": "c58b974a30f7a2ee5815be31b0bdd83a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Team"
-        },
-        "9/declaration/body/3/argument/3/9": {
-          "type": "element",
-          "hash": "0f824991153fd5d7987af2ef342ac318",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Reports"
-        },
-        "9/declaration/body/3/argument/5/1": {
-          "type": "element",
-          "hash": "87aebddc3087d58ab799f5d55d5883f4",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Profile"
-        },
-        "9/declaration/body/3/argument/5/3/3": {
-          "type": "element",
-          "hash": "07948fdf20705e04a7bf68ab197512bf",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Logout"
-        }
-      }
-    },
-    "components/dashboard/subscription-info.tsx": {
-      "scopes": {
-        "6/declaration/body/2/argument/1/1": {
-          "type": "element",
-          "hash": "ba9f3675e18987d067d48533c8897343",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Subscription"
-        },
-        "6/declaration/body/2/argument/3/1/3/1": {
-          "type": "element",
-          "hash": "a3d40c0267b81ae53c9598eaeb05087d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Manage"
-        },
-        "6/declaration/body/2/argument/3/3/1/1": {
-          "type": "element",
-          "hash": "02bd753763eba240012e2a0524979e04",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Email Scans"
-        },
-        "6/declaration/body/2/argument/3/3/1/3": {
-          "type": "element",
-          "hash": "8c7c40f47c1572a0aa6f5fcb87cc116d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<expression/> / <expression/>"
-        },
-        "6/declaration/body/2/argument/3/3/5/1": {
-          "type": "element",
-          "hash": "61333c4a765e10b2ad46774951725233",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Team Members"
-        },
-        "6/declaration/body/2/argument/3/3/5/3": {
-          "type": "element",
-          "hash": "bb442ee6a9ca5360a2fcfca21075e12f",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "1 / <expression/>"
-        },
-        "6/declaration/body/2/argument/3/5/1/1": {
-          "type": "element",
-          "hash": "072cdae0e8638b31a256fa92b4b45ae6",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Need more capacity?"
-        },
-        "6/declaration/body/2/argument/3/5/1/3/1": {
-          "type": "element",
-          "hash": "63c3b52882e0d779859307d672c178c2",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Upgrade"
-        }
-      }
-    },
-    "components/featured-images.tsx": {
+    "../../src/components/featured-images.tsx": {
       "scopes": {
         "6/declaration/0/init/body/0/argument/7": {
           "type": "element",
@@ -981,7 +57,7 @@
         }
       }
     },
-    "components/features/index.tsx": {
+    "../../src/components/features/index.tsx": {
       "scopes": {
         "12/declaration/0/init/body/0/argument/1/3": {
           "type": "element",
@@ -1065,7 +141,7 @@
         }
       }
     },
-    "components/features/skeletons/fifth.tsx": {
+    "../../src/components/features/skeletons/fifth.tsx": {
       "scopes": {
         "3/declaration/0/init/body/4/argument/3/11/1/1": {
           "type": "element",
@@ -1141,7 +217,7 @@
         }
       }
     },
-    "components/features/skeletons/first.tsx": {
+    "../../src/components/features/skeletons/first.tsx": {
       "scopes": {
         "3/declaration/0/init/body/2/argument/1/3/3/1/expression/right/1/1/3": {
           "type": "element",
@@ -1217,7 +293,7 @@
         }
       }
     },
-    "components/features/skeletons/second.tsx": {
+    "../../src/components/features/skeletons/second.tsx": {
       "scopes": {
         "2/declaration/0/init/body/6/argument/1/3/3/1": {
           "type": "element",
@@ -1237,7 +313,7 @@
         }
       }
     },
-    "components/features/skeletons/third.tsx": {
+    "../../src/components/features/skeletons/third.tsx": {
       "scopes": {
         "3/declaration/0/init/body/0/argument/3/11/11/3/1": {
           "type": "element",
@@ -1337,7 +413,7 @@
         }
       }
     },
-    "components/layout/footer.tsx": {
+    "../../src/components/layout/footer.tsx": {
       "scopes": {
         "4/declaration/0/init/body/4/argument/5/11/1/1": {
           "type": "element",
@@ -1445,7 +521,7 @@
         }
       }
     },
-    "components/layout/navbar/desktop-navbar.tsx": {
+    "../../src/components/layout/navbar/desktop-navbar.tsx": {
       "scopes": {
         "8/declaration/0/init/body/3/argument/5/1/expression/alternate/1": {
           "type": "element",
@@ -1473,7 +549,7 @@
         }
       }
     },
-    "components/layout/navbar/mobile-navbar.tsx": {
+    "../../src/components/layout/navbar/mobile-navbar.tsx": {
       "scopes": {
         "8/declaration/0/init/body/4/argument/5/expression/right/5/1/expression/alternate/1": {
           "type": "element",
@@ -1501,7 +577,7 @@
         }
       }
     },
-    "components/logo.tsx": {
+    "../../src/components/logo.tsx": {
       "scopes": {
         "3/declaration/0/init/body/0/argument/3": {
           "type": "element",
@@ -1513,7 +589,7 @@
         }
       }
     },
-    "components/marketing/cta.tsx": {
+    "../../src/components/marketing/cta.tsx": {
       "scopes": {
         "9/declaration/0/init/body/0/argument/1/1/1": {
           "type": "element",
@@ -1629,7 +705,7 @@
         }
       }
     },
-    "components/marketing/faqs.tsx": {
+    "../../src/components/marketing/faqs.tsx": {
       "scopes": {
         "8/declaration/0/init/body/1/argument/1/11/1": {
           "type": "element",
@@ -1681,7 +757,7 @@
         }
       }
     },
-    "components/marketing/hero.tsx": {
+    "../../src/components/marketing/hero.tsx": {
       "scopes": {
         "12/declaration/0/init/body/8/argument/1/1": {
           "type": "element",
@@ -1714,42 +790,10 @@
           "skip": false,
           "overrides": {},
           "content": "SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface"
-        },
-        "14/declaration/0/init/body/9/argument/1/1": {
-          "type": "element",
-          "hash": "d5c90c768536df80b1831504a6c03047",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Never Lose Money to Email Attacks Again"
-        },
-        "14/declaration/0/init/body/9/argument/1/3": {
-          "type": "element",
-          "hash": "cbcfe1255913fcc2a03043adf9be5d0d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Advanced AI-powered email security software that detects phishing, malware, ransomware, and business email compromise (BEC) attacks in real-time. Protect your organization with 99.9% accurate threat detection that works with Gmail, Outlook, and Office 365."
-        },
-        "14/declaration/0/init/body/9/argument/1/7/1/1/1": {
-          "type": "element",
-          "hash": "3a30d65f4190e6607153ba90de45e8f3",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Start Free Email Security Trial"
-        },
-        "14/declaration/0/init/body/9/argument/3/1/1/1-alt": {
-          "type": "attribute",
-          "hash": "1caa1c3b34786592a8f31d265905a971",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface"
         }
       }
     },
-    "components/marketing/tools.tsx": {
+    "../../src/components/marketing/tools.tsx": {
       "scopes": {
         "11/0/init/body/0/argument/11/1": {
           "type": "element",
@@ -2017,7 +1061,7 @@
         }
       }
     },
-    "components/testimonials/index.tsx": {
+    "../../src/components/testimonials/index.tsx": {
       "scopes": {
         "10/0/init/body/1/argument/1/1": {
           "type": "element",
@@ -2053,7 +1097,7 @@
         }
       }
     },
-    "components/testimonials/slider.tsx": {
+    "../../src/components/testimonials/slider.tsx": {
       "scopes": {
         "7/declaration/0/init/body/7/argument/1/1/7/7/1/1/expression/0/body/1": {
           "type": "element",
@@ -2065,113 +1109,9 @@
         }
       }
     },
-    "components/tour/CustomTour.tsx": {
-      "scopes": {
-        "8/declaration/0/init/body/12/argument/7/1/1/1/1": {
-          "type": "element",
-          "hash": "3d4ce400c76c16470032ceabd2b95d21",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Step <expression/> of {tourSteps.length}"
-        },
-        "8/declaration/0/init/body/12/argument/7/1/1/9/1/1": {
-          "type": "element",
-          "hash": "c6e0d3fb9de9193309caec8b5701bd8e",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:IconArrowLeft></element:IconArrowLeft> Back"
-        },
-        "8/declaration/0/init/body/12/argument/7/1/1/9/1/3": {
-          "type": "element",
-          "hash": "ff6302805e6be4910bce58c8a97c16e6",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Skip Tour"
-        },
-        "8/declaration/0/init/body/12/argument/7/1/1/9/3/1/expression/alternate": {
-          "type": "element",
-          "hash": "6a4f24acee6df6a6909fd0676c212b0a",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Next<element:IconArrowRight></element:IconArrowRight>"
-        },
-        "8/declaration/0/init/body/12/argument/7/1/1/9/3/1/expression/consequent": {
-          "type": "element",
-          "hash": "93db380294c8d7c17115b1a7dd1ae263",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<element:IconCheck></element:IconCheck> Complete"
-        }
-      }
-    },
-    "components/ui/avatar-menu.tsx": {
-      "scopes": {
-        "8/declaration/body/7/argument/3/5": {
-          "type": "element",
-          "hash": "87aebddc3087d58ab799f5d55d5883f4",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Profile"
-        },
-        "8/declaration/body/7/argument/3/7": {
-          "type": "element",
-          "hash": "fe2a87e50390a7e4f511f46c2fb881fe",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Settings"
-        },
-        "8/declaration/body/7/argument/3/9": {
-          "type": "element",
-          "hash": "c2e47b09ee9d1f27da653ade1a6ee78d",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Log out"
-        }
-      }
-    },
-    "components/ui/date-range-picker.tsx": {
-      "scopes": {
-        "7/declaration/body/0/argument/1/1/1/3/expression/alternate": {
-          "type": "element",
-          "hash": "44f84b12b94c8101d2a9a601a10b3eaf",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Wähle Zeitraum"
-        },
-        "7/declaration/body/0/argument/1/1/1/3/expression/consequent/consequent": {
-          "type": "element",
-          "hash": "df477a304c7ec9ed2dfd252fac2ae590",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "<function:format/> - <function:format/>"
-        }
-      }
-    },
-    "components/ui/dialog.tsx": {
+    "../../src/components/ui/dialog.tsx": {
       "scopes": {
         "10/0/init/0/body/3/3/3": {
-          "type": "element",
-          "hash": "2c2e22f8424a1031de89063bd0022e16",
-          "context": "",
-          "skip": false,
-          "overrides": {},
-          "content": "Close"
-        }
-      }
-    },
-    "components/ui/sheet.tsx": {
-      "scopes": {
-        "11/0/init/0/body/3/3/3": {
           "type": "element",
           "hash": "2c2e22f8424a1031de89063bd0022e16",
           "context": "",
