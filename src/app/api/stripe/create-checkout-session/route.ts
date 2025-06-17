@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@/utils/supabase/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2025-02-24.acacia',
+    apiVersion: '2025-05-28.basil' as any,
 });
 
 export async function POST(request: NextRequest) {
@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
                 }
 
                 // Add tax ID if available
-                if (account.company_tax_id) {
+                if (account.company_tax_id && customerData.metadata) {
                     customerData.metadata.tax_id = account.company_tax_id;
                 }
 
                 // Add VAT number if available
-                if (account.vat_number) {
+                if (account.vat_number && customerData.metadata) {
                     customerData.metadata.vat_number = account.vat_number;
                 }
             } else {
@@ -130,12 +130,12 @@ export async function POST(request: NextRequest) {
                 }
 
                 // Add tax ID if available
-                if (account.company_tax_id) {
+                if (account.company_tax_id && updateData.metadata) {
                     updateData.metadata.tax_id = account.company_tax_id;
                 }
 
                 // Add VAT number if available
-                if (account.vat_number) {
+                if (account.vat_number && updateData.metadata) {
                     updateData.metadata.vat_number = account.vat_number;
                 }
             } else {

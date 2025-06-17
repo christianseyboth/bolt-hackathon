@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@/utils/supabase/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2025-02-24.acacia',
+    apiVersion: '2025-05-28.basil' as any,
 });
 
 export async function POST(request: NextRequest) {
@@ -132,13 +132,13 @@ export async function POST(request: NextRequest) {
                 updatedSchedule = await stripe.subscriptionSchedules.update(newSchedule.id, {
                     phases: [
                         // Keep the existing phase (clean it of empty properties)
-                        ...newSchedule.phases.map(phase => ({
-                            items: phase.items,
+                        ...(newSchedule.phases.map(phase => ({
+                            items: phase.items as any,
                             start_date: phase.start_date,
                             end_date: phase.end_date,
                             ...(phase.collection_method && { collection_method: phase.collection_method }),
-                            ...(phase.invoice_settings && { invoice_settings: phase.invoice_settings }),
-                        })),
+                            ...(phase.invoice_settings && { invoice_settings: phase.invoice_settings as any }),
+                        })) as any),
                         {
                             // Add new phase - downgraded plan starts after current period
                             items: [{
@@ -189,13 +189,13 @@ export async function POST(request: NextRequest) {
                 updatedSchedule = await stripe.subscriptionSchedules.update(subscriptionSchedule.id, {
                     phases: [
                         // Keep the existing phase (clean it of empty properties)
-                        ...subscriptionSchedule.phases.map(phase => ({
-                            items: phase.items,
+                        ...(subscriptionSchedule.phases.map(phase => ({
+                            items: phase.items as any,
                             start_date: phase.start_date,
                             end_date: phase.end_date,
                             ...(phase.collection_method && { collection_method: phase.collection_method }),
-                            ...(phase.invoice_settings && { invoice_settings: phase.invoice_settings }),
-                        })),
+                            ...(phase.invoice_settings && { invoice_settings: phase.invoice_settings as any }),
+                        })) as any),
                         {
                             // Add new phase - downgraded plan starts after current period
                             items: [{
@@ -231,13 +231,13 @@ export async function POST(request: NextRequest) {
 
                         updatedSchedule = await stripe.subscriptionSchedules.update(newSchedule.id, {
                             phases: [
-                                ...newSchedule.phases.map(phase => ({
-                                    items: phase.items,
+                                ...(newSchedule.phases.map(phase => ({
+                                    items: phase.items as any,
                                     start_date: phase.start_date,
                                     end_date: phase.end_date,
                                     ...(phase.collection_method && { collection_method: phase.collection_method }),
-                                    ...(phase.invoice_settings && { invoice_settings: phase.invoice_settings }),
-                                })),
+                                    ...(phase.invoice_settings && { invoice_settings: phase.invoice_settings as any }),
+                                })) as any),
                                 {
                                     items: [{
                                         price: newPriceId,
