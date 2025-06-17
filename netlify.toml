@@ -7,16 +7,5 @@ package = "@netlify/plugin-nextjs"
 
 [build.environment]
 NEXT_TELEMETRY_DISABLED = "1"
+# These are public environment variables that should be ignored by secret scanning
 SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL"
-AWS_LAMBDA_JS_RUNTIME = "nodejs20.x"
-
-[functions]
-node_bundler = "esbuild"
-external_node_modules = [
-    "@supabase/ssr",
-    "@supabase/supabase-js",
-    "next",
-    "react",
-    "react-dom",
-]
-included_files = ["src/**/*.ts", "src/**/*.tsx"]
