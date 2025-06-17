@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
 
   // Get browser's preferred language
   const acceptLanguage = request.headers.get('accept-language') || '';
-  const supportedLocales = ['es', 'fr', 'de'];
+  const supportedLocales = ['es', 'fr', 'de', 'en'];
 
   // Simple language detection
   for (const locale of supportedLocales) {

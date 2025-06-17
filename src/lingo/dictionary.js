@@ -77,6 +77,51 @@ export default {
     },
     "app/page.tsx": {
       entries: {
+        "10/declaration/body/0/argument/3/5/11-aria-label": {
+          content: {
+            de: "Erste Schritte mit SecPilot",
+            en: "Get started with SecPilot",
+            es: "Comenzar con SecPilot",
+            fr: "Démarrer avec SecPilot",
+          },
+          hash: "7c4ff368b285e32aac6f33bdad6f5c5e",
+        },
+        "10/declaration/body/0/argument/3/5/3-aria-label": {
+          content: {
+            de: "E-Mail-Sicherheitsfunktionen",
+            en: "Email security features",
+            es: "Características de seguridad de correo electrónico",
+            fr: "Fonctionnalités de sécurité email",
+          },
+          hash: "19ebb4f3f0fd8ed7bd099273954ef679",
+        },
+        "10/declaration/body/0/argument/3/5/5-aria-label": {
+          content: {
+            de: "SecPilot Plattformübersicht",
+            en: "SecPilot platform overview",
+            es: "Descripción general de la plataforma SecPilot",
+            fr: "Aperçu de la plateforme SecPilot",
+          },
+          hash: "0b795d22ac7f6ed3124e11d120e5db86",
+        },
+        "10/declaration/body/0/argument/3/5/7-aria-label": {
+          content: {
+            de: "Kundenbewertungen",
+            en: "Customer testimonials",
+            es: "Testimonios de clientes",
+            fr: "Témoignages clients",
+          },
+          hash: "56ab62c5db88fa94e7b7a62f8fad47f1",
+        },
+        "10/declaration/body/0/argument/3/5/9-aria-label": {
+          content: {
+            de: "Häufig gestellte Fragen",
+            en: "Frequently asked questions",
+            es: "Preguntas frecuentes",
+            fr: "Questions fréquemment posées",
+          },
+          hash: "5f3f4a2d061bb559ada5d1b7eb8d7378",
+        },
         "12/declaration/body/3/argument/3/7/11-aria-label": {
           content: {
             de: "Erste Schritte mit SecPilot",
@@ -1070,16 +1115,16 @@ export default {
             es: "Seguridad de correo electrónico de nivel empresarial para pequeñas empresas",
             fr: "Sécurité email de niveau entreprise pour les petites entreprises",
           },
-          hash: "f12ca61f77dd6068f9d07825666462c6",
+          hash: "f78e67710c019009a39bb5956312a16a",
         },
         "12/declaration/0/init/body/0/argument/1/5": {
           content: {
             de: "SecPilot bietet fortschrittlichen E-Mail-Bedrohungsschutz mit KI-gestützter Phishing-Erkennung, Malware-Scanning und Echtzeit-Sicherheitsanalysen. Erhalten Sie E-Mail-Sicherheit auf Unternehmensebene ohne die Unternehmenskosten - ab 19 €/Monat mit Datenschutz ohne Speicherung.",
             en: "SecPilot delivers advanced email threat protection with AI-powered phishing detection, malware scanning, and real-time security analytics. Get enterprise-level email security without the enterprise cost - starting at $19/month with zero-storage privacy protection.",
-            es: "SecPilot ofrece protección avanzada contra amenazas de correo electrónico con detección de phishing impulsada por IA, análisis de malware y análisis de seguridad en tiempo real. Obtén seguridad de correo electrónico de nivel empresarial sin el costo empresarial - desde $19/mes con protección de privacidad sin almacenamiento.",
+            es: "SecPilot ofrece protección avanzada contra amenazas de correo electrónico con detección de phishing impulsada por IA, análisis de malware y análisis de seguridad en tiempo real. Obtenga seguridad de correo electrónico de nivel empresarial sin el costo empresarial - desde $19/mes con protección de privacidad sin almacenamiento.",
             fr: "SecPilot offre une protection avancée contre les menaces par email avec détection de phishing par IA, analyse de malwares et analyses de sécurité en temps réel. Obtenez une sécurité email de niveau entreprise sans le coût d'une entreprise - à partir de 19 €/mois avec protection de la confidentialité sans stockage.",
           },
-          hash: "501016e6e24c8f318a2903a23aff4d5a",
+          hash: "329c605e06ac3c3a043f8aa15a6f8529",
         },
         "12/declaration/0/init/body/0/argument/1/7/1/1": {
           content: {
@@ -1092,12 +1137,12 @@ export default {
         },
         "12/declaration/0/init/body/0/argument/1/7/1/3": {
           content: {
-            de: "SecPilot analysiert Ihre E-Mails auf Sicherheitsbedrohungen mit fortschrittlichen KI-Algorithmen, ohne persönliche Daten, E-Mail-Inhalte oder sensible Informationen zu speichern. SOC2 Typ II zertifiziert mit HIPAA-, DSGVO- und PCI DSS-Konformität für Gesundheits-, Rechts- und Finanzorganisationen.",
+            de: "SecPilot analysiert Ihre E-Mails auf Sicherheitsbedrohungen mit fortschrittlichen KI-Algorithmen, ohne persönliche Daten, E-Mail-Inhalte oder sensible Informationen zu speichern. SOC2 Typ II zertifiziert mit HIPAA, DSGVO und PCI DSS-Konformität für Gesundheits-, Rechts- und Finanzorganisationen.",
             en: "SecPilot analyzes your emails for security threats using advanced AI algorithms without storing any personal data, email content, or sensitive information. SOC2 Type II certified with HIPAA, GDPR, and PCI DSS compliance for healthcare, legal, and financial organizations.",
-            es: "SecPilot analiza tus correos electrónicos en busca de amenazas de seguridad utilizando algoritmos avanzados de IA sin almacenar datos personales, contenido de correo electrónico o información sensible. Certificado SOC2 Tipo II con cumplimiento de HIPAA, RGPD y PCI DSS para organizaciones de salud, legales y financieras.",
-            fr: "SecPilot analyse vos emails pour détecter les menaces de sécurité à l'aide d'algorithmes d'IA avancés sans stocker de données personnelles, de contenu d'email ou d'informations sensibles. Certifié SOC2 Type II avec conformité HIPAA, RGPD et PCI DSS pour les organisations de santé, juridiques et financières.",
+            es: "SecPilot analiza tus correos electrónicos en busca de amenazas de seguridad utilizando algoritmos avanzados de IA sin almacenar datos personales, contenido de correos electrónicos o información sensible. Certificación SOC2 Tipo II con cumplimiento de HIPAA, GDPR y PCI DSS para organizaciones de salud, legales y financieras.",
+            fr: "SecPilot analyse vos emails pour détecter les menaces de sécurité en utilisant des algorithmes d'IA avancés sans stocker aucune donnée personnelle, contenu d'email ou information sensible. Certifié SOC2 Type II avec conformité HIPAA, RGPD et PCI DSS pour les organisations de santé, juridiques et financières.",
           },
-          hash: "6cfdf08b7e7ac8d2b342c266d5a751e9",
+          hash: "c03961d9948665e281740810d0d04e48",
         },
         "12/declaration/0/init/body/0/argument/1/7/3/3": {
           content: {
@@ -1112,10 +1157,10 @@ export default {
           content: {
             de: "Erhalten Sie umfassende E-Mail-Sicherheitseinblicke mit Echtzeit-Bedrohungserkennungsanalysen, Sicherheitsberichten für Führungskräfte und detaillierten Bedrohungsinformationen. Verfolgen Sie Phishing-Versuche, Malware-Blockierungen und Verbesserungen der Sicherheitslage mit automatisierter Berichterstattung.",
             en: "Get comprehensive email security insights with real-time threat detection analytics, executive security reports, and detailed threat intelligence. Track phishing attempts, malware blocks, and security posture improvements with automated reporting.",
-            es: "Obtén información completa sobre seguridad de correo electrónico con análisis de detección de amenazas en tiempo real, informes ejecutivos de seguridad e inteligencia detallada sobre amenazas. Realiza un seguimiento de intentos de phishing, bloqueos de malware y mejoras en la postura de seguridad con informes automatizados.",
+            es: "Obtenga información completa sobre la seguridad del correo electrónico con análisis de detección de amenazas en tiempo real, informes de seguridad ejecutivos e inteligencia detallada sobre amenazas. Realice un seguimiento de los intentos de phishing, bloqueos de malware y mejoras en la postura de seguridad con informes automatizados.",
             fr: "Obtenez des informations complètes sur la sécurité des emails avec des analyses de détection de menaces en temps réel, des rapports de sécurité pour les dirigeants et des renseignements détaillés sur les menaces. Suivez les tentatives de phishing, les blocages de malwares et les améliorations de posture de sécurité grâce à des rapports automatisés.",
           },
-          hash: "179f803a91e55d31cabd74af6fa06a7d",
+          hash: "979fa9d91e75b7f6ad72dd726ab5cd2e",
         },
         "12/declaration/0/init/body/0/argument/1/7/5/3": {
           content: {
@@ -1130,10 +1175,10 @@ export default {
           content: {
             de: "SecPilot analysiert E-Mail-Bedrohungen aus über 50 Ländern mit maschinellen Lernmodellen, die auf globalen Angriffsmustern trainiert wurden. Unser Bedrohungsinformationsnetzwerk verarbeitet täglich Millionen von E-Mails, um neue Phishing-Kampagnen, Malware-Varianten und Zero-Day-E-Mail-Angriffe zu erkennen.",
             en: "SecPilot analyzes email threats from 50+ countries using machine learning models trained on global attack patterns. Our threat intelligence network processes millions of emails daily to detect emerging phishing campaigns, malware variants, and zero-day email attacks.",
-            es: "SecPilot analiza amenazas de correo electrónico de más de 50 países utilizando modelos de aprendizaje automático entrenados en patrones de ataque globales. Nuestra red de inteligencia de amenazas procesa millones de correos electrónicos diariamente para detectar campañas emergentes de phishing, variantes de malware y ataques de correo electrónico de día cero.",
-            fr: "SecPilot analyse les menaces par email provenant de plus de 50 pays à l'aide de modèles d'apprentissage automatique formés sur les schémas d'attaque mondiaux. Notre réseau de renseignements sur les menaces traite des millions d'emails quotidiennement pour détecter les campagnes de phishing émergentes, les variantes de malwares et les attaques email zero-day.",
+            es: "SecPilot analiza amenazas de correo electrónico de más de 50 países utilizando modelos de aprendizaje automático entrenados en patrones de ataque globales. Nuestra red de inteligencia de amenazas procesa millones de correos electrónicos diariamente para detectar campañas de phishing emergentes, variantes de malware y ataques de correo electrónico de día cero.",
+            fr: "SecPilot analyse les menaces par email provenant de plus de 50 pays en utilisant des modèles d'apprentissage automatique entraînés sur des schémas d'attaque mondiaux. Notre réseau de renseignement sur les menaces traite des millions d'emails quotidiennement pour détecter les campagnes de phishing émergentes, les variantes de malwares et les attaques par email zero-day.",
           },
-          hash: "5bee2cf79dd7fbc65715dab5685e9b6b",
+          hash: "20eb8cf5d1b93a2d4f67f0b65e3c4727",
         },
         "12/declaration/0/init/body/0/argument/1/7/7/3": {
           content: {
@@ -1146,12 +1191,12 @@ export default {
         },
         "12/declaration/0/init/body/0/argument/1/7/7/5": {
           content: {
-            de: "Fortschrittliche maschinelle Lernalgorithmen analysieren E-Mail-Inhalte, Absenderreputation, URLs und Anhänge mit 99,9 % Genauigkeit. Erkennen Sie raffinierte Business Email Compromise (BEC), CEO-Betrug, Lieferantenimitationen und fortgeschrittene persistente Bedrohungen, die herkömmliche E-Mail-Filter umgehen.",
+            de: "Fortschrittliche maschinelle Lernalgorithmen analysieren E-Mail-Inhalte, Absenderreputation, URLs und Anhänge mit 99,9% Genauigkeit. Erkennen Sie raffinierte Business Email Compromise (BEC), CEO-Betrug, Lieferantenimitationen und fortgeschrittene persistente Bedrohungen, die herkömmliche E-Mail-Filter umgehen.",
             en: "Advanced machine learning algorithms analyze email content, sender reputation, URLs, and attachments with 99.9% accuracy. Detect sophisticated business email compromise (BEC), CEO fraud, vendor impersonation, and advanced persistent threats that bypass traditional email filters.",
-            es: "Algoritmos avanzados de aprendizaje automático analizan el contenido del correo electrónico, la reputación del remitente, URLs y archivos adjuntos con una precisión del 99,9%. Detecta sofisticados compromisos de correo electrónico empresarial (BEC), fraude de CEO, suplantación de proveedores y amenazas persistentes avanzadas que eluden los filtros de correo electrónico tradicionales.",
-            fr: "Des algorithmes avancés d'apprentissage automatique analysent le contenu des emails, la réputation de l'expéditeur, les URL et les pièces jointes avec une précision de 99,9 %. Détectez les compromissions sophistiquées d'emails professionnels (BEC), les fraudes au PDG, les usurpations d'identité de fournisseurs et les menaces persistantes avancées qui contournent les filtres d'email traditionnels.",
+            es: "Los algoritmos avanzados de aprendizaje automático analizan el contenido del correo electrónico, la reputación del remitente, las URL y los archivos adjuntos con una precisión del 99,9%. Detecte sofisticados compromisos de correo electrónico empresarial (BEC), fraude de CEO, suplantación de proveedores y amenazas persistentes avanzadas que eluden los filtros de correo electrónico tradicionales.",
+            fr: "Des algorithmes d'apprentissage automatique avancés analysent le contenu des emails, la réputation de l'expéditeur, les URL et les pièces jointes avec une précision de 99,9 %. Détectez les compromissions sophistiquées d'emails professionnels (BEC), les fraudes au PDG, les usurpations d'identité de fournisseurs et les menaces persistantes avancées qui contournent les filtres d'email traditionnels.",
           },
-          hash: "6c4c26ece2b319e2f4e645638288562d",
+          hash: "ca68d692b073507f652547b8bfbbaecb",
         },
       },
     },
@@ -1849,6 +1894,42 @@ export default {
     },
     "components/marketing/hero.tsx": {
       entries: {
+        "12/declaration/0/init/body/8/argument/1/1": {
+          content: {
+            de: "Verlieren Sie nie wieder Geld durch E-Mail-Angriffe",
+            en: "Never Lose Money to Email Attacks Again",
+            es: "Nunca más pierdas dinero por ataques de correo electrónico",
+            fr: "Ne perdez plus jamais d'argent à cause d'attaques par email",
+          },
+          hash: "d5c90c768536df80b1831504a6c03047",
+        },
+        "12/declaration/0/init/body/8/argument/1/3": {
+          content: {
+            de: "Fortschrittliche KI-gestützte E-Mail-Sicherheitssoftware, die Phishing, Malware, Ransomware und Business Email Compromise (BEC)-Angriffe in Echtzeit erkennt. Schützen Sie Ihre Organisation mit 99,9 % genauer Bedrohungserkennung, die mit Gmail, Outlook und Office 365 funktioniert.",
+            en: "Advanced AI-powered email security software that detects phishing, malware, ransomware, and business email compromise (BEC) attacks in real-time. Protect your organization with 99.9% accurate threat detection that works with Gmail, Outlook, and Office 365.",
+            es: "Software avanzado de seguridad de correo electrónico impulsado por IA que detecta ataques de phishing, malware, ransomware y compromiso de correo electrónico empresarial (BEC) en tiempo real. Protege tu organización con detección de amenazas 99,9% precisa que funciona con Gmail, Outlook y Office 365.",
+            fr: "Logiciel de sécurité email avancé propulsé par l'IA qui détecte en temps réel les attaques de phishing, de malwares, de ransomwares et de compromission d'emails professionnels (BEC). Protégez votre organisation avec une détection de menaces précise à 99,9 % qui fonctionne avec Gmail, Outlook et Office 365.",
+          },
+          hash: "cbcfe1255913fcc2a03043adf9be5d0d",
+        },
+        "12/declaration/0/init/body/8/argument/1/7/1/1/1": {
+          content: {
+            de: "Kostenlose E-Mail-Sicherheits-Testversion starten",
+            en: "Start Free Email Security Trial",
+            es: "Iniciar prueba gratuita de seguridad de correo",
+            fr: "Démarrer l'essai gratuit de sécurité email",
+          },
+          hash: "3a30d65f4190e6607153ba90de45e8f3",
+        },
+        "12/declaration/0/init/body/8/argument/3/1/1/1-alt": {
+          content: {
+            de: "SecPilot E-Mail-Sicherheits-Dashboard mit Echtzeit-Bedrohungserkennung, Phishing-Schutz und Malware-Scanning-Oberfläche",
+            en: "SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface",
+            es: "Panel de seguridad de correo electrónico de SecPilot mostrando detección de amenazas en tiempo real, protección contra phishing e interfaz de escaneo de malware",
+            fr: "Tableau de bord de sécurité email SecPilot montrant la détection de menaces en temps réel, la protection contre le phishing et l'interface d'analyse de malwares",
+          },
+          hash: "1caa1c3b34786592a8f31d265905a971",
+        },
         "14/declaration/0/init/body/9/argument/1/1": {
           content: {
             de: "Verlieren Sie nie wieder Geld durch E-Mail-Angriffe",

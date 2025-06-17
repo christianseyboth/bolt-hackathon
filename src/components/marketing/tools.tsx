@@ -1,22 +1,12 @@
 'use client';
-import { motion, useMotionValueEvent } from 'motion/react';
-import React, { useRef, useState } from 'react';
+'use i18n';
+import { motion } from 'motion/react';
+import React from 'react';
 import { FeatureIconContainer } from '@/components/features/feature-icon-container';
 import { Heading } from '@/components/heading';
 import { Subheading } from '@/components/subheading';
 import { StickyScroll } from '@/components/ui/sticky-scroll';
-import {
-    IconMailForward,
-    IconSocial,
-    IconTerminal,
-    IconTool,
-    IconShieldCheck,
-    IconMail,
-    IconSettings,
-    IconChartBar,
-} from '@tabler/icons-react';
-import { useScroll } from 'motion/react';
-import { BlurImage } from '@/components/blur-image';
+import { IconTerminal, IconMail, IconChartBar } from '@tabler/icons-react';
 
 export const Tools = () => {
     const content = [
@@ -167,8 +157,8 @@ const SecurityDashboardMockup = () => {
                                         threat.severity === 'critical'
                                             ? 'bg-red-500'
                                             : threat.severity === 'high'
-                                            ? 'bg-amber-500'
-                                            : 'bg-yellow-500'
+                                              ? 'bg-amber-500'
+                                              : 'bg-yellow-500'
                                     }`}
                                 ></div>
                                 <span className='text-neutral-300'>{threat.type}</span>
@@ -391,4 +381,3 @@ const ReportingMockup = () => {
         </div>
     );
 };
-
