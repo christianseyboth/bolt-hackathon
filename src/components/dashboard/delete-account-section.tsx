@@ -151,7 +151,11 @@ export function DeleteAccountSection() {
                 .single();
 
             if (accountError || !account) {
-                throw new Error('Account not found');
+                console.error('Account not found:', accountError);
+                return {
+                    success: false,
+                    error: 'Account data is not available. Please try refreshing the page or contact support.',
+                };
             }
 
             // Prepare export data

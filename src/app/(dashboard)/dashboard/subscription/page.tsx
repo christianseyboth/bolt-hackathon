@@ -18,14 +18,45 @@ export default async function SettingsPage() {
     }
 
     // Get account data
-    const { data: account, error: accountError } = await supabase
+    let { data: account, error: accountError } = await supabase
         .from('accounts')
         .select('*')
         .eq('owner_id', user.id)
         .single();
 
+    // If no account exists, this means the handle_new_user trigger didn't run or failed
+    // We should not create a duplicate account here, instead show an error
     if (accountError || !account) {
-        redirect('/login');
+        console.error('❌ No account found for user:', user.id, 'Error:', accountError);
+        console.error(
+            '❌ This suggests the handle_new_user trigger failed or user was created outside the normal flow'
+        );
+
+        // For debugging, let's check if there are any accounts for this user
+        const { data: allAccounts, error: allAccountsError } = await supabase
+            .from('accounts')
+            .select('id, owner_id, billing_email, created_at')
+            .eq('owner_id', user.id);
+
+        console.log('🔍 All accounts for user:', allAccounts);
+        console.log('🔍 User ID:', user.id);
+        console.log('🔍 User email:', user.email);
+
+        // Try to find account by email as fallback
+        const { data: accountByEmail, error: emailError } = await supabase
+            .from('accounts')
+            .select('*')
+            .eq('billing_email', user.email)
+            .single();
+
+        if (accountByEmail && !emailError) {
+            console.log('✅ Found account by email instead of owner_id:', accountByEmail.id);
+            account = accountByEmail;
+        } else {
+            console.error('❌ No account found by email either. User needs account setup.');
+            console.log('🔄 Redirecting to setup-account page...');
+            redirect('/setup-account?error=no-account-found');
+        }
     }
 
     // Get current subscription using single source of truth

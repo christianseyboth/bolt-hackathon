@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
         // Get account data first (accounts table has the basic account info)
         console.log('🔍 Fetching account data for accountId:', accountId);
-        const { data: account, error: accountError } = await supabase
+        let { data: account, error: accountError } = await supabase
             .from('accounts')
             .select('*')
             .eq('id', accountId)
@@ -37,14 +37,78 @@ export async function POST(request: NextRequest) {
 
         if (accountError || !account) {
             console.log('❌ Account not found for ID:', accountId, 'Error:', accountError);
-            return NextResponse.json({
-                error: 'Account not found',
-                message: `No account found with ID: ${accountId}`,
-                accountId: accountId
-            }, { status: 404 });
+
+            // Try to get user and create account if this is a new OAuth user
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+            if (userError || !user) {
+                return NextResponse.json({
+                    error: 'Authentication required',
+                    message: 'Please sign in to continue'
+                }, { status: 401 });
+            }
+
+            // Check if account ID matches user ID (for new users, they might pass user ID as account ID)
+            if (accountId === user.id) {
+                console.log('🆕 Creating account for new OAuth user:', user.id);
+
+                try {
+                    // Extract user info from OAuth metadata
+                    const userFullName = user.user_metadata?.full_name ||
+                                        user.user_metadata?.name ||
+                                        user.email?.split('@')[0] || 'User';
+
+                    const userAvatarUrl = user.user_metadata?.avatar_url ||
+                                        user.user_metadata?.picture ||
+                                        null;
+
+                    const provider = user.app_metadata?.provider || 'email';
+
+                    // Create new account
+                    const { data: newAccount, error: createError } = await supabase
+                        .from('accounts')
+                        .insert({
+                            owner_id: user.id,
+                            billing_email: user.email,
+                            full_name: userFullName,
+                            avatar_url: userAvatarUrl,
+                            provider: provider,
+                            plan: 'Free',
+                            role: 'owner',
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString(),
+                        })
+                        .select()
+                        .single();
+
+                    if (createError || !newAccount) {
+                        console.error('❌ Failed to create account:', createError);
+                        return NextResponse.json({
+                            error: 'Failed to create account',
+                            message: 'Please try again or contact support'
+                        }, { status: 500 });
+                    }
+
+                    account = newAccount;
+                    console.log('✅ Account created successfully:', account.id);
+
+                } catch (error) {
+                    console.error('❌ Error creating account for OAuth user:', error);
+                    return NextResponse.json({
+                        error: 'Failed to create account',
+                        message: 'Please try again or contact support'
+                    }, { status: 500 });
+                }
+            } else {
+                return NextResponse.json({
+                    error: 'Account not found',
+                    message: `No account found with ID: ${accountId}`,
+                    accountId: accountId
+                }, { status: 404 });
+            }
         }
 
-                // Get subscription data (our main source of truth for Stripe info)
+        // Get subscription data (our main source of truth for Stripe info)
         console.log('🔍 Fetching subscription data for account:', accountId);
         const { data: subscription, error: subscriptionError } = await supabase
             .from('subscriptions')
@@ -158,14 +222,14 @@ export async function POST(request: NextRequest) {
                 console.log('✅ Initial subscription created:', newSubscription.id);
             }
 
-            // If subscription exists but no stripe_customer_id
+                        // If subscription exists but no stripe_customer_id, redirect to checkout
             if (currentSubscription && !currentSubscription.stripe_customer_id) {
-                console.log('❌ Subscription exists but no Stripe customer ID');
+                console.log('🔄 Subscription exists but no Stripe customer ID, redirecting to checkout...');
                 return NextResponse.json({
-                    error: 'Stripe customer not found',
-                    message: 'Please sync your subscription first or contact support',
-                    needsSync: true
-                }, { status: 404 });
+                    error: 'No payment method found',
+                    needsCheckout: true,
+                    message: 'Please complete checkout to set up your payment method and upgrade your subscription'
+                }, { status: 402 }); // 402 Payment Required
             }
         }
 
@@ -232,6 +296,16 @@ export async function POST(request: NextRequest) {
 
         // Check if customer has a default payment method
         console.log('🔍 Checking customer payment methods...');
+
+        // If no stripe_customer_id, redirect to checkout to create customer
+        if (!currentSubscription.stripe_customer_id) {
+            console.log('🔄 No Stripe customer ID found, redirecting to checkout to create customer...');
+            return NextResponse.json({
+                error: 'No payment method found',
+                needsCheckout: true,
+                message: 'Please complete checkout to set up your payment method and upgrade your subscription'
+            }, { status: 402 }); // 402 Payment Required
+        }
 
         // Get the customer to check for default payment method
         const customer = await stripe.customers.retrieve(currentSubscription.stripe_customer_id);

@@ -13,6 +13,7 @@ import {
     IconX,
     IconCrown,
     IconCamera,
+    IconUser,
 } from '@tabler/icons-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { createClient } from '@/utils/supabase/client';
@@ -82,11 +83,25 @@ export function AccountProfile() {
 
             if (error) {
                 console.error('Error fetching account:', error);
-                toast({
-                    variant: 'destructive',
-                    title: 'Error',
-                    description: 'Failed to load account data.',
-                });
+
+                // More specific error handling
+                if (error.code === 'PGRST116') {
+                    // No account found - this is expected for new users
+                    console.log('No account found for user, this may be expected for new users');
+                    toast({
+                        variant: 'default',
+                        title: 'Account Setup',
+                        description:
+                            'Your account is being set up. Please try refreshing the page in a moment.',
+                    });
+                } else {
+                    // Other database errors
+                    toast({
+                        variant: 'destructive',
+                        title: 'Error',
+                        description: 'Failed to load account data. Please try refreshing the page.',
+                    });
+                }
                 setLoading(false);
                 return;
             }
@@ -415,8 +430,14 @@ export function AccountProfile() {
 
     if (!account) {
         return (
-            <div className='text-center py-8'>
-                <p className='text-neutral-400'>No account data found.</p>
+            <div className='text-center py-8 text-neutral-400'>
+                <IconUser className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                <p>Unable to load account information</p>
+                <p className='text-sm mt-2'>Your account may still be setting up</p>
+                <Button variant='outline' onClick={fetchAccount} className='mt-4'>
+                    <IconEdit className='h-4 w-4 mr-2' />
+                    Retry
+                </Button>
             </div>
         );
     }

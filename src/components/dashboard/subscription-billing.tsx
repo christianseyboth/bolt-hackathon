@@ -244,7 +244,14 @@ export function SubscriptionBilling({
         setIsAutoSyncing(true);
 
         try {
-            const response = await fetch('/api/debug/sync-subscription', {
+            // If subscription has no stripe_customer_id, use the after-checkout sync
+            const syncEndpoint = !currentSubscription?.stripe_customer_id
+                ? '/api/stripe/sync-after-checkout'
+                : '/api/debug/sync-subscription';
+
+            console.log('🔄 Using sync endpoint:', syncEndpoint);
+
+            const response = await fetch(syncEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -253,6 +260,12 @@ export function SubscriptionBilling({
             });
 
             const result = await response.json();
+
+            console.log('🔍 Sync response:', {
+                status: response.status,
+                ok: response.ok,
+                result,
+            });
 
             if (result.success) {
                 toast({
@@ -634,19 +647,22 @@ export function SubscriptionBilling({
                             )}
 
                         <div className='flex flex-wrap gap-2'>
-                            <Button
-                                variant='outline'
-                                onClick={handleManageBilling}
-                                disabled={loading === 'portal'}
-                            >
-                                {loading === 'portal' && (
-                                    <IconLoader className='h-4 w-4 mr-2 animate-spin' />
-                                )}
-                                Manage Billing
-                            </Button>
+                            {/* Only show Manage Billing button if user has a Stripe customer ID */}
+                            {currentSubscription?.stripe_customer_id && (
+                                <Button
+                                    variant='outline'
+                                    onClick={handleManageBilling}
+                                    disabled={loading === 'portal'}
+                                >
+                                    {loading === 'portal' && (
+                                        <IconLoader className='h-4 w-4 mr-2 animate-spin' />
+                                    )}
+                                    Manage Billing
+                                </Button>
+                            )}
 
                             {/* Manual sync button for troubleshooting */}
-                            <Button
+                            {/* <Button
                                 variant='outline'
                                 onClick={async () => {
                                     setLoading('sync');
@@ -730,7 +746,7 @@ export function SubscriptionBilling({
                                 )}
                                 <IconCreditCard className='h-4 w-4 mr-2' />
                                 Sync Billing Info
-                            </Button>
+                            </Button> */}
 
                             {(() => {
                                 // Don't show cancel subscription button for Free plan

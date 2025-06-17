@@ -45,7 +45,8 @@ export async function createApiKey(
             .single();
 
         if (accountError || !account) {
-            return { success: false, error: 'Account not found' };
+            console.log('No account found for API key creation, account needs setup:', accountError);
+            return { success: false, error: 'Account setup required. Please complete your profile setup first.' };
         }
 
         // Check API key limits based on plan
@@ -138,7 +139,9 @@ export async function listApiKeys(): Promise<{ success: boolean; keys?: ApiKey[]
             .single();
 
         if (accountError || !account) {
-            return { success: false, error: 'Account not found' };
+            console.log('No account found for API key listing, returning empty list:', accountError);
+            // Return empty list instead of error for new users
+            return { success: true, keys: [] };
         }
 
         // Fetch API keys (only active ones since revoked keys are now deleted)
@@ -179,7 +182,8 @@ export async function revokeApiKey(keyId: string): Promise<{ success: boolean; e
             .single();
 
         if (accountError || !account) {
-            return { success: false, error: 'Account not found' };
+            console.log('No account found for API key revocation:', accountError);
+            return { success: false, error: 'Account setup required. Please complete your profile setup first.' };
         }
 
         // Permanently delete the API key from database
@@ -223,7 +227,8 @@ export async function updateApiKeyName(
             .single();
 
         if (accountError || !account) {
-            return { success: false, error: 'Account not found' };
+            console.log('No account found for API key update:', accountError);
+            return { success: false, error: 'Account setup required. Please complete your profile setup first.' };
         }
 
         // Update the API key name

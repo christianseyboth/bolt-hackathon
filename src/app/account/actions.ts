@@ -236,7 +236,18 @@ export async function getAccountData(): Promise<{
             .single();
 
         if (accountError || !account) {
-            return { success: false, error: 'Account not found' };
+            console.log('No account found for user, returning default data:', accountError);
+            // Instead of returning error, return default data for new users
+            return {
+                success: true,
+                data: {
+                    createdAt: new Date().toISOString(),
+                    plan: 'Free',
+                    emailsUsed: 0,
+                    apiKeysCount: 0,
+                    hasActiveSubscription: false,
+                }
+            };
         }
 
         // Count API keys
@@ -307,14 +318,43 @@ export async function exportAccountData(): Promise<{
             .eq('owner_id', user.id)
             .single();
 
-        if (accountError) {
-            console.error('Account fetch error:', accountError);
-            return { success: false, error: `Account not found: ${accountError.message}` };
-        }
-
-        if (!account) {
-            console.error('No account found for user');
-            return { success: false, error: 'Account not found' };
+        if (accountError || !account) {
+            console.log('No account found for user, returning minimal export data:', accountError);
+            // Instead of returning error, return minimal export data for new users
+            return {
+                success: true,
+                data: {
+                    account: {
+                        id: 'N/A',
+                        plan: 'Free',
+                        billing_email: user.email,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        full_name: 'Not provided',
+                        role: 'user',
+                        emails_left: 100,
+                        avatar_url: null,
+                        provider: 'email',
+                    },
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        created_at: user.created_at,
+                        last_sign_in_at: user.last_sign_in_at,
+                        provider: user.app_metadata?.provider,
+                        email_verified: user.email_confirmed_at !== null,
+                    },
+                    subscriptions: [],
+                    api_keys: [],
+                    metadata: {
+                        export_version: '1.0',
+                        exported_at: new Date().toISOString(),
+                        total_subscriptions: 0,
+                        total_api_keys: 0,
+                        note: 'Account data not yet created - showing default values'
+                    },
+                }
+            };
         }
 
         console.log('Account data fetched successfully, preparing export...');

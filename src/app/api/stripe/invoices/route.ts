@@ -30,17 +30,21 @@ export async function POST(request: NextRequest) {
             .single();
 
         if (subscriptionError || !subscription) {
-            return NextResponse.json(
-                { error: 'Account not found' },
-                { status: 404 }
-            );
+            // Return empty invoices array instead of error if no subscription exists
+            return NextResponse.json({
+                success: true,
+                invoices: [],
+                message: 'No subscription found'
+            });
         }
 
         if (!subscription.stripe_customer_id) {
-            return NextResponse.json(
-                { error: 'No Stripe customer found' },
-                { status: 400 }
-            );
+            // Return empty invoices array instead of error if no Stripe customer ID
+            return NextResponse.json({
+                success: true,
+                invoices: [],
+                message: 'No Stripe customer found'
+            });
         }
 
         // Fetch invoices from Stripe

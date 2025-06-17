@@ -78,9 +78,15 @@ export function SecuritySettings() {
     const fetchUserSecurityInfo = async () => {
         setLoading(true);
         try {
-            const { data: { user: authUser }, error: userError } = await supabase.auth.getUser();
+            const {
+                data: { user: authUser },
+                error: userError,
+            } = await supabase.auth.getUser();
             if (userError || !authUser) {
-                throw new Error('User not found');
+                console.error('User not found:', userError);
+                // Instead of throwing an error, just keep user as null and stop loading
+                setLoading(false);
+                return;
             }
 
             // Check if user is OAuth-based
@@ -163,9 +169,10 @@ export function SecuritySettings() {
 
         try {
             // First create a challenge for the factor
-            const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
-                factorId: factorId,
-            });
+            const { data: challengeData, error: challengeError } =
+                await supabase.auth.mfa.challenge({
+                    factorId: factorId,
+                });
 
             if (challengeError) throw challengeError;
 
@@ -257,7 +264,7 @@ export function SecuritySettings() {
         setPasswordLoading(true);
         try {
             const { error } = await supabase.auth.updateUser({
-                password: newPassword
+                password: newPassword,
             });
 
             if (error) throw error;
@@ -293,17 +300,23 @@ export function SecuritySettings() {
 
     const getProviderIcon = (provider: string) => {
         switch (provider) {
-            case 'google': return <IconBrandGoogle className="h-4 w-4" />;
-            case 'github': return <IconBrandGithub className="h-4 w-4" />;
-            default: return <IconMail className="h-4 w-4" />;
+            case 'google':
+                return <IconBrandGoogle className='h-4 w-4' />;
+            case 'github':
+                return <IconBrandGithub className='h-4 w-4' />;
+            default:
+                return <IconMail className='h-4 w-4' />;
         }
     };
 
     const getProviderName = (provider: string) => {
         switch (provider) {
-            case 'google': return 'Google';
-            case 'github': return 'GitHub';
-            default: return 'Email';
+            case 'google':
+                return 'Google';
+            case 'github':
+                return 'GitHub';
+            default:
+                return 'Email';
         }
     };
 
@@ -319,57 +332,81 @@ export function SecuritySettings() {
 
     if (loading) {
         return (
-            <Card className="border border-neutral-800 bg-neutral-900">
+            <Card className='border border-neutral-800 bg-neutral-900'>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <IconShield className="h-5 w-5" />
+                    <CardTitle className='flex items-center gap-2'>
+                        <IconShield className='h-5 w-5' />
                         Security Settings
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="animate-pulse space-y-6">
-                        <div className="h-16 bg-neutral-800 rounded"></div>
-                        <div className="h-16 bg-neutral-800 rounded"></div>
-                        <div className="h-16 bg-neutral-800 rounded"></div>
+                    <div className='animate-pulse space-y-6'>
+                        <div className='h-16 bg-neutral-800 rounded'></div>
+                        <div className='h-16 bg-neutral-800 rounded'></div>
+                        <div className='h-16 bg-neutral-800 rounded'></div>
                     </div>
                 </CardContent>
             </Card>
         );
     }
 
-    if (!user) return null;
-
-    return (
-        <>
-            <Card className="border border-neutral-800 bg-neutral-900">
+    if (!user) {
+        return (
+            <Card className='border border-neutral-800 bg-neutral-900'>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <IconShield className="h-5 w-5" />
+                    <CardTitle className='flex items-center gap-2'>
+                        <IconShield className='h-5 w-5' />
                         Security Settings
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent>
+                    <div className='text-center py-8 text-neutral-400'>
+                        <IconShield className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                        <p>Unable to load security information</p>
+                        <p className='text-sm mt-2'>
+                            Please try refreshing the page or signing in again
+                        </p>
+                        <Button variant='outline' onClick={fetchUserSecurityInfo} className='mt-4'>
+                            <IconRefresh className='h-4 w-4 mr-2' />
+                            Retry
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    return (
+        <>
+            <Card className='border border-neutral-800 bg-neutral-900'>
+                <CardHeader>
+                    <CardTitle className='flex items-center gap-2'>
+                        <IconShield className='h-5 w-5' />
+                        Security Settings
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-6'>
                     {/* Authentication Method */}
-                    <div className="p-4 bg-neutral-800/50 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                            <Label className="text-base">Authentication Method</Label>
-                            <Badge variant="secondary" className="flex items-center gap-1">
+                    <div className='p-4 bg-neutral-800/50 rounded-lg'>
+                        <div className='flex items-center justify-between mb-2'>
+                            <Label className='text-base'>Authentication Method</Label>
+                            <Badge variant='secondary' className='flex items-center gap-1'>
                                 {getProviderIcon(user.provider)}
                                 {getProviderName(user.provider)}
                             </Badge>
                         </div>
-                        <div className="text-sm text-neutral-400 space-y-1">
+                        <div className='text-sm text-neutral-400 space-y-1'>
                             <div>Email: {user.email}</div>
-                            <div className="flex items-center gap-2">
+                            <div className='flex items-center gap-2'>
                                 Status:
                                 {user.emailVerified ? (
-                                    <Badge variant="default" className="text-xs bg-emerald-600">
-                                        <IconCheck className="h-3 w-3 mr-1" />
+                                    <Badge variant='default' className='text-xs bg-emerald-600'>
+                                        <IconCheck className='h-3 w-3 mr-1' />
                                         Verified
                                     </Badge>
                                 ) : (
-                                    <Badge variant="destructive" className="text-xs">
-                                        <IconX className="h-3 w-3 mr-1" />
+                                    <Badge variant='destructive' className='text-xs'>
+                                        <IconX className='h-3 w-3 mr-1' />
                                         Unverified
                                     </Badge>
                                 )}
@@ -381,40 +418,44 @@ export function SecuritySettings() {
                     </div>
 
                     {/* Two-Factor Authentication */}
-                    <div className="flex items-center justify-between p-4 border border-neutral-800 rounded-lg">
+                    <div className='flex items-center justify-between p-4 border border-neutral-800 rounded-lg'>
                         <div>
-                            <Label className="text-base">Two-Factor Authentication</Label>
-                            <p className="text-sm text-neutral-400 mt-1">
-                                Add an extra layer of security to your account using an authenticator app
+                            <Label className='text-base'>Two-Factor Authentication</Label>
+                            <p className='text-sm text-neutral-400 mt-1'>
+                                Add an extra layer of security to your account using an
+                                authenticator app
                             </p>
                             {user.mfaEnabled && (
-                                <Badge variant="default" className="text-xs bg-emerald-600 mt-2">
-                                    <IconCheck className="h-3 w-3 mr-1" />
+                                <Badge variant='default' className='text-xs bg-emerald-600 mt-2'>
+                                    <IconCheck className='h-3 w-3 mr-1' />
                                     Enabled
                                 </Badge>
                             )}
                         </div>
-                        <div className="flex gap-2">
+                        <div className='flex gap-2'>
                             {user.mfaEnabled ? (
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button variant="outline" size="sm">
+                                        <Button variant='outline' size='sm'>
                                             Disable
                                         </Button>
                                     </AlertDialogTrigger>
-                                    <AlertDialogContent className="bg-neutral-900 border-neutral-800">
+                                    <AlertDialogContent className='bg-neutral-900 border-neutral-800'>
                                         <AlertDialogHeader>
-                                            <AlertDialogTitle>Disable Two-Factor Authentication</AlertDialogTitle>
+                                            <AlertDialogTitle>
+                                                Disable Two-Factor Authentication
+                                            </AlertDialogTitle>
                                             <AlertDialogDescription>
-                                                Are you sure you want to disable two-factor authentication?
-                                                This will make your account less secure.
+                                                Are you sure you want to disable two-factor
+                                                authentication? This will make your account less
+                                                secure.
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                                             <AlertDialogAction
                                                 onClick={handleDisableMfa}
-                                                className="bg-red-600 hover:bg-red-700"
+                                                className='bg-red-600 hover:bg-red-700'
                                             >
                                                 Disable 2FA
                                             </AlertDialogAction>
@@ -422,11 +463,7 @@ export function SecuritySettings() {
                                     </AlertDialogContent>
                                 </AlertDialog>
                             ) : (
-                                <Button
-                                    onClick={handleEnableMfa}
-                                    disabled={mfaLoading}
-                                    size="sm"
-                                >
+                                <Button onClick={handleEnableMfa} disabled={mfaLoading} size='sm'>
                                     {mfaLoading ? 'Setting up...' : 'Enable'}
                                 </Button>
                             )}
@@ -435,62 +472,67 @@ export function SecuritySettings() {
 
                     {/* Password Management - Only for email users */}
                     {!user.isOAuthUser && (
-                        <div className="flex items-center justify-between p-4 border border-neutral-800 rounded-lg">
+                        <div className='flex items-center justify-between p-4 border border-neutral-800 rounded-lg'>
                             <div>
-                                <Label className="text-base">Password</Label>
-                                <p className="text-sm text-neutral-400 mt-1">
+                                <Label className='text-base'>Password</Label>
+                                <p className='text-sm text-neutral-400 mt-1'>
                                     Change your account password
                                 </p>
                             </div>
                             <Dialog open={showPasswordChange} onOpenChange={setShowPasswordChange}>
                                 <DialogTrigger asChild>
-                                    <Button variant="outline" size="sm">
-                                        <IconLock className="h-4 w-4 mr-2" />
+                                    <Button variant='outline' size='sm'>
+                                        <IconLock className='h-4 w-4 mr-2' />
                                         Change Password
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="bg-neutral-900 border-neutral-800">
+                                <DialogContent className='bg-neutral-900 border-neutral-800'>
                                     <DialogHeader>
                                         <DialogTitle>Change Password</DialogTitle>
                                         <DialogDescription>
-                                            Enter your current password and choose a new secure password.
+                                            Enter your current password and choose a new secure
+                                            password.
                                         </DialogDescription>
                                     </DialogHeader>
-                                    <div className="space-y-4">
+                                    <div className='space-y-4'>
                                         <div>
-                                            <Label htmlFor="currentPassword">Current Password</Label>
+                                            <Label htmlFor='currentPassword'>
+                                                Current Password
+                                            </Label>
                                             <Input
-                                                id="currentPassword"
-                                                type="password"
+                                                id='currentPassword'
+                                                type='password'
                                                 value={currentPassword}
                                                 onChange={(e) => setCurrentPassword(e.target.value)}
-                                                className="mt-1"
+                                                className='mt-1'
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="newPassword">New Password</Label>
+                                            <Label htmlFor='newPassword'>New Password</Label>
                                             <Input
-                                                id="newPassword"
-                                                type="password"
+                                                id='newPassword'
+                                                type='password'
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
-                                                className="mt-1"
+                                                className='mt-1'
                                             />
                                         </div>
                                         <div>
-                                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                                            <Label htmlFor='confirmPassword'>
+                                                Confirm New Password
+                                            </Label>
                                             <Input
-                                                id="confirmPassword"
-                                                type="password"
+                                                id='confirmPassword'
+                                                type='password'
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                                className="mt-1"
+                                                className='mt-1'
                                             />
                                         </div>
                                     </div>
                                     <DialogFooter>
                                         <Button
-                                            variant="outline"
+                                            variant='outline'
                                             onClick={() => setShowPasswordChange(false)}
                                         >
                                             Cancel
@@ -509,15 +551,17 @@ export function SecuritySettings() {
 
                     {/* OAuth Users Password Notice */}
                     {user.isOAuthUser && (
-                        <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                            <div className="flex items-start gap-3">
+                        <div className='p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg'>
+                            <div className='flex items-start gap-3'>
                                 {getProviderIcon(user.provider)}
                                 <div>
-                                    <h4 className="font-medium text-blue-400 mb-1">
+                                    <h4 className='font-medium text-blue-400 mb-1'>
                                         OAuth Authentication
                                     </h4>
-                                    <p className="text-sm text-neutral-300">
-                                        You signed in with {getProviderName(user.provider)}. Your password is managed by {getProviderName(user.provider)} and cannot be changed here.
+                                    <p className='text-sm text-neutral-300'>
+                                        You signed in with {getProviderName(user.provider)}. Your
+                                        password is managed by {getProviderName(user.provider)} and
+                                        cannot be changed here.
                                     </p>
                                 </div>
                             </div>
@@ -528,70 +572,65 @@ export function SecuritySettings() {
 
             {/* MFA Setup Dialog */}
             <Dialog open={showMfaSetup} onOpenChange={setShowMfaSetup}>
-                <DialogContent className="bg-neutral-900 border-neutral-800 max-w-md">
+                <DialogContent className='bg-neutral-900 border-neutral-800 max-w-md'>
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <IconQrcode className="h-5 w-5" />
+                        <DialogTitle className='flex items-center gap-2'>
+                            <IconQrcode className='h-5 w-5' />
                             Setup Two-Factor Authentication
                         </DialogTitle>
                         <DialogDescription>
-                            Scan the QR code with your authenticator app and enter the verification code.
+                            Scan the QR code with your authenticator app and enter the verification
+                            code.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-6">
+                    <div className='space-y-6'>
                         {/* QR Code */}
                         {qrCodeUrl && (
-                            <div className="text-center">
-                                <img src={qrCodeUrl} alt="QR Code" className="mx-auto bg-white p-4 rounded-lg" />
+                            <div className='text-center'>
+                                <img
+                                    src={qrCodeUrl}
+                                    alt='QR Code'
+                                    className='mx-auto bg-white p-4 rounded-lg'
+                                />
                             </div>
                         )}
 
                         {/* Manual Entry */}
                         <div>
                             <Label>Manual Entry Key</Label>
-                            <div className="flex gap-2 mt-1">
-                                <Input
-                                    value={mfaSecret}
-                                    readOnly
-                                    className="font-mono text-sm"
-                                />
+                            <div className='flex gap-2 mt-1'>
+                                <Input value={mfaSecret} readOnly className='font-mono text-sm' />
                                 <Button
-                                    variant="outline"
-                                    size="sm"
+                                    variant='outline'
+                                    size='sm'
                                     onClick={() => copyToClipboard(mfaSecret)}
                                 >
-                                    <IconCopy className="h-4 w-4" />
+                                    <IconCopy className='h-4 w-4' />
                                 </Button>
                             </div>
-                            <p className="text-xs text-neutral-400 mt-1">
+                            <p className='text-xs text-neutral-400 mt-1'>
                                 Use this if you can't scan the QR code
                             </p>
                         </div>
 
                         {/* Verification Code */}
                         <div>
-                            <Label htmlFor="verificationCode">Verification Code</Label>
+                            <Label htmlFor='verificationCode'>Verification Code</Label>
                             <Input
-                                id="verificationCode"
+                                id='verificationCode'
                                 value={verificationCode}
                                 onChange={(e) => setVerificationCode(e.target.value)}
-                                placeholder="Enter 6-digit code"
+                                placeholder='Enter 6-digit code'
                                 maxLength={6}
-                                className="mt-1"
+                                className='mt-1'
                             />
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowMfaSetup(false)}
-                        >
+                        <Button variant='outline' onClick={() => setShowMfaSetup(false)}>
                             Cancel
                         </Button>
-                        <Button
-                            onClick={handleVerifyMfa}
-                            disabled={verificationCode.length !== 6}
-                        >
+                        <Button onClick={handleVerifyMfa} disabled={verificationCode.length !== 6}>
                             Verify & Enable
                         </Button>
                     </DialogFooter>

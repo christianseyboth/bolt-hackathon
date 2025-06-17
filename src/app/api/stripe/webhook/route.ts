@@ -65,19 +65,58 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
     const customerId = subscription.customer as string;
     console.log(`🔄 Processing subscription update for customer: ${customerId}, subscription: ${subscription.id}`);
 
-    // Get account by Stripe customer ID from subscriptions table
-    const { data: existingSubscription, error: subscriptionError } = await supabase
+    // First, try to find subscription by existing customer ID
+    let { data: existingSubscription, error: subscriptionError } = await supabase
         .from('subscriptions')
         .select('account_id')
         .eq('stripe_customer_id', customerId)
         .single();
 
+    let accountId = existingSubscription?.account_id;
+
+    // If not found, this might be a new customer from checkout
+    // Try to find subscription with NULL customer ID and match by account email
     if (subscriptionError || !existingSubscription) {
-        console.error('❌ Subscription not found for customer:', customerId);
-        return;
+        console.log('🔍 Subscription not found by customer ID, checking for new customer from checkout...');
+
+        // Get customer email from Stripe
+        const Stripe = require('stripe');
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+        const customer = await stripe.customers.retrieve(customerId);
+        const customerEmail = (customer as any).email;
+
+        if (customerEmail) {
+            console.log(`🔍 Looking for account with email: ${customerEmail}`);
+
+            // Find account by email
+            const { data: account, error: accountError } = await supabase
+                .from('accounts')
+                .select('id')
+                .eq('billing_email', customerEmail)
+                .single();
+
+            if (account && !accountError) {
+                // Find subscription with NULL customer ID for this account
+                const { data: nullCustomerSub, error: nullCustomerError } = await supabase
+                    .from('subscriptions')
+                    .select('account_id')
+                    .eq('account_id', account.id)
+                    .is('stripe_customer_id', null)
+                    .single();
+
+                if (nullCustomerSub && !nullCustomerError) {
+                    console.log(`✅ Found subscription with NULL customer ID for account: ${account.id}`);
+                    accountId = account.id;
+                    existingSubscription = nullCustomerSub;
+                }
+            }
+        }
     }
 
-    const accountId = existingSubscription.account_id;
+    if (!accountId || !existingSubscription) {
+        console.error('❌ Could not find subscription for customer:', customerId);
+        return;
+    }
 
     console.log(`✅ Found account: ${accountId} for customer: ${customerId}`);
 
@@ -125,18 +164,51 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription, supa
     const customerId = subscription.customer as string;
     console.log(`🗑️ Processing subscription deletion for customer: ${customerId}, subscription: ${subscription.id}`);
 
-    const { data: existingSubscription, error: subscriptionError } = await supabase
+    // Try to find subscription by customer ID first
+    let { data: existingSubscription, error: subscriptionError } = await supabase
         .from('subscriptions')
         .select('account_id')
         .eq('stripe_customer_id', customerId)
         .single();
 
+    let accountId = existingSubscription?.account_id;
+
+    // If not found, try the same fallback logic as in handleSubscriptionUpdate
     if (subscriptionError || !existingSubscription) {
-        console.error('❌ Subscription not found for customer:', customerId);
-        return;
+        console.log('🔍 Subscription not found by customer ID for deletion, checking by email...');
+
+        const Stripe = require('stripe');
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+        const customer = await stripe.customers.retrieve(customerId);
+        const customerEmail = (customer as any).email;
+
+        if (customerEmail) {
+            const { data: account, error: accountError } = await supabase
+                .from('accounts')
+                .select('id')
+                .eq('billing_email', customerEmail)
+                .single();
+
+            if (account && !accountError) {
+                const { data: nullCustomerSub, error: nullCustomerError } = await supabase
+                    .from('subscriptions')
+                    .select('account_id')
+                    .eq('account_id', account.id)
+                    .is('stripe_customer_id', null)
+                    .single();
+
+                if (nullCustomerSub && !nullCustomerError) {
+                    accountId = account.id;
+                    existingSubscription = nullCustomerSub;
+                }
+            }
+        }
     }
 
-    const accountId = existingSubscription.account_id;
+    if (!accountId || !existingSubscription) {
+        console.error('❌ Could not find subscription for customer deletion:', customerId);
+        return;
+    }
     console.log(`✅ Found account: ${accountId} for deleted subscription`);
 
     // Update subscription to Free plan (not just "canceled")
