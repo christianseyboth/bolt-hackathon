@@ -96,6 +96,14 @@ export default function RootLayout({
     return (
         <ViewTransitions>
             <html lang={locale} className='dark' style={{ position: 'relative' }}>
+                <head>
+                    <script
+                        type='application/ld+json'
+                        dangerouslySetInnerHTML={{
+                            __html: JSON.stringify(structuredData),
+                        }}
+                    />
+                </head>
                 <body
                     className={cn('bg-charcoal antialiased h-full w-full')}
                     style={{ position: 'relative' }}
