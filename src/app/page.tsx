@@ -12,7 +12,7 @@ import { Toaster } from '@/components/ui/toaster';
 export default function Home() {
     return (
         <>
-            <NavBar />
+            {/* <NavBar /> */}
             <main className='relative min-h-screen bg-neutral-950' style={{ position: 'relative' }}>
                 {/* Your existing background animations */}
                 <div className='fixed inset-0 pointer-events-none'>
@@ -52,22 +52,22 @@ export default function Home() {
 
                 <div className='relative z-10'>
                     <header>
-                        {/* <Hero /> */}
+                        <Hero />
                     </header>
                     <section aria-label='Email security features'>
                         <Features />
                     </section>
                     <section aria-label='SecPilot platform overview'>
-                        {/* <Tools /> */}
+                        <Tools />
                     </section>
                     <section aria-label='Customer testimonials'>
-                        {/* <Testimonials /> */}
+                        <Testimonials />
                     </section>
                     <section aria-label='Frequently asked questions'>
-                        {/* <FAQs /> */}
+                        <FAQs />
                     </section>
                     <section aria-label='Get started with SecPilot'>
-                        {/* <CTA /> */}
+                        <CTA />
                     </section>
                 </div>
             </main>
