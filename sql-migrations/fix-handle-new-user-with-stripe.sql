@@ -35,8 +35,8 @@ BEGIN
             true,
             NOW(),
             NOW(),
-            100,    -- 100 emails per month
-            100,    -- 100 analysis per month
+            5,      -- 5 emails per month
+            5,      -- 5 analysis per month
             1       -- 1 seat maximum
         )
         ON CONFLICT (name) DO NOTHING;
@@ -166,9 +166,9 @@ BEGIN
             false,                        -- Don't cancel at period end
             NOW(),                        -- Created timestamp
             NOW(),                        -- Updated timestamp
-            100,                          -- Analysis emails allowed
+            5,                            -- Analysis emails allowed (Free plan)
             0,                            -- No analysis used yet
-            100,                          -- Emails left
+            5,                            -- Emails left (Free plan)
             NULL,                         -- Stripe customer ID will be created when needed
             NULL                          -- Stripe subscription ID will be created when needed
         );

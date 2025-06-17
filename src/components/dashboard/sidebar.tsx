@@ -113,7 +113,7 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
                     isActive={pathname === '/dashboard/profile'}
                     onNavigate={onNavigate}
                 >
-                    Profile
+                    Settings
                 </SidebarItem>
 
 

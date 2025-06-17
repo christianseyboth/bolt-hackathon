@@ -299,13 +299,13 @@ async function getPlanNameFromPriceId(priceId: string): Promise<string> {
 
 function getAnalysisAmountFromPlan(planName: string): number {
     const planLimits: Record<string, number> = {
-        'Free': 100,
-        'Solo': 1000,
-        'Entrepreneur': 5000,
-        'Team': 20000,
+        'Free': 5,
+        'Solo': 10,
+        'Entrepreneur': 30,
+        'Team': 100,
     };
 
-    return planLimits[planName] || 100;
+    return planLimits[planName] || 5;
 }
 
 function getSeatsFromPlan(planName: string): number {
@@ -313,7 +313,7 @@ function getSeatsFromPlan(planName: string): number {
         'Free': 1,
         'Solo': 1,
         'Entrepreneur': 5,
-        'Team': 20,
+        'Team': 10,
     };
 
     return planSeats[planName] || 1;

@@ -352,7 +352,7 @@ export function SubscriptionBilling({
     const getDefaultFeatures = (planName: string) => {
         const defaultFeatures: Record<string, string[]> = {
             Solo: [
-                'Up to 1,000 email analyses per month',
+                'Up to 10 email analyses per month',
                 'Real-time threat detection',
                 'Basic AI analysis',
                 'Email support',
@@ -360,7 +360,7 @@ export function SubscriptionBilling({
                 'Basic API access',
             ],
             Entrepreneur: [
-                'Up to 5,000 email analyses per month',
+                'Up to 30 email analyses per month',
                 'Real-time threat detection',
                 'Advanced AI analysis',
                 'Priority email support',
@@ -370,7 +370,7 @@ export function SubscriptionBilling({
                 'Team collaboration',
             ],
             Team: [
-                'Up to 20,000 email analyses per month',
+                'Up to 100 email analyses per month',
                 'Real-time threat detection',
                 'Advanced AI analysis',
                 'Priority 24/7 support',
@@ -403,10 +403,20 @@ export function SubscriptionBilling({
             Free: 1,
             Solo: 1,
             Entrepreneur: 5,
-            Team: 20,
+            Team: 10,
         };
 
         return planSeats[planName] || 1;
+    };
+
+    const getAnalysisAmountFromPlan = (planName: string): number => {
+        const planAnalysis: Record<string, number> = {
+            Free: 5,
+            Solo: 10,
+            Entrepreneur: 30,
+            Team: 100,
+        };
+        return planAnalysis[planName] || 5;
     };
 
     // Clear session storage on successful manual sync

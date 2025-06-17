@@ -36,7 +36,9 @@ export function AvatarMenu() {
 
     const fetchAccount = async () => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
             if (!user) return;
 
             const { data: accountData } = await supabase
@@ -66,7 +68,7 @@ export function AvatarMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='relative h-10 w-10 rounded-full'>
+                <Button variant='ghost' className='relative h-10 w-10 rounded-full cursor-pointer'>
                     <Avatar>
                         <AvatarImage
                             src={account?.avatar_url ?? undefined}
@@ -75,12 +77,12 @@ export function AvatarMenu() {
                         <AvatarFallback>
                             {account?.full_name
                                 ? account.full_name
-                                    .split(' ')
-                                    .map((n: string) => n[0])
-                                    .join('')
-                                    .slice(0, 2)
-                                    .toUpperCase()
-                                : account?.billing_email?.[0]?.toUpperCase() ?? 'U'}
+                                      .split(' ')
+                                      .map((n: string) => n[0])
+                                      .join('')
+                                      .slice(0, 2)
+                                      .toUpperCase()
+                                : (account?.billing_email?.[0]?.toUpperCase() ?? 'U')}
                         </AvatarFallback>
                     </Avatar>
                 </Button>
@@ -90,17 +92,17 @@ export function AvatarMenu() {
                     {account?.full_name || account?.billing_email || 'My Account'}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
-                    Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>
+                <DropdownMenuItem
+                    className='cursor-pointer'
+                    onClick={() => router.push('/dashboard/profile')}
+                >
                     Settings
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
                     onClick={handleSignOut}
                     disabled={pending}
-                    className='text-red-400'
+                    className='text-red-400 cursor-pointer'
                 >
                     Log out
                 </DropdownMenuItem>

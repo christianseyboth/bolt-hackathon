@@ -50,7 +50,7 @@ export function SubscriptionInfo({
                         </div>
                     </div>
                     <Button variant='outline' size='sm' asChild>
-                        <Link href='/dashboard/settings'>Manage</Link>
+                        <Link href='/dashboard/subscription'>Manage</Link>
                     </Button>
                 </div>
 
@@ -58,14 +58,14 @@ export function SubscriptionInfo({
                     <div className='flex justify-between text-xs'>
                         <span>Email Scans</span>
                         <span>
-                            {subscription?.analysis_used || 100 - (account?.emails_left || 100)} /{' '}
-                            {subscription?.analysis_amount || 100}
+                            {subscription?.analysis_used || 5 - (account?.emails_left || 5)} /{' '}
+                            {subscription?.analysis_amount || 5}
                         </span>
                     </div>
                     <Progress
                         value={calcProgress(
-                            subscription?.analysis_used || 100 - (account?.emails_left || 100),
-                            subscription?.analysis_amount || 100
+                            subscription?.analysis_used || 5 - (account?.emails_left || 5),
+                            subscription?.analysis_amount || 5
                         )}
                         className='h-2'
                     />
@@ -84,7 +84,7 @@ export function SubscriptionInfo({
                     <div className='flex justify-between items-center'>
                         <div className='text-sm'>Need more capacity?</div>
                         <Button size='sm' asChild>
-                            <Link href='/dashboard/settings'>Upgrade</Link>
+                            <Link href='/dashboard/subscription'>Upgrade</Link>
                         </Button>
                     </div>
                 </div>

@@ -191,13 +191,17 @@ export function AccountProfile() {
 
         setUploadingAvatar(true);
         try {
+            console.log('🔄 Starting avatar upload for file:', avatarFile.name);
+
             // Delete old avatar if exists
             if (account.avatar_url) {
+                console.log('🗑️ Deleting old avatar:', account.avatar_url);
                 await deleteOldAvatar(account.avatar_url);
             }
 
             const fileExt = avatarFile.name.split('.').pop();
             const fileName = `avatar-${account.id}-${Date.now()}.${fileExt}`;
+            console.log('📁 Generated filename:', fileName);
 
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('avatars')
@@ -207,17 +211,20 @@ export function AccountProfile() {
                 });
 
             if (uploadError) {
-                console.error('Upload error:', uploadError);
+                console.error('❌ Upload error:', uploadError);
                 throw uploadError;
             }
+
+            console.log('✅ Upload successful:', uploadData);
 
             const {
                 data: { publicUrl },
             } = supabase.storage.from('avatars').getPublicUrl(fileName);
 
+            console.log('🔗 Generated public URL:', publicUrl);
             return publicUrl;
         } catch (error) {
-            console.error('Error uploading avatar:', error);
+            console.error('❌ Error uploading avatar:', error);
             toast({
                 variant: 'destructive',
                 title: 'Upload failed',
@@ -442,10 +449,17 @@ export function AccountProfile() {
         );
     }
 
-    const displayAvatarUrl =
-        previewUrl ||
-        (account.avatar_url ? `${account.avatar_url}?t=${Date.now()}` : account.avatar_url);
+    const displayAvatarUrl = previewUrl || account.avatar_url;
     const canEditAvatar = account.provider === 'email';
+
+    // Debug logging for avatar issues
+    console.log('🔍 Avatar Debug:', {
+        account_avatar_url: account.avatar_url,
+        displayAvatarUrl,
+        previewUrl,
+        provider: account.provider,
+        canEditAvatar,
+    });
 
     return (
         <div className='space-y-6'>
@@ -459,6 +473,16 @@ export function AccountProfile() {
                         <AvatarImage
                             src={displayAvatarUrl ?? undefined}
                             alt={account.full_name ?? ''}
+                            onError={(e) => {
+                                console.error('❌ Avatar image failed to load:', displayAvatarUrl);
+                                console.error('Error details:', e);
+                            }}
+                            onLoad={() => {
+                                console.log(
+                                    '✅ Avatar image loaded successfully:',
+                                    displayAvatarUrl
+                                );
+                            }}
                         />
                         <AvatarFallback className='text-lg'>
                             {account.full_name?.[0]?.toUpperCase() ??
@@ -685,55 +709,111 @@ export function AccountProfile() {
                 </CardHeader>
                 <CardContent className='space-y-4 pt-0'>
                     {/* Billing Type Toggle */}
-                    <div className='space-y-2'>
-                        <Label>Billing Type</Label>
-                        <div className='flex space-x-4'>
-                            <label className='flex items-center space-x-2'>
-                                <input
-                                    type='radio'
-                                    name='billing_type'
-                                    value='individual'
-                                    checked={
+                    <div className='space-y-3'>
+                        <div>
+                            <Label className='text-base font-medium'>How should we bill you?</Label>
+                            <p className='text-sm text-neutral-400 mt-1'>
+                                Choose how you want to receive invoices and what information appears
+                                on them.
+                            </p>
+                        </div>
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                            <label
+                                className={`
+                                flex flex-col p-4 border rounded-lg cursor-pointer transition-all duration-200
+                                ${
+                                    (
                                         isEditing
                                             ? editedAccount.billing_type === 'individual'
                                             : account.billing_type === 'individual'
-                                    }
-                                    onChange={(e) =>
-                                        setEditedAccount({
-                                            ...editedAccount,
-                                            billing_type: e.target.value as
-                                                | 'individual'
-                                                | 'business',
-                                        })
-                                    }
-                                    disabled={!isEditing}
-                                    className='text-blue-600'
-                                />
-                                <span>Individual</span>
+                                    )
+                                        ? 'border-blue-500 bg-blue-500/10'
+                                        : 'border-neutral-700 hover:border-neutral-600'
+                                }
+                                ${!isEditing ? 'cursor-not-allowed opacity-75' : ''}
+                            `}
+                            >
+                                <div className='flex items-center space-x-3'>
+                                    <input
+                                        type='radio'
+                                        name='billing_type'
+                                        value='individual'
+                                        checked={
+                                            isEditing
+                                                ? editedAccount.billing_type === 'individual'
+                                                : account.billing_type === 'individual'
+                                        }
+                                        onChange={(e) =>
+                                            setEditedAccount({
+                                                ...editedAccount,
+                                                billing_type: e.target.value as
+                                                    | 'individual'
+                                                    | 'business',
+                                            })
+                                        }
+                                        disabled={!isEditing}
+                                        className='text-blue-600 w-4 h-4'
+                                    />
+                                    <div>
+                                        <div className='font-medium text-white'>Personal</div>
+                                        <div className='text-sm text-neutral-400'>
+                                            Individual subscription for personal use
+                                        </div>
+                                    </div>
+                                </div>
                             </label>
-                            <label className='flex items-center space-x-2'>
-                                <input
-                                    type='radio'
-                                    name='billing_type'
-                                    value='business'
-                                    checked={
+
+                            <label
+                                className={`
+                                flex flex-col p-4 border rounded-lg cursor-pointer transition-all duration-200
+                                ${
+                                    (
                                         isEditing
                                             ? editedAccount.billing_type === 'business'
                                             : account.billing_type === 'business'
-                                    }
-                                    onChange={(e) =>
-                                        setEditedAccount({
-                                            ...editedAccount,
-                                            billing_type: e.target.value as
-                                                | 'individual'
-                                                | 'business',
-                                        })
-                                    }
-                                    disabled={!isEditing}
-                                    className='text-blue-600'
-                                />
-                                <span>Business</span>
+                                    )
+                                        ? 'border-blue-500 bg-blue-500/10'
+                                        : 'border-neutral-700 hover:border-neutral-600'
+                                }
+                                ${!isEditing ? 'cursor-not-allowed opacity-75' : ''}
+                            `}
+                            >
+                                <div className='flex items-center space-x-3'>
+                                    <input
+                                        type='radio'
+                                        name='billing_type'
+                                        value='business'
+                                        checked={
+                                            isEditing
+                                                ? editedAccount.billing_type === 'business'
+                                                : account.billing_type === 'business'
+                                        }
+                                        onChange={(e) =>
+                                            setEditedAccount({
+                                                ...editedAccount,
+                                                billing_type: e.target.value as
+                                                    | 'individual'
+                                                    | 'business',
+                                            })
+                                        }
+                                        disabled={!isEditing}
+                                        className='text-blue-600 w-4 h-4'
+                                    />
+                                    <div>
+                                        <div className='font-medium text-white'>Business</div>
+                                        <div className='text-sm text-neutral-400'>
+                                            Company subscription with business details on invoices
+                                        </div>
+                                    </div>
+                                </div>
                             </label>
+                        </div>
+                        <div className='text-xs text-neutral-500 bg-neutral-800/30 p-3 rounded-lg'>
+                            <strong>Personal:</strong> Invoices will be addressed to you personally
+                            using your name and email.
+                            <br />
+                            <strong>Business:</strong> Invoices will include your company
+                            information, address, and tax details for business accounting.
                         </div>
                     </div>
 

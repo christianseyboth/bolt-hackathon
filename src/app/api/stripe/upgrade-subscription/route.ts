@@ -200,9 +200,9 @@ export async function POST(request: NextRequest) {
                         seats: 1,
                         price_per_seat: 0,
                         total_price: 0,
-                        analysis_amount: 5,
+                        analysis_amount: 5, // Free plan gets 5 analyses
                         analysis_used: 0,
-                        emails_left: 5,
+                        emails_left: 5, // Free plan gets 5 emails
                         stripe_customer_id: stripeCustomerId,
                         current_period_start: new Date().toISOString(),
                         cancel_at_period_end: false,
@@ -572,7 +572,7 @@ function getSeatsFromPlan(planName: string): number {
         'Free': 1,
         'Solo': 1,
         'Entrepreneur': 5,
-        'Team': 20,
+        'Team': 10,
     };
 
     return planSeats[planName] || 1;
@@ -580,11 +580,11 @@ function getSeatsFromPlan(planName: string): number {
 
 function getAnalysisAmountFromPlan(planName: string): number {
     const planLimits: Record<string, number> = {
-        'Free': 100,
-        'Solo': 1000,
-        'Entrepreneur': 5000,
-        'Team': 20000,
+        'Free': 5,
+        'Solo': 10,
+        'Entrepreneur': 30,
+        'Team': 100,
     };
 
-    return planLimits[planName] || 100;
+    return planLimits[planName] || 5;
 }

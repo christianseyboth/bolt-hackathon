@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
                     seats: 1,
                     price_per_seat: 0,
                     total_price: 0,
-                    analysis_amount: 100,
+                    analysis_amount: 5, // Free plan gets 5 analyses
                     current_period_start: new Date().toISOString(),
                     current_period_end: null,
                     stripe_subscription_id: null,
                     stripe_customer_id: currentSubscription.stripe_customer_id, // Keep customer ID
-                    emails_left: 100,
+                    emails_left: 5, // Free plan gets 5 emails
                     updated_at: new Date().toISOString(),
                 })
                 .eq('account_id', accountId)
@@ -150,11 +150,11 @@ export async function POST(request: NextRequest) {
                     seats: 1,
                     price_per_seat: 0,
                     total_price: 0,
-                    analysis_amount: 100,
+                    analysis_amount: 5, // Free plan gets 5 analyses
                     current_period_start: new Date().toISOString(),
                     current_period_end: null,
                     stripe_subscription_id: null,
-                    emails_left: 100,
+                    emails_left: 5, // Free plan gets 5 emails
                     updated_at: new Date().toISOString(),
                 })
                 .eq('account_id', accountId)

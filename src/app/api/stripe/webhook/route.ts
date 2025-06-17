@@ -221,11 +221,12 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription, supa
             seats: 1,
             price_per_seat: 0,
             total_price: 0,
-            analysis_amount: 100,
+            analysis_amount: 5, // Free plan gets 5 analyses
+            analysis_used: 0, // Reset usage counter
             current_period_start: new Date().toISOString(),
             current_period_end: null,
             stripe_subscription_id: null, // Clear the Stripe subscription ID
-            emails_left: 100,
+            emails_left: 5, // Free plan gets 5 emails
             updated_at: new Date().toISOString(),
         })
         .eq('account_id', accountId);
@@ -241,30 +242,46 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription, supa
 }
 
 async function handlePaymentSucceeded(invoice: Stripe.Invoice, supabase: any) {
-    // Reset usage counters on successful payment
+    // Reset usage counters on successful payment (subscription renewal)
     const subscriptionId = invoice.subscription as string;
     const customerId = invoice.customer as string;
 
+    console.log(`💰 Processing payment success for customer: ${customerId}, subscription: ${subscriptionId}`);
+
     if (subscriptionId && customerId) {
-        // Get account by customer ID from subscriptions table
-        const { data: subscription } = await supabase
+        // Get subscription by customer ID from subscriptions table
+        const { data: subscription, error: subError } = await supabase
             .from('subscriptions')
-            .select('account_id')
+            .select('account_id, plan_name')
             .eq('stripe_customer_id', customerId)
             .single();
 
-        if (subscription) {
-            await supabase
+        if (subscription && !subError) {
+            const planName = subscription.plan_name;
+            const newAnalysisAmount = getAnalysisAmountFromPlan(planName);
+
+            console.log(`🔄 Resetting usage for ${planName} plan: ${newAnalysisAmount} analyses`);
+
+            const { error: updateError } = await supabase
                 .from('subscriptions')
                 .update({
-                    analysis_used: 0, // Reset usage counter
+                    analysis_used: 0, // Reset usage counter to 0
+                    emails_left: newAnalysisAmount, // Reset emails left to plan limit
                     updated_at: new Date().toISOString(),
                 })
                 .eq('account_id', subscription.account_id);
+
+            if (updateError) {
+                console.error('❌ Failed to reset usage counters:', updateError);
+            } else {
+                console.log(`✅ Reset usage counters for account: ${subscription.account_id}`);
+            }
+        } else {
+            console.error('❌ Could not find subscription for customer:', customerId, subError);
         }
     }
 
-    console.log('Payment succeeded for invoice:', invoice.id);
+    console.log('✅ Payment succeeded for invoice:', invoice.id);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice, supabase: any) {
@@ -299,10 +316,10 @@ function getSeatsFromPlan(planName: string): number {
 
 function getAnalysisAmountFromPlan(planName: string): number {
     const planAnalysis: Record<string, number> = {
-        'Free': 100,
-        'Solo': 500,
-        'Entrepreneur': 2000,
-        'Team': 5000,
+        'Free': 5,
+        'Solo': 10,
+        'Entrepreneur': 30,
+        'Team': 100,
     };
-    return planAnalysis[planName] || 100;
+    return planAnalysis[planName] || 5;
 }

@@ -238,10 +238,10 @@ function getSeatsFromPlan(planName: string): number {
 
 function getAnalysisAmountFromPlan(planName: string): number {
     const planAnalysis: Record<string, number> = {
-        'Free': 100,
-        'Solo': 500,
-        'Entrepreneur': 2000,
-        'Team': 5000,
+        'Free': 5,
+        'Solo': 10,
+        'Entrepreneur': 30,
+        'Team': 100,
     };
-    return planAnalysis[planName] || 100;
+    return planAnalysis[planName] || 5;
 }
