@@ -55,19 +55,19 @@ export default function Home() {
                         <Hero />
                     </header>
                     <section aria-label='Email security features'>
-                        <Features />
+                        {/* <Features /> */}
                     </section>
                     <section aria-label='SecPilot platform overview'>
-                        <Tools />
+                        {/* <Tools /> */}
                     </section>
                     <section aria-label='Customer testimonials'>
-                        <Testimonials />
+                        {/* <Testimonials /> */}
                     </section>
                     <section aria-label='Frequently asked questions'>
-                        <FAQs />
+                        {/* <FAQs /> */}
                     </section>
                     <section aria-label='Get started with SecPilot'>
-                        <CTA />
+                        {/* <CTA /> */}
                     </section>
                 </div>
             </main>
