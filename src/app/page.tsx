@@ -52,10 +52,10 @@ export default function Home() {
 
                 <div className='relative z-10'>
                     <header>
-                        <Hero />
+                        {/* <Hero /> */}
                     </header>
                     <section aria-label='Email security features'>
-                        {/* <Features /> */}
+                        <Features />
                     </section>
                     <section aria-label='SecPilot platform overview'>
                         {/* <Tools /> */}
