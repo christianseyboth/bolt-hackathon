@@ -66,7 +66,6 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     // Locale handling temporarily disabled due to Lingo.dev compatibility issues
-    const locale = 'de';
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'SoftwareApplication',
@@ -99,7 +98,7 @@ export default function RootLayout({
     return (
         <LingoProvider loadDictionary={(locale) => loadDictionary(locale)}>
             <ViewTransitions>
-                <html lang={locale} className='dark' style={{ position: 'relative' }}>
+                <html className='dark' style={{ position: 'relative' }}>
                     <head>
                         <script
                             type='application/ld+json'

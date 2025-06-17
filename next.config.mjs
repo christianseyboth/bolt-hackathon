@@ -49,7 +49,6 @@ const withLingo = lingoCompiler.next({
     models: 'lingo.dev',
     sourceRoot: 'src', // Default for Next.js
     lingoDir: 'lingo', // Translation files directory
-    rsc: true,
     debug: true, // Enable debug logging
 });
 
