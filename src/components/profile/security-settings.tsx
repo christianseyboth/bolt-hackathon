@@ -95,7 +95,7 @@ export function SecuritySettings() {
 
             // Get MFA factors
             const { data: factors } = await supabase.auth.mfa.listFactors();
-            const mfaEnabled = factors?.totp?.length > 0;
+            const mfaEnabled = (factors?.totp?.length ?? 0) > 0;
 
             setUser({
                 id: authUser.id,
@@ -209,7 +209,7 @@ export function SecuritySettings() {
     const handleDisableMfa = async () => {
         try {
             const { data: factors } = await supabase.auth.mfa.listFactors();
-            if (factors?.totp?.length > 0) {
+            if ((factors?.totp?.length ?? 0) > 0 && factors?.totp) {
                 const { error } = await supabase.auth.mfa.unenroll({
                     factorId: factors.totp[0].id,
                 });

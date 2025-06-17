@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IconCheck, IconEdit, IconSave, IconX } from '@tabler/icons-react';
+import { IconCheck, IconEdit, IconX } from '@tabler/icons-react';
 import { createClient } from '@/utils/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -40,7 +40,9 @@ export function UserProfile({ initialUser }: UserProfileProps) {
 
     const fetchProfile = async () => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
 
             if (!user) {
                 setLoading(false);
@@ -112,12 +114,12 @@ export function UserProfile({ initialUser }: UserProfileProps) {
 
     if (loading) {
         return (
-            <div className="animate-pulse space-y-4">
-                <div className="flex items-center space-x-4">
-                    <div className="h-16 w-16 bg-neutral-800 rounded-full"></div>
-                    <div className="space-y-2">
-                        <div className="h-4 bg-neutral-800 rounded w-32"></div>
-                        <div className="h-3 bg-neutral-800 rounded w-48"></div>
+            <div className='animate-pulse space-y-4'>
+                <div className='flex items-center space-x-4'>
+                    <div className='h-16 w-16 bg-neutral-800 rounded-full'></div>
+                    <div className='space-y-2'>
+                        <div className='h-4 bg-neutral-800 rounded w-32'></div>
+                        <div className='h-3 bg-neutral-800 rounded w-48'></div>
                     </div>
                 </div>
             </div>
@@ -126,94 +128,90 @@ export function UserProfile({ initialUser }: UserProfileProps) {
 
     if (!profile) {
         return (
-            <div className="text-center py-8">
-                <p className="text-neutral-400">No profile data found.</p>
+            <div className='text-center py-8'>
+                <p className='text-neutral-400'>No profile data found.</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className='space-y-6'>
             {/* Profile Header */}
-            <div className="flex items-center space-x-4">
-                <Avatar className="h-16 w-16">
-                    <AvatarImage
-                        src={profile.avatar_url || undefined}
-                        alt={profile.full_name}
-                    />
-                    <AvatarFallback className="text-lg">
+            <div className='flex items-center space-x-4'>
+                <Avatar className='h-16 w-16'>
+                    <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name} />
+                    <AvatarFallback className='text-lg'>
                         {profile.full_name?.[0]?.toUpperCase() || profile.email[0].toUpperCase()}
                     </AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                        <h2 className="text-xl font-semibold">{profile.full_name}</h2>
-                        <Badge variant="secondary" className="text-xs">
+                <div className='flex-1'>
+                    <div className='flex items-center gap-2'>
+                        <h2 className='text-xl font-semibold'>{profile.full_name}</h2>
+                        <Badge variant='secondary' className='text-xs'>
                             {profile.provider === 'email' ? 'Email' : `OAuth (${profile.provider})`}
                         </Badge>
                         {profile.avatar_url && (
-                            <Badge variant="default" className="text-xs bg-emerald-600">
-                                <IconCheck className="h-3 w-3 mr-1" />
+                            <Badge variant='default' className='text-xs bg-emerald-600'>
+                                <IconCheck className='h-3 w-3 mr-1' />
                                 Avatar
                             </Badge>
                         )}
                     </div>
-                    <p className="text-neutral-400">{profile.email}</p>
+                    <p className='text-neutral-400'>{profile.email}</p>
                 </div>
                 {!isEditing && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsEditing(true)}
-                    >
-                        <IconEdit className="h-4 w-4 mr-2" />
+                    <Button variant='outline' size='sm' onClick={() => setIsEditing(true)}>
+                        <IconEdit className='h-4 w-4 mr-2' />
                         Edit
                     </Button>
                 )}
             </div>
 
             {/* Profile Form */}
-            <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="full_name">Full Name</Label>
+            <div className='space-y-4'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-2'>
+                        <Label htmlFor='full_name'>Full Name</Label>
                         <Input
-                            id="full_name"
+                            id='full_name'
                             value={isEditing ? editedProfile.full_name || '' : profile.full_name}
-                            onChange={(e) => setEditedProfile({ ...editedProfile, full_name: e.target.value })}
+                            onChange={(e) =>
+                                setEditedProfile({ ...editedProfile, full_name: e.target.value })
+                            }
                             disabled={!isEditing}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
+                    <div className='space-y-2'>
+                        <Label htmlFor='email'>Email Address</Label>
                         <Input
-                            id="email"
+                            id='email'
                             value={profile.email}
                             disabled
-                            className="bg-neutral-800/50"
+                            className='bg-neutral-800/50'
                         />
-                        <p className="text-xs text-neutral-400">
+                        <p className='text-xs text-neutral-400'>
                             Email cannot be changed. Contact support if needed.
                         </p>
                     </div>
                 </div>
 
                 {profile.avatar_url && (
-                    <div className="space-y-2">
+                    <div className='space-y-2'>
                         <Label>Profile Avatar</Label>
-                        <div className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-md">
-                            <Avatar className="h-8 w-8">
+                        <div className='flex items-center gap-3 p-3 bg-neutral-800/50 rounded-md'>
+                            <Avatar className='h-8 w-8'>
                                 <AvatarImage src={profile.avatar_url} />
                                 <AvatarFallback>
                                     {profile.full_name?.[0]?.toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
-                            <div className="flex-1">
-                                <p className="text-sm">
-                                    Avatar from {profile.provider === 'google' ? 'Google' : profile.provider}
+                            <div className='flex-1'>
+                                <p className='text-sm'>
+                                    Avatar from{' '}
+                                    {profile.provider === 'google' ? 'Google' : profile.provider}
                                 </p>
-                                <p className="text-xs text-neutral-400">
+                                <p className='text-xs text-neutral-400'>
                                     Automatically synced from your OAuth provider
                                 </p>
                             </div>
@@ -221,39 +219,39 @@ export function UserProfile({ initialUser }: UserProfileProps) {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 text-sm'>
                     <div>
-                        <Label className="text-neutral-400">Account Created</Label>
+                        <Label className='text-neutral-400'>Account Created</Label>
                         <p>{new Date(profile.created_at).toLocaleDateString()}</p>
                     </div>
                     <div>
-                        <Label className="text-neutral-400">Last Updated</Label>
+                        <Label className='text-neutral-400'>Last Updated</Label>
                         <p>{new Date(profile.updated_at).toLocaleDateString()}</p>
                     </div>
                     <div>
-                        <Label className="text-neutral-400">Auth Provider</Label>
-                        <p className="capitalize">{profile.provider}</p>
+                        <Label className='text-neutral-400'>Auth Provider</Label>
+                        <p className='capitalize'>{profile.provider}</p>
                     </div>
                 </div>
 
                 {/* Edit Actions */}
                 {isEditing && (
-                    <div className="flex gap-2 pt-4">
+                    <div className='flex gap-2 pt-4'>
                         <Button onClick={handleSave} disabled={updating}>
                             {updating ? (
                                 <>
-                                    <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white"></div>
+                                    <div className='h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white'></div>
                                     Saving...
                                 </>
                             ) : (
                                 <>
-                                    <IconSave className="h-4 w-4 mr-2" />
+                                    <IconCheck className='h-4 w-4 mr-2' />
                                     Save Changes
                                 </>
                             )}
                         </Button>
-                        <Button variant="outline" onClick={handleCancel} disabled={updating}>
-                            <IconX className="h-4 w-4 mr-2" />
+                        <Button variant='outline' onClick={handleCancel} disabled={updating}>
+                            <IconX className='h-4 w-4 mr-2' />
                             Cancel
                         </Button>
                     </div>

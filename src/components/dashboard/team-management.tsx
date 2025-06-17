@@ -27,7 +27,11 @@ import {
     IconExclamationMark,
 } from '@tabler/icons-react';
 import { Badge } from '../ui/badge';
-import { addTeamMember, removeTeamMember, enforceTeamLimits } from '@/app/(dashboard)/dashboard/team/actions';
+import {
+    addTeamMember,
+    removeTeamMember,
+    enforceTeamLimits,
+} from '@/app/(dashboard)/dashboard/team/actions';
 import { useToast } from '../ui/use-toast';
 import { useRouter } from 'next/navigation';
 
@@ -71,7 +75,7 @@ export function TeamManagement({
         currentMemberCount,
         isOverLimit,
         subscriptionStatus: subscription?.status,
-        subscriptionPlan: subscription?.plan_name
+        subscriptionPlan: subscription?.plan_name,
     });
 
     const { toast } = useToast();
@@ -86,7 +90,7 @@ export function TeamManagement({
         startTransition(async () => {
             try {
                 const result = await enforceTeamLimits(subscription.id);
-                if (result.success) {
+                if (result.success && result.results) {
                     const { results } = result;
                     toast({
                         title: 'Team limits enforced',
@@ -208,7 +212,9 @@ export function TeamManagement({
                                 <IconExclamationMark className='h-5 w-5 text-red-400' />
                             </div>
                             <div>
-                                <CardTitle className='text-lg text-red-400'>Team Limit Exceeded</CardTitle>
+                                <CardTitle className='text-lg text-red-400'>
+                                    Team Limit Exceeded
+                                </CardTitle>
                                 <CardDescription className='text-red-300/80'>
                                     Your team has more members than your current subscription allows
                                 </CardDescription>
@@ -222,19 +228,21 @@ export function TeamManagement({
                                     <IconAlertCircle className='h-5 w-5 mr-2 flex-shrink-0 mt-0.5' />
                                     <div className='text-sm space-y-2'>
                                         <p>
-                                            <strong>Action Required:</strong> You currently have {currentMemberCount} team members,
-                                            but your subscription only allows {maxTeamMembers}. You need to remove {excessMembers} member{excessMembers > 1 ? 's' : ''}
+                                            <strong>Action Required:</strong> You currently have{' '}
+                                            {currentMemberCount} team members, but your subscription
+                                            only allows {maxTeamMembers}. You need to remove{' '}
+                                            {excessMembers} member{excessMembers > 1 ? 's' : ''}
                                             to comply with your subscription.
                                         </p>
                                         <p>
-                                            Until you reduce your team size, you won't be able to add new members, and some
-                                            features may be restricted.
+                                            Until you reduce your team size, you won't be able to
+                                            add new members, and some features may be restricted.
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                                                                                    <div className='flex flex-col sm:flex-row gap-3'>
-                                                                <Button
+                            <div className='flex flex-col sm:flex-row gap-3'>
+                                <Button
                                     variant='outline'
                                     className='border-amber-700 text-amber-400 hover:bg-amber-950/30'
                                     onClick={handleEnforceLimits}
@@ -248,11 +256,13 @@ export function TeamManagement({
                                     className='border-red-700 text-red-400 hover:bg-red-950/30'
                                     onClick={() => {
                                         // Scroll to team members section
-                                        const teamMembersSection = document.querySelector('[data-section="team-members"]');
+                                        const teamMembersSection = document.querySelector(
+                                            '[data-section="team-members"]'
+                                        );
                                         if (teamMembersSection) {
                                             teamMembersSection.scrollIntoView({
                                                 behavior: 'smooth',
-                                                block: 'start'
+                                                block: 'start',
                                             });
                                         }
                                     }}
@@ -263,7 +273,9 @@ export function TeamManagement({
                                 <Button
                                     variant='outline'
                                     className='border-cyan-700 text-cyan-400 hover:bg-cyan-950/30'
-                                    onClick={() => window.location.href = '/dashboard/subscription'}
+                                    onClick={() =>
+                                        (window.location.href = '/dashboard/subscription')
+                                    }
                                 >
                                     <IconUsers className='h-4 w-4 mr-2' />
                                     Upgrade Subscription
@@ -293,7 +305,8 @@ export function TeamManagement({
                                     className='border-orange-700 text-orange-400 hover:bg-orange-950/30'
                                     onClick={() => {
                                         // Force hard refresh - clears all caches
-                                        window.location.href = window.location.href + '?t=' + Date.now();
+                                        window.location.href =
+                                            window.location.href + '?t=' + Date.now();
                                     }}
                                 >
                                     <IconCheck className='h-4 w-4 mr-2' />
@@ -322,8 +335,11 @@ export function TeamManagement({
                     <div className='space-y-4'>
                         <div className='flex justify-between items-center'>
                             <div className='text-sm font-medium'>Team Members</div>
-                            <div className={`text-sm ${isOverLimit ? 'text-red-400 font-medium' : 'text-neutral-400'}`}>
-                                {currentMemberCount} of {maxTeamMembers} {isOverLimit ? '(Over Limit)' : 'used'}
+                            <div
+                                className={`text-sm ${isOverLimit ? 'text-red-400 font-medium' : 'text-neutral-400'}`}
+                            >
+                                {currentMemberCount} of {maxTeamMembers}{' '}
+                                {isOverLimit ? '(Over Limit)' : 'used'}
                             </div>
                         </div>
                         <Progress
@@ -351,7 +367,7 @@ export function TeamManagement({
             </Card>
 
             {/* Add Member */}
-            <Card className='border-neutral-800 bg-neutral-900' data-tour="add-team-member">
+            <Card className='border-neutral-800 bg-neutral-900' data-tour='add-team-member'>
                 <CardHeader>
                     <CardTitle className='text-lg'>Add Team Member</CardTitle>
                     <CardDescription>
@@ -426,7 +442,7 @@ export function TeamManagement({
             </Card>
 
             {/* Team Members */}
-            <Card className='border-neutral-800 bg-neutral-900' data-section="team-members">
+            <Card className='border-neutral-800 bg-neutral-900' data-section='team-members'>
                 <CardHeader>
                     <CardTitle className='text-lg flex items-center justify-between'>
                         <span>Team Members</span>
@@ -439,8 +455,7 @@ export function TeamManagement({
                     <CardDescription>
                         {isOverLimit
                             ? `Remove ${excessMembers} member${excessMembers > 1 ? 's' : ''} to comply with your subscription`
-                            : 'Manage your existing team members'
-                        }
+                            : 'Manage your existing team members'}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -455,16 +470,21 @@ export function TeamManagement({
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Email</TableHead>
-                                        <TableHead className='hidden sm:table-cell'>Status</TableHead>
+                                        <TableHead className='hidden sm:table-cell'>
+                                            Status
+                                        </TableHead>
                                         <TableHead className='hidden md:table-cell'>Note</TableHead>
-                                        <TableHead className='hidden lg:table-cell'>Added On</TableHead>
+                                        <TableHead className='hidden lg:table-cell'>
+                                            Added On
+                                        </TableHead>
                                         <TableHead className='text-right'>Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                                                                                            {initialMembers.map((member, index) => {
+                                    {initialMembers.map((member, index) => {
                                         // Highlight members that exceed the limit (newest members first for removal suggestion)
-                                        const isExcessMember = isOverLimit && index >= maxTeamMembers;
+                                        const isExcessMember =
+                                            isOverLimit && index >= maxTeamMembers;
                                         const isDisabled = member.status === 'inactive';
 
                                         return (
@@ -474,14 +494,22 @@ export function TeamManagement({
                                                     isDisabled
                                                         ? 'bg-red-950/30 border-red-900/50'
                                                         : isExcessMember
-                                                            ? 'bg-red-950/20 border-red-900/30'
-                                                            : ''
+                                                          ? 'bg-red-950/20 border-red-900/30'
+                                                          : ''
                                                 }
                                             >
                                                 <TableCell className='font-medium'>
                                                     <div className='flex items-center space-x-2'>
-                                                        <span className={isDisabled ? 'text-neutral-400 line-through' : ''}>{member.email}</span>
-                                                                                                                {isDisabled && (
+                                                        <span
+                                                            className={
+                                                                isDisabled
+                                                                    ? 'text-neutral-400 line-through'
+                                                                    : ''
+                                                            }
+                                                        >
+                                                            {member.email}
+                                                        </span>
+                                                        {isDisabled && (
                                                             <Badge
                                                                 variant='outline'
                                                                 className='border-red-700 text-red-400 text-xs px-1 py-0'
@@ -499,10 +527,16 @@ export function TeamManagement({
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className='hidden sm:table-cell'>{renderStatusBadge(member.status)}</TableCell>
-                                                <TableCell className='hidden md:table-cell'>{member.label || '-'}</TableCell>
+                                                <TableCell className='hidden sm:table-cell'>
+                                                    {renderStatusBadge(member.status)}
+                                                </TableCell>
+                                                <TableCell className='hidden md:table-cell'>
+                                                    {member.label || '-'}
+                                                </TableCell>
                                                 <TableCell className='hidden lg:table-cell'>
-                                                    {new Date(member.created_at).toLocaleDateString()}
+                                                    {new Date(
+                                                        member.created_at
+                                                    ).toLocaleDateString()}
                                                 </TableCell>
                                                 <TableCell className='text-right space-x-1'>
                                                     <Button
@@ -513,8 +547,8 @@ export function TeamManagement({
                                                             isDisabled
                                                                 ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
                                                                 : isExcessMember
-                                                                    ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
-                                                                    : 'text-red-400 hover:text-red-300 hover:bg-red-950/30'
+                                                                  ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
+                                                                  : 'text-red-400 hover:text-red-300 hover:bg-red-950/30'
                                                         }`}
                                                         onClick={() => {
                                                             setMemberToDelete(member);

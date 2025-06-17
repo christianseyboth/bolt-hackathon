@@ -95,11 +95,17 @@ export function ScheduledReports({
     const { toast } = useToast();
     const supabase = createClient();
 
-    const [newReport, setNewReport] = useState({
+    const [newReport, setNewReport] = useState<{
+        name: string;
+        type: string;
+        format: 'pdf' | 'csv' | 'xlsx';
+        frequency: 'daily' | 'weekly' | 'monthly';
+        recipients: string;
+    }>({
         name: '',
         type: 'security-summary',
-        format: 'pdf' as const,
-        frequency: 'weekly' as const,
+        format: 'pdf',
+        frequency: 'weekly',
         recipients: '',
     });
 

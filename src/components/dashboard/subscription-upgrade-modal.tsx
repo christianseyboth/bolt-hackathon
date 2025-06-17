@@ -135,8 +135,9 @@ export function SubscriptionUpgradeModal({
                 console.log('📡 API Response ok:', response.ok);
 
                 let result;
+                let responseText = '';
                 try {
-                    const responseText = await response.text();
+                    responseText = await response.text();
                     console.log('📡 Raw response text:', responseText);
                     result = JSON.parse(responseText);
                 } catch (parseError) {

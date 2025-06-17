@@ -15,7 +15,8 @@ import { useTour } from '@/hooks/useTour';
 import { tourSteps } from '@/config/tourSteps';
 
 export const CustomTour = () => {
-    const { isActive, currentStep, setCurrentStep, completeTour, skipTour } = useTour();
+    const { isTourActive, currentStep, startTour, endTour, nextStep, prevStep, goToStep } =
+        useTour();
     const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
     const [isMounted, setIsMounted] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
@@ -33,7 +34,7 @@ export const CustomTour = () => {
 
     useEffect(() => {
         // Only run after component is mounted, hydrated, AND tour is active
-        if (!isMounted || !isHydrated || !isActive || !tourSteps[currentStep]) return;
+        if (!isMounted || !isHydrated || !isTourActive || !tourSteps[currentStep]) return;
 
         // Additional safety check
         if (typeof window === 'undefined' || typeof document === 'undefined') return;
@@ -95,9 +96,9 @@ export const CustomTour = () => {
                 });
             }
         };
-    }, [isMounted, isHydrated, isActive, currentStep]);
+    }, [isMounted, isHydrated, isTourActive, currentStep]);
 
-    const nextStep = () => {
+    const handleNextStep = () => {
         const currentStepData = tourSteps[currentStep];
 
         // Clean up current element before moving to next
@@ -118,13 +119,13 @@ export const CustomTour = () => {
         }
 
         if (currentStep < tourSteps.length - 1) {
-            setCurrentStep(currentStep + 1);
+            nextStep();
         } else {
-            completeTour();
+            endTour();
         }
     };
 
-    const prevStep = () => {
+    const handlePrevStep = () => {
         // Clean up current element before moving to previous
         if (targetElement && isHydrated) {
             targetElement.classList.remove('tour-highlight');
@@ -137,7 +138,7 @@ export const CustomTour = () => {
         }
 
         if (currentStep > 0) {
-            setCurrentStep(currentStep - 1);
+            prevStep();
         }
     };
 
@@ -146,7 +147,7 @@ export const CustomTour = () => {
         !isMounted ||
         !isHydrated ||
         typeof window === 'undefined' ||
-        !isActive ||
+        !isTourActive ||
         !tourSteps[currentStep]
     ) {
         return null;
@@ -178,7 +179,7 @@ export const CustomTour = () => {
                             <Badge variant='secondary' className='bg-blue-500 text-white'>
                                 Step {currentStep + 1} of {tourSteps.length}
                             </Badge>
-                            <Button variant='ghost' size='sm' onClick={skipTour}>
+                            <Button variant='ghost' size='sm' onClick={endTour}>
                                 <IconX className='h-4 w-4' />
                             </Button>
                         </div>
@@ -193,18 +194,18 @@ export const CustomTour = () => {
                                 <Button
                                     variant='ghost'
                                     size='sm'
-                                    onClick={prevStep}
+                                    onClick={handlePrevStep}
                                     disabled={currentStep === 0}
                                 >
                                     <IconArrowLeft className='h-4 w-4 mr-1' />
                                     Back
                                 </Button>
-                                <Button variant='ghost' size='sm' onClick={skipTour}>
+                                <Button variant='ghost' size='sm' onClick={endTour}>
                                     Skip Tour
                                 </Button>
                             </div>
 
-                            <Button onClick={nextStep} size='sm'>
+                            <Button onClick={handleNextStep} size='sm'>
                                 {currentStep === tourSteps.length - 1 ? (
                                     <>
                                         <IconCheck className='h-4 w-4 mr-1' />

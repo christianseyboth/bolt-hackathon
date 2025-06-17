@@ -66,7 +66,7 @@ export function SubscriptionStatusBanner({
                         hasScheduled: analysis.scheduled_subscriptions > 0,
                         totalSubscriptions: analysis.total_subscriptions,
                         scheduledPlans: result.all_subscriptions?.filter(
-                            (sub) => sub.subscription_status !== 'active'
+                            (sub: any) => sub.subscription_status !== 'active'
                         ),
                     });
                 } else {
