@@ -51,5 +51,4 @@ const withLingo = lingoCompiler.next({
     lingoDir: 'lingo', // Translation files directory
     debug: true, // Enable debug logging
 });
-
-export default withMDX(withLingo(nextConfig));
+export default withLingo(withMDX(nextConfig));

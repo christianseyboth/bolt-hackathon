@@ -1,11 +1,9 @@
 'use i18n';
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { ViewTransitions } from 'next-view-transitions';
 import type { Viewport } from 'next';
-import { LingoProvider, loadDictionary } from 'lingo.dev/react/rsc';
 
 export const metadata: Metadata = {
     title: 'SecPilot - Advanced Email Security Software | AI-Powered Phishing & Malware Protection',
@@ -66,6 +64,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     // Locale handling temporarily disabled due to Lingo.dev compatibility issues
+    const locale = 'de';
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'SoftwareApplication',
@@ -96,25 +95,23 @@ export default function RootLayout({
     };
 
     return (
-        <LingoProvider loadDictionary={(locale) => loadDictionary(locale)}>
-            <ViewTransitions>
-                <html className='dark' style={{ position: 'relative' }}>
-                    <head>
-                        <script
-                            type='application/ld+json'
-                            dangerouslySetInnerHTML={{
-                                __html: JSON.stringify(structuredData),
-                            }}
-                        />
-                    </head>
-                    <body
-                        className={cn('bg-charcoal antialiased h-full w-full')}
-                        style={{ position: 'relative' }}
-                    >
-                        {children}
-                    </body>
-                </html>
-            </ViewTransitions>
-        </LingoProvider>
+        <ViewTransitions>
+            <html lang={locale} className='dark' style={{ position: 'relative' }}>
+                <head>
+                    <script
+                        type='application/ld+json'
+                        dangerouslySetInnerHTML={{
+                            __html: JSON.stringify(structuredData),
+                        }}
+                    />
+                </head>
+                <body
+                    className={cn('bg-charcoal antialiased h-full w-full')}
+                    style={{ position: 'relative' }}
+                >
+                    {children}
+                </body>
+            </html>
+        </ViewTransitions>
     );
 }
