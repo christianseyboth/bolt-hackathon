@@ -40,8 +40,7 @@ export async function updateSession(request: NextRequest) {
 
   const PROTECTED_PATHS = [
     '/dashboard',
-    '/settings',
-    '/profile',
+    '/dashboard/*',
   ];
 
   const isProtected = PROTECTED_PATHS.some((p) => request.nextUrl.pathname.startsWith(p));
