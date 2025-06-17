@@ -3,7 +3,6 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { ViewTransitions } from 'next-view-transitions';
 import type { Viewport } from 'next';
-import { LingoProvider, loadDictionary } from 'lingo.dev/react/rsc';
 
 export const metadata: Metadata = {
     title: 'SecPilot - Advanced Email Security Software | AI-Powered Phishing & Malware Protection',
