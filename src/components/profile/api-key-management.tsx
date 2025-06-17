@@ -53,6 +53,8 @@ import {
     updateApiKeyName,
     type ApiKey,
 } from '@/app/api-keys/actions';
+import { SubscriptionAccessGate } from '@/components/dashboard/subscription-access-gate';
+import { createClient } from '@/utils/supabase/client';
 
 export function ApiKeyManagement() {
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -64,11 +66,73 @@ export function ApiKeyManagement() {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
     const [showNewKey, setShowNewKey] = useState(false);
+    const [subscriptionAccess, setSubscriptionAccess] = useState<{
+        hasApiAccess: boolean;
+        planName: string;
+    } | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
         fetchApiKeys();
+        checkSubscriptionAccess();
     }, []);
+
+    const checkSubscriptionAccess = async () => {
+        try {
+            const supabase = createClient();
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
+
+            if (!user) return;
+
+            // Get user's account
+            const { data: account } = await supabase
+                .from('accounts')
+                .select('id')
+                .eq('owner_id', user.id)
+                .single();
+
+            if (!account) return;
+
+            // Get current active subscription
+            const { data: subscription } = await supabase
+                .from('subscriptions')
+                .select('plan_name, subscription_status')
+                .eq('account_id', account.id)
+                .eq('subscription_status', 'active')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            const planName = subscription?.plan_name || 'Free';
+            const isFreePlan = planName === 'Free';
+
+            // API access rules: Free plans have access, Solo/Entrepreneur don't, Team does
+            let hasApiAccess = true; // Free plans can access all features
+
+            if (!isFreePlan) {
+                switch (planName) {
+                    case 'Solo':
+                    case 'Entrepreneur':
+                        hasApiAccess = false;
+                        break;
+                    case 'Team':
+                        hasApiAccess = true;
+                        break;
+                    default:
+                        hasApiAccess = false;
+                }
+            }
+
+            setSubscriptionAccess({
+                hasApiAccess,
+                planName,
+            });
+        } catch (error) {
+            console.error('Error checking subscription access:', error);
+        }
+    };
 
     const fetchApiKeys = async () => {
         setLoading(true);
@@ -215,6 +279,27 @@ export function ApiKeyManagement() {
                         <div className='h-20 bg-neutral-800 rounded'></div>
                         <div className='h-20 bg-neutral-800 rounded'></div>
                     </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    // Show access gate if user doesn't have API access
+    if (subscriptionAccess && !subscriptionAccess.hasApiAccess) {
+        return (
+            <Card className='border border-neutral-800 bg-neutral-900'>
+                <CardHeader>
+                    <CardTitle className='flex items-center gap-2'>
+                        <IconKey className='h-5 w-5' />
+                        API Keys
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <SubscriptionAccessGate
+                        feature='api'
+                        currentPlan={subscriptionAccess.planName}
+                        requiredPlan='Team'
+                    />
                 </CardContent>
             </Card>
         );

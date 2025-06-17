@@ -17,6 +17,8 @@ import {
 import { getStatistics } from './get-statistics';
 import { getAllThreatHistoryData } from './get-threat-history';
 import { getAllThreatCategoryData } from './get-threat-categories';
+import { getSubscriptionAccess, getFeatureRequiredPlan } from '@/lib/subscription-access';
+import { SubscriptionAccessGate } from '@/components/dashboard/subscription-access-gate';
 
 export default async function SecurityPage() {
     const supabase = await createClient();
@@ -34,6 +36,30 @@ export default async function SecurityPage() {
         .single();
 
     const accountId = account_data.id;
+
+    // Check subscription access
+    const subscriptionAccess = await getSubscriptionAccess(user.id);
+
+    if (!subscriptionAccess) {
+        redirect('/login');
+    }
+
+    // If user doesn't have access to security analytics, show upgrade gate
+    if (!subscriptionAccess.hasSecurityAnalyticsAccess) {
+        return (
+            <>
+                <DashboardHeader
+                    heading='Security Analytics'
+                    subheading='Comprehensive analysis of your email security posture'
+                />
+                <SubscriptionAccessGate
+                    feature='security-analytics'
+                    currentPlan={subscriptionAccess.planName}
+                    requiredPlan={getFeatureRequiredPlan('security-analytics')}
+                />
+            </>
+        );
+    }
 
     // 2. PARALLEL DATA FETCHING
     const [statisticsRes, threatHistory, threatCategories, riskiestSendersRes, topTargetsRes] =
@@ -111,7 +137,6 @@ export default async function SecurityPage() {
             <DashboardHeader
                 heading='Security Analytics'
                 subheading='Comprehensive analysis of your email security posture'
-
             />
 
             <div className='mt-8'>

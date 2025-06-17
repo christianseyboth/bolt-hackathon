@@ -7,6 +7,7 @@ import { Button } from '@/components/button';
 import { Badge } from '@/components/ui/badge';
 import {
     IconCheck,
+    IconX,
     IconCrown,
     IconBolt,
     IconStar,
@@ -15,6 +16,7 @@ import {
     IconLoader,
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { getPlanFeatures } from '@/lib/feature-matrix';
 import Link from 'next/link';
 
 interface Plan {
@@ -151,44 +153,6 @@ export function PricingSection() {
         }
     };
 
-    const getPlanFeatures = (planName: string) => {
-        const features: Record<string, string[]> = {
-            Solo: [
-                'Up to 1,000 email scans per month',
-                'Real-time phishing detection',
-                'Basic AI threat analysis',
-                'Email & chat support',
-                'Standard security rules',
-                'API access',
-                'Mobile app access',
-            ],
-            Entrepreneur: [
-                'Up to 5,000 email scans per month',
-                'Advanced threat detection',
-                'AI-powered malware scanning',
-                'Priority support',
-                'Custom security policies',
-                'Full API access',
-                'Advanced reporting',
-                'Team collaboration tools',
-                'Slack/Teams integration',
-            ],
-            Team: [
-                'Up to 20,000 email scans per month',
-                'Enterprise threat detection',
-                'Advanced AI analysis',
-                'Dedicated account manager',
-                'Custom integrations',
-                'HIPAA compliance ready',
-                'Multi-team management',
-                'Advanced analytics',
-                'SSO integration',
-                'Custom reporting',
-            ],
-        };
-        return features[planName] || [];
-    };
-
     const getPopularPlan = () => 'Entrepreneur';
 
     if (loading) {
@@ -210,7 +174,7 @@ export function PricingSection() {
                     <button
                         onClick={() => setBillingCycle('monthly')}
                         className={cn(
-                            'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200',
+                            'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer',
                             billingCycle === 'monthly'
                                 ? 'bg-emerald-600 text-white'
                                 : 'text-neutral-400 hover:text-white'
@@ -221,7 +185,7 @@ export function PricingSection() {
                     <button
                         onClick={() => setBillingCycle('yearly')}
                         className={cn(
-                            'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-2',
+                            'px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center space-x-2 cursor-pointer',
                             billingCycle === 'yearly'
                                 ? 'bg-emerald-600 text-white'
                                 : 'text-neutral-400 hover:text-white'
@@ -309,19 +273,38 @@ export function PricingSection() {
 
                             <CardContent className='pt-0'>
                                 <div className='space-y-3 mb-6'>
-                                    {getPlanFeatures(product.name).map((feature, index) => (
-                                        <div key={index} className='flex items-start space-x-3'>
-                                            <IconCheck className='h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0' />
-                                            <span className='text-sm text-neutral-300'>
-                                                {feature}
-                                            </span>
-                                        </div>
-                                    ))}
+                                    {getPlanFeatures(product.name).map((feature, index) => {
+                                        const isIncluded = feature.included !== false;
+                                        const displayValue =
+                                            typeof feature.included === 'string'
+                                                ? feature.included
+                                                : feature.name;
+
+                                        return (
+                                            <div key={index} className='flex items-start space-x-3'>
+                                                {isIncluded ? (
+                                                    <IconCheck className='h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0' />
+                                                ) : (
+                                                    <IconX className='h-4 w-4 text-red-400 mt-0.5 flex-shrink-0' />
+                                                )}
+                                                <span
+                                                    className={cn(
+                                                        'text-sm',
+                                                        isIncluded
+                                                            ? 'text-neutral-300'
+                                                            : 'text-neutral-500 line-through'
+                                                    )}
+                                                >
+                                                    {displayValue}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
 
-                                <Link href='/dashboard' className='block w-full'>
+                                <Link href='/register' className='block w-full'>
                                     <Button
-                                        variant={isPopular ? 'primary' : 'outline'}
+                                        variant={isPopular ? 'primary' : 'simple'}
                                         className={cn(
                                             'w-full transition-all duration-200',
                                             isPopular
@@ -334,7 +317,7 @@ export function PricingSection() {
                                 </Link>
 
                                 <p className='text-xs text-neutral-500 text-center mt-3'>
-                                    14-day free trial • No credit card required
+                                    Free Trial( 5 Analyses ) • No credit card required
                                 </p>
                             </CardContent>
                         </Card>
@@ -357,7 +340,7 @@ export function PricingSection() {
                         <div className='flex flex-col sm:flex-row gap-4 justify-center items-center'>
                             <Link href='/contact'>
                                 <Button
-                                    variant='outline'
+                                    variant='simple'
                                     className='border-emerald-600 text-emerald-400 hover:bg-emerald-600 hover:text-white'
                                 >
                                     Contact Sales

@@ -12,7 +12,7 @@ import { PricingSection } from '@/components/marketing/pricing-section';
 export const metadata: Metadata = {
     title: 'Email Security Pricing | SecPilot Plans & Features',
     description:
-        'Simple, transparent pricing for SecPilot email security software. Plans starting at $19/month for small businesses. Advanced AI-powered phishing protection, malware detection, and real-time threat analytics.',
+        'Simple, transparent pricing for SecPilot email security software. Plans starting at $9.90/month for small businesses. Advanced AI-powered phishing protection, malware detection, and real-time threat analytics.',
     openGraph: {
         images: ['/banner.png'],
     },
@@ -75,7 +75,7 @@ export default function PricingPage() {
             {/* Page content with proper z-index */}
             <div className='relative z-10'>
                 {/* Header Section */}
-                <section className='py-20 sm:py-40'>
+                <section className='py-10 sm:py-40'>
                     <Container className='max-w-4xl mx-auto text-center'>
                         <FeatureIconContainer className='flex justify-center items-center overflow-hidden mx-auto'>
                             <div className='relative'>
@@ -95,7 +95,7 @@ export default function PricingPage() {
                 </section>
 
                 {/* Pricing Section with Stripe Integration */}
-                <section aria-label='Pricing plans'>
+                <section aria-label='Pricing plans' className='-mt-20'>
                     <PricingSection />
                 </section>
 

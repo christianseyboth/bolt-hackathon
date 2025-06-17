@@ -9,6 +9,7 @@ import {
     IconCreditCard,
     IconCrown,
     IconCheck,
+    IconX,
     IconLoader,
     IconStar,
     IconShield,
@@ -20,6 +21,8 @@ import { RefreshCw, Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { SubscriptionUpgradeModal } from './subscription-upgrade-modal';
 import { SubscriptionCancelModal } from './subscription-cancel-modal';
+import { getPlanFeatures } from '@/lib/feature-matrix';
+import { cn } from '@/lib/utils';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -904,9 +907,7 @@ export function SubscriptionBilling({
                         }
 
                         const isCurrentPlan = currentSubscription?.plan_name === product.name;
-                        const features =
-                            product.metadata.features?.split(',') ||
-                            getDefaultFeatures(product.name);
+                        const features = getPlanFeatures(product.name);
                         const isPopular = product.name.toLowerCase() === 'pro';
 
                         return (
@@ -959,12 +960,33 @@ export function SubscriptionBilling({
 
                                 {/* Plan Features */}
                                 <ul className='space-y-2 mb-6'>
-                                    {features.map((feature: string, index: number) => (
-                                        <li key={index} className='flex items-start'>
-                                            <IconCheck className='h-5 w-5 text-emerald-400 mr-2 flex-shrink-0 mt-0.5' />
-                                            <span className='text-sm'>{feature.trim()}</span>
-                                        </li>
-                                    ))}
+                                    {features.map((feature, index) => {
+                                        const isIncluded = feature.included !== false;
+                                        const displayValue =
+                                            typeof feature.included === 'string'
+                                                ? feature.included
+                                                : feature.name;
+
+                                        return (
+                                            <li key={index} className='flex items-start'>
+                                                {isIncluded ? (
+                                                    <IconCheck className='h-5 w-5 text-emerald-400 mr-2 flex-shrink-0 mt-0.5' />
+                                                ) : (
+                                                    <IconX className='h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5' />
+                                                )}
+                                                <span
+                                                    className={cn(
+                                                        'text-sm',
+                                                        isIncluded
+                                                            ? 'text-neutral-300'
+                                                            : 'text-neutral-500 line-through'
+                                                    )}
+                                                >
+                                                    {displayValue}
+                                                </span>
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
 
                                 {isCurrentPlan ? (
