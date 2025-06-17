@@ -1,22 +1,10 @@
 'use client';
-import { motion, useMotionValueEvent } from 'motion/react';
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { FeatureIconContainer } from '@/components/features/feature-icon-container';
 import { Heading } from '@/components/heading';
 import { Subheading } from '@/components/subheading';
 import { StickyScroll } from '@/components/ui/sticky-scroll';
-import {
-    IconMailForward,
-    IconSocial,
-    IconTerminal,
-    IconTool,
-    IconShieldCheck,
-    IconMail,
-    IconSettings,
-    IconChartBar,
-} from '@tabler/icons-react';
-import { useScroll } from 'motion/react';
-import { BlurImage } from '@/components/blur-image';
+import { IconTerminal, IconMail, IconChartBar } from '@tabler/icons-react';
 
 export const Tools = () => {
     const content = [
@@ -154,12 +142,13 @@ const SecurityDashboardMockup = () => {
                             severity: 'critical',
                         },
                     ].map((threat, i) => (
-                        <motion.div
+                        <div
                             key={i}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.2 }}
-                            className='flex items-center justify-between text-xs bg-zinc-800/50 rounded p-2'
+                            className='flex items-center justify-between text-xs bg-zinc-800/50 rounded p-2 animate-[fadeInUp_0.5s_ease-out] opacity-0'
+                            style={{
+                                animationDelay: `${i * 0.2}s`,
+                                animationFillMode: 'forwards',
+                            }}
                         >
                             <div className='flex items-center gap-2'>
                                 <div
@@ -167,15 +156,15 @@ const SecurityDashboardMockup = () => {
                                         threat.severity === 'critical'
                                             ? 'bg-red-500'
                                             : threat.severity === 'high'
-                                            ? 'bg-amber-500'
-                                            : 'bg-yellow-500'
+                                              ? 'bg-amber-500'
+                                              : 'bg-yellow-500'
                                     }`}
                                 ></div>
                                 <span className='text-neutral-300'>{threat.type}</span>
                                 <span className='text-neutral-500'>from {threat.sender}</span>
                             </div>
                             <span className='text-neutral-400'>{threat.time}</span>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
             </div>
@@ -364,12 +353,14 @@ const ReportingMockup = () => {
                 <div className='text-xs text-neutral-400 mb-2'>Threat Trends (Last 30 Days)</div>
                 <div className='flex items-end justify-between h-20 gap-1'>
                     {Array.from({ length: 12 }).map((_, i) => (
-                        <motion.div
+                        <div
                             key={i}
-                            initial={{ height: 0 }}
-                            animate={{ height: `${Math.random() * 60 + 20}%` }}
-                            transition={{ delay: i * 0.1, duration: 0.5 }}
-                            className='bg-gradient-to-t from-emerald-500/60 to-emerald-400/80 rounded-sm flex-1'
+                            className='bg-gradient-to-t from-emerald-500/60 to-emerald-400/80 rounded-sm flex-1 animate-[growUp_0.5s_ease-out] opacity-0'
+                            style={{
+                                height: `${Math.random() * 60 + 20}%`,
+                                animationDelay: `${i * 0.1}s`,
+                                animationFillMode: 'forwards',
+                            }}
                         />
                     ))}
                 </div>
@@ -391,4 +382,3 @@ const ReportingMockup = () => {
         </div>
     );
 };
-
