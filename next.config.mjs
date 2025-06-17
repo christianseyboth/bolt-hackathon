@@ -1,11 +1,19 @@
+import rehypePrism from '@mapbox/rehype-prism';
+import nextMDX from '@next/mdx';
+import remarkGfm from 'remark-gfm';
+import lingoCompiler from 'lingo.dev/compiler';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Minimal configuration
+    // MDX Configuration
     experimental: {
-        // Remove all experimental features for now
+        mdxRs: true, // Disable the Rust-based MDX compiler
     },
 
-    // Basic image configuration
+    // File extensions Next.js should handle
+    pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'mdx'],
+
+    // Image configurations
     images: {
         remotePatterns: [
             {
@@ -18,17 +26,38 @@ const nextConfig = {
                 hostname: 'images.unsplash.com',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'i.pravatar.cc',
+                pathname: '/**',
+            },
         ],
     },
 
-    // Disable problematic features
+    // Add ESLint configuration
     eslint: {
-        ignoreDuringBuilds: true, // Temporarily ignore ESLint
+        // Directories to run ESLint on during production builds
+        dirs: ['pages', 'components', 'lib', 'src', 'mdx'],
+        // Allow warnings but not errors
+        ignoreDuringBuilds: false,
     },
 
+    // TypeScript configuration
     typescript: {
-        ignoreBuildErrors: true, // Temporarily ignore TypeScript errors
+        ignoreBuildErrors: false,
     },
 };
 
-export default nextConfig;
+// MDX Configuration with plugins
+const withMDX = nextMDX({
+    extension: /\.mdx?$/, // Handle both .mdx and .md files
+    options: {
+        remarkPlugins: [remarkGfm], // GitHub Flavored Markdown support
+        rehypePlugins: [rehypePrism], // Syntax highlighting
+        // Add optional MDX configuration
+        providerImportSource: '@mdx-js/react',
+    },
+});
+
+// Export the configured Next.js setup
+export default withMDX(nextConfig);
