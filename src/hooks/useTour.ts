@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface TourStep {
     target: string;
@@ -9,108 +10,115 @@ interface TourStep {
     action?: () => void;
 }
 
-export const useTour = () => {
-    const [isActive, setIsActive] = useState(false);
+export const useTour = (isNewAccount: boolean = false) => {
+    const [isTourActive, setIsTourActive] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
-    const [hasCompletedTour, setHasCompletedTour] = useState(false);
-    const [isMounted, setIsMounted] = useState(false);
+    const searchParams = useSearchParams();
 
-    useEffect(() => {
-        // Delay mounting to ensure hydration is complete
-        const timer = setTimeout(() => {
-            setIsMounted(true);
-            checkTourStatus();
-        }, 100);
-
-        return () => clearTimeout(timer);
-    }, []);
-
-    // Function to check tour status
+    // Check if we should start the tour
     const checkTourStatus = () => {
-        if (typeof window !== 'undefined') {
-            const completed = localStorage.getItem('tour-completed');
-            const isFirstLogin = localStorage.getItem('first-login');
-            const isNavigating = localStorage.getItem('tour-navigating');
-            const savedStep = localStorage.getItem('tour-current-step');
+        if (typeof window === 'undefined') return;
 
-            console.log('useTour - checkTourStatus called with:', {
-                completed,
-                isFirstLogin,
-                isNavigating,
-                savedStep
-            });
+        // Check if tour was already completed
+        const tourCompleted = localStorage.getItem('proactiv-tour-completed');
+        const isFirstLogin = localStorage.getItem('proactiv-first-login');
 
-            if (!completed) {
-                if (isNavigating === 'true' && savedStep) {
-                    console.log('🔄 Resuming tour from navigation to step:', savedStep);
-                    setIsActive(true);
-                    setCurrentStep(parseInt(savedStep));
-                    localStorage.removeItem('tour-navigating');
-                    localStorage.removeItem('tour-current-step');
-                } else if (isFirstLogin === 'true') {
-                    console.log('🚀 First login detected, starting tour');
-                    setIsActive(true);
-                    setCurrentStep(0);
-                }
-            } else {
-                console.log('❌ Tour already completed, not starting');
-            }
+        // URL parameter takes precedence (for debugging)
+        const forceStart = searchParams.get('tour') === 'start';
+        const forceComplete = searchParams.get('tour') === 'complete';
+
+        if (forceComplete) {
+            localStorage.setItem('proactiv-tour-completed', 'true');
+            localStorage.removeItem('proactiv-first-login');
+            setIsTourActive(false);
+            return;
+        }
+
+        if (forceStart) {
+            // Force start tour, clear completion flag
+            localStorage.removeItem('proactiv-tour-completed');
+            setIsTourActive(true);
+            return;
+        }
+
+        // Look for saved step from navigation
+        const savedStep = localStorage.getItem('proactiv-tour-step');
+        if (savedStep && !tourCompleted) {
+            setCurrentStep(parseInt(savedStep));
+            setIsTourActive(true);
+            return;
+        }
+
+        // Start tour for first-time users
+        if ((isNewAccount || isFirstLogin) && !tourCompleted) {
+            setIsTourActive(true);
+            return;
+        }
+
+        // Don't start if already completed
+        if (tourCompleted) {
+            return;
         }
     };
 
-    // Listen for storage events to detect when first-login flag is set
+    // Listen for storage events (first login detection)
     useEffect(() => {
-        if (!isMounted) return;
-
-        const handleStorageChange = () => {
-            checkTourStatus();
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'proactiv-first-login' && e.newValue) {
+                checkTourStatus();
+            }
         };
 
         window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, [isMounted]);
+    // Initial check on mount
+    useEffect(() => {
+        checkTourStatus();
+    }, [isNewAccount, searchParams]);
 
     const startTour = () => {
-        if (!isMounted) return;
-        setIsActive(true);
+        setIsTourActive(true);
         setCurrentStep(0);
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('tour-current-step');
-            localStorage.removeItem('tour-navigating');
-        }
+        localStorage.removeItem('proactiv-tour-completed');
     };
 
-    const completeTour = () => {
-        setIsActive(false);
-        setHasCompletedTour(true);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('tour-completed', 'true');
-            localStorage.removeItem('first-login');
-            localStorage.removeItem('tour-current-step');
-            localStorage.removeItem('tour-navigating');
-        }
+    const endTour = () => {
+        setIsTourActive(false);
+        localStorage.setItem('proactiv-tour-completed', 'true');
+        localStorage.removeItem('proactiv-first-login');
+        localStorage.removeItem('proactiv-tour-step');
     };
 
-    const skipTour = () => {
-        setIsActive(false);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('tour-completed', 'true');
-            localStorage.removeItem('first-login');
-            localStorage.removeItem('tour-current-step');
-            localStorage.removeItem('tour-navigating');
-        }
+    const nextStep = () => {
+        setCurrentStep(prev => {
+            const next = prev + 1;
+            localStorage.setItem('proactiv-tour-step', next.toString());
+            return next;
+        });
+    };
+
+    const prevStep = () => {
+        setCurrentStep(prev => {
+            const prev_step = Math.max(0, prev - 1);
+            localStorage.setItem('proactiv-tour-step', prev_step.toString());
+            return prev_step;
+        });
+    };
+
+    const goToStep = (step: number) => {
+        setCurrentStep(step);
+        localStorage.setItem('proactiv-tour-step', step.toString());
     };
 
     return {
-        isActive: isMounted ? isActive : false,
+        isTourActive,
         currentStep,
-        setCurrentStep,
         startTour,
-        completeTour,
-        skipTour,
-        hasCompletedTour
+        endTour,
+        nextStep,
+        prevStep,
+        goToStep,
     };
 };

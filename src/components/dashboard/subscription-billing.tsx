@@ -76,9 +76,6 @@ export function SubscriptionBilling({
             const checkoutCanceled = urlParams.get('canceled');
 
             if (checkoutSuccess === 'true') {
-                console.log(
-                    '🎉 Returned from successful checkout, refreshing subscription data...'
-                );
                 toast({
                     title: 'Payment successful!',
                     description: 'Updating your subscription status...',
@@ -92,7 +89,6 @@ export function SubscriptionBilling({
                     handleAutoSync();
                 }, 2000);
             } else if (checkoutCanceled === 'true') {
-                console.log('❌ Checkout was canceled');
                 toast({
                     title: 'Checkout canceled',
                     description: 'Your subscription was not changed.',
@@ -111,8 +107,6 @@ export function SubscriptionBilling({
     // Auto-sync effect
     useEffect(() => {
         if (shouldAutoSyncFromServer) {
-            console.log('🎯 Server recommended auto-sync:', autoSyncReason);
-
             // Delay auto-sync slightly to allow page to load
             const timer = setTimeout(() => {
                 handleAutoSync();
@@ -122,36 +116,7 @@ export function SubscriptionBilling({
         }
     }, [shouldAutoSyncFromServer, autoSyncReason]);
 
-    // Debug logging
-    console.log('SubscriptionBilling received products:', products?.length || 0);
-    console.log('Products data:', products);
-    console.log(
-        '🔍 FULL Current subscription object:',
-        JSON.stringify(currentSubscription, null, 2)
-    );
-    console.log('🔍 Subscription status:', currentSubscription?.subscription_status);
-    console.log('🔍 Subscription cancel_at_period_end:', currentSubscription?.cancel_at_period_end);
-    console.log(
-        '🔍 Should show "Ends on"?',
-        currentSubscription?.subscription_status === 'cancelled' ||
-            currentSubscription?.cancel_at_period_end
-    );
-    console.log(
-        '🔍 All subscription keys:',
-        currentSubscription ? Object.keys(currentSubscription) : 'No subscription'
-    );
-    console.log(
-        '🔍 Current subscription stripe_subscription_id:',
-        currentSubscription?.stripe_subscription_id
-    );
-    console.log('🔍 Auto-sync props:', { shouldAutoSync, autoSyncReason, hasAutoSynced });
-    console.log('🔍 Account data being passed to components:', {
-        account_id: account?.id,
-        account_email: account?.email,
-        account_type: typeof account?.id,
-        account_length: account?.id ? account.id.length : 'null',
-        full_account_keys: account ? Object.keys(account) : 'No account',
-    });
+    // Remove debug logging for production
 
     const handleSubscribe = async (priceId: string) => {
         setLoading(priceId);
@@ -243,7 +208,6 @@ export function SubscriptionBilling({
     const handleAutoSync = async () => {
         if (isAutoSyncing) return;
 
-        console.log('🎯 Auto-sync triggered');
         setIsAutoSyncing(true);
 
         try {
@@ -251,8 +215,6 @@ export function SubscriptionBilling({
             const syncEndpoint = !currentSubscription?.stripe_customer_id
                 ? '/api/stripe/sync-after-checkout'
                 : '/api/debug/sync-subscription';
-
-            console.log('🔄 Using sync endpoint:', syncEndpoint);
 
             const response = await fetch(syncEndpoint, {
                 method: 'POST',
@@ -263,12 +225,6 @@ export function SubscriptionBilling({
             });
 
             const result = await response.json();
-
-            console.log('🔍 Sync response:', {
-                status: response.status,
-                ok: response.ok,
-                result,
-            });
 
             if (result.success) {
                 toast({
