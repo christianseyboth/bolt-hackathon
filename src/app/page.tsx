@@ -4,15 +4,15 @@ import { Features } from '@/components/features';
 import { Hero } from '@/components/marketing/hero';
 import { Testimonials } from '@/components/testimonials';
 import { Tools } from '@/components/marketing/tools';
-import { NavBar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { createClient } from '@/utils/supabase/server';
+import { ClientNavBar } from '@/components/layout/navbar/client-navbar';
 
 export default async function Home() {
-
     return (
         <>
+            <ClientNavBar />
             <main className='relative min-h-screen bg-neutral-950' style={{ position: 'relative' }}>
                 {/* Enhanced unified background with subtle animations */}
                 <div className='fixed inset-0 pointer-events-none'>
