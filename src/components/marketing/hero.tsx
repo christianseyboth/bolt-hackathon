@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { MotionValue, motion, useScroll, useTransform } from 'motion/react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/button';
 import { HiArrowRight } from 'react-icons/hi2';
@@ -15,12 +14,10 @@ import Beam from '@/components/beam';
 
 export const Hero = () => {
     const containerRef = useRef<any>(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-    });
-    const [isMobile, setIsMobile] = React.useState(false);
+    const [scrollProgress, setScrollProgress] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth <= 768);
         };
@@ -31,13 +28,32 @@ export const Hero = () => {
         };
     }, []);
 
-    const scaleDimensions = () => {
-        return isMobile ? [0.7, 0.9] : [1.05, 1.2];
-    };
+    useEffect(() => {
+        const handleScroll = () => {
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const progress = Math.max(
+                    0,
+                    Math.min(1, -rect.top / (rect.height - window.innerHeight))
+                );
+                setScrollProgress(progress);
+            }
+        };
 
-    const rotate = useTransform(scrollYProgress, [0, 0.5], [20, 0]);
-    const scale = useTransform(scrollYProgress, [0, 1], scaleDimensions());
-    const translate = useTransform(scrollYProgress, [0, 1], [0, 100]);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const getTransformStyle = () => {
+        const rotate = 20 - scrollProgress * 20;
+        const scale = isMobile ? 0.7 + scrollProgress * 0.2 : 1.05 + scrollProgress * 0.15;
+        const translateY = scrollProgress * 100;
+
+        return {
+            transform: `rotateX(${rotate}deg) translateY(${translateY}px) scale(${scale})`,
+            transition: 'transform 0.1s ease-out',
+        };
+    };
 
     return (
         <div
@@ -82,7 +98,7 @@ export const Hero = () => {
                         position: 'relative',
                     }}
                 >
-                    <Card rotate={rotate} translate={translate} scale={scale}>
+                    <Card transformStyle={getTransformStyle()}>
                         <Image
                             src={`/hero-screenshot.avif`}
                             alt='SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface'
@@ -100,48 +116,39 @@ export const Hero = () => {
 };
 
 export const Card = ({
-    rotate,
-    scale,
-    translate,
+    transformStyle,
     children,
 }: {
-    rotate: MotionValue<number>;
-    scale: MotionValue<number>;
-    translate: MotionValue<number>;
+    transformStyle: React.CSSProperties;
     children: React.ReactNode;
 }) => {
     return (
-        <motion.div
+        <div
             style={{
-                rotateX: rotate,
-                translateY: translate,
-                scale,
+                ...transformStyle,
                 boxShadow:
                     '0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003',
+                backgroundColor: '#0a0a0a',
             }}
             className='max-w-6xl z-40 group -mt-12 mx-auto isolate group h-[20rem] md:h-[50rem] w-full border-4 border-neutral-900 p-2 md:p-2 rounded-[30px] shadow-2xl relative'
-            initial={{ backgroundColor: '#0a0a0a' }}
         >
             <Beam showBeam className='-top-1 block' />
             <div
                 className='absolute h-40 w-full bottom-0 md:-bottom-10 inset-x-0 scale-[1.2] z-20 pointer-events-none [mask-image:linear-gradient(to_top,white_30%,transparent)]'
                 style={{ backgroundColor: '#0a0a0a' }}
             />
-            <motion.div
-                className='absolute inset-0 z-20 group-hover:bg-black/0 flex items-center justify-center'
-                initial={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
-                whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
-                transition={{ duration: 0.2 }}
+            <div
+                className='absolute inset-0 z-20 group-hover:bg-black/0 flex items-center justify-center transition-colors duration-200'
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
             >
                 <VideoModal />
-            </motion.div>
+            </div>
             <div
                 className=' h-full w-full overflow-hidden rounded-2xl md:rounded-2xl md:p-4'
                 style={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
             >
                 {children}
             </div>
-        </motion.div>
+        </div>
     );
 };
-

@@ -1,11 +1,7 @@
 'use client';
-import React, { useRef } from 'react';
-import { MacbookScroll } from '@/components/macbook';
-import { motion, useScroll, useTransform } from 'motion/react';
+import React from 'react';
 import { Button } from '@/components/button';
-import { HiArrowRight } from 'react-icons/hi2';
 import { Container } from '@/components/container';
-import { FeaturedImages } from '@/components/featured-images';
 import { IconShield, IconBolt, IconUsers, IconArrowRight } from '@tabler/icons-react';
 import Link from 'next/link';
 
@@ -14,9 +10,9 @@ export const CTA = () => {
         <div className='relative py-20 sm:py-40'>
             <Container className='text-center'>
                 <div className='max-w-4xl mx-auto'>
-                    <motion.h2 className='text-white text-3xl md:text-5xl font-bold mb-6'>
+                    <h2 className='text-white text-3xl md:text-5xl font-bold mb-6'>
                         Stop Email Attacks Before They Cost Your Business
-                    </motion.h2>
+                    </h2>
                     <p className='text-lg md:text-xl text-neutral-400 mb-8 max-w-2xl mx-auto'>
                         Join 10,000+ businesses using SecPilot's AI-powered email security to
                         prevent phishing, malware, and ransomware attacks. 99.9% accuracy,
@@ -86,4 +82,3 @@ export const CTA = () => {
         </div>
     );
 };
-
