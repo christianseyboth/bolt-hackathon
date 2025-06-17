@@ -10,13 +10,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { createClient } from '@/utils/supabase/server';
 
 export default async function Home() {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getUser();
-    const user = data.user;
 
     return (
         <>
-            <NavBar user={user} />
             <main className='relative min-h-screen bg-neutral-950' style={{ position: 'relative' }}>
                 {/* Enhanced unified background with subtle animations */}
                 <div className='fixed inset-0 pointer-events-none'>
