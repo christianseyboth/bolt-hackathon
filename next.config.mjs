@@ -70,4 +70,4 @@ const withLingo = lingoCompiler.next({
 });
 
 // Export the configured Next.js setup
-export default withMDX(withLingo(nextConfig));
+export default withMDX(nextConfig);
