@@ -1,13 +1,29 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import { Container } from '@/components/container';
 import { Heading } from '@/components/heading';
 import { Subheading } from '@/components/subheading';
 import { Button } from '@/components/button';
 import { Grid } from '@/components/features/grid';
-import { FeatureIconContainer } from '@/components/features/feature-icon-container';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { IconMailFilled, IconPhone, IconMapPin, IconClock } from '@tabler/icons-react';
 
 export const ContactForm = () => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [inquiryType, setInquiryType] = useState('');
+
+    const handleSubmit = (e: React.FormEvent) => {
+        setIsSubmitting(true);
+        // Let the form submit naturally to Netlify
+        // No need to prevent default or use fetch
+    };
+
     return (
         <Container className='py-20 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-16 px-6'>
             {/* Left Side - Contact Info */}
@@ -31,7 +47,7 @@ export const ContactForm = () => {
                         </div>
                         <div>
                             <p className='text-sm font-medium text-neutral-200'>Email Support</p>
-                            <p className='text-sm text-neutral-400'>support@secpilot.com</p>
+                            <p className='text-sm text-neutral-400'>support@secpilot.io</p>
                             <p className='text-xs text-neutral-500 mt-1'>
                                 Typical response within 2 hours
                             </p>
@@ -88,7 +104,7 @@ export const ContactForm = () => {
                     <div className='flex items-center space-x-6 text-xs'>
                         <div className='flex items-center space-x-2'>
                             <div className='w-2 h-2 bg-emerald-500 rounded-full'></div>
-                            <span className='text-neutral-400'>SOC2 Compliant</span>
+                            <span className='text-neutral-400'>SOC2 Ready</span>
                         </div>
                         <div className='flex items-center space-x-2'>
                             <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
@@ -114,93 +130,158 @@ export const ContactForm = () => {
                     </p>
                 </div>
 
-                <div className='mb-4 w-full relative z-20'>
-                    <label
-                        className='text-neutral-300 text-sm font-medium mb-2 inline-block'
-                        htmlFor='name'
-                    >
-                        Full Name *
-                    </label>
-                    <input
-                        id='name'
-                        type='text'
-                        placeholder='John Smith'
-                        className='h-11 px-4 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'
-                    />
-                </div>
-
-                <div className='mb-4 w-full relative z-20'>
-                    <label
-                        className='text-neutral-300 text-sm font-medium mb-2 inline-block'
-                        htmlFor='email'
-                    >
-                        Business Email *
-                    </label>
-                    <input
-                        id='email'
-                        type='email'
-                        placeholder='john@company.com'
-                        className='h-11 px-4 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'
-                    />
-                </div>
-
-                <div className='mb-4 w-full relative z-20'>
-                    <label
-                        className='text-neutral-300 text-sm font-medium mb-2 inline-block'
-                        htmlFor='company'
-                    >
-                        Company Name
-                    </label>
-                    <input
-                        id='company'
-                        type='text'
-                        placeholder='Acme Corporation'
-                        className='h-11 px-4 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'
-                    />
-                </div>
-
-                <div className='mb-4 w-full relative z-20'>
-                    <label
-                        className='text-neutral-300 text-sm font-medium mb-2 inline-block'
-                        htmlFor='subject'
-                    >
-                        Inquiry Type
-                    </label>
-                    <select
-                        id='subject'
-                        className='h-11 px-4 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'
-                    >
-                        <option value=''>Select an option</option>
-                        <option value='general'>General Information</option>
-                        <option value='sales'>Sales & Pricing</option>
-                        <option value='support'>Technical Support</option>
-                        <option value='enterprise'>Enterprise Solutions</option>
-                        <option value='security'>Security Question</option>
-                        <option value='integration'>Integration Help</option>
-                    </select>
-                </div>
-
-                <div className='mb-6 w-full relative z-20'>
-                    <label
-                        className='text-neutral-300 text-sm font-medium mb-2 inline-block'
-                        htmlFor='message'
-                    >
-                        Message *
-                    </label>
-                    <textarea
-                        id='message'
-                        rows={4}
-                        placeholder='Tell us about your email security needs, team size, or any specific requirements...'
-                        className='px-4 pt-3 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 resize-none'
-                    />
-                </div>
-
-                <Button
-                    variant='primary'
-                    className='w-full bg-emerald-600 hover:bg-emerald-700 text-white border-0 h-11 transition-all duration-200'
+                <form
+                    name='contact'
+                    method='POST'
+                    action='/contact/success'
+                    data-netlify='true'
+                    data-netlify-honeypot='bot-field'
+                    onSubmit={handleSubmit}
+                    className='w-full relative z-20 space-y-4'
                 >
-                    Send Message
-                </Button>
+                    {/* Hidden fields for Netlify */}
+                    <input type='hidden' name='form-name' value='contact' />
+
+                    {/* Honeypot field - hidden from users */}
+                    <div className='hidden'>
+                        <label>
+                            Don't fill this out if you're human:
+                            <input name='bot-field' />
+                        </label>
+                    </div>
+
+                    <div className='w-full'>
+                        <label
+                            className='text-neutral-300 text-sm font-medium mb-2 inline-block'
+                            htmlFor='name'
+                        >
+                            Full Name *
+                        </label>
+                        <input
+                            id='name'
+                            name='name'
+                            type='text'
+                            required
+                            placeholder='John Smith'
+                            className='h-11 px-4 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'
+                        />
+                    </div>
+
+                    <div className='w-full'>
+                        <label
+                            className='text-neutral-300 text-sm font-medium mb-2 inline-block'
+                            htmlFor='email'
+                        >
+                            Business Email *
+                        </label>
+                        <input
+                            id='email'
+                            name='email'
+                            type='email'
+                            required
+                            placeholder='john@company.com'
+                            className='h-11 px-4 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'
+                        />
+                    </div>
+
+                    <div className='w-full'>
+                        <label
+                            className='text-neutral-300 text-sm font-medium mb-2 inline-block'
+                            htmlFor='company'
+                        >
+                            Company Name
+                        </label>
+                        <input
+                            id='company'
+                            name='company'
+                            type='text'
+                            placeholder='Acme Corporation'
+                            className='h-11 px-4 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'
+                        />
+                    </div>
+
+                    <div className='w-full'>
+                        <label
+                            className='text-neutral-300 text-sm font-medium mb-2 inline-block'
+                            htmlFor='subject'
+                        >
+                            Inquiry Type
+                        </label>
+
+                        {/* Hidden input for Netlify to capture the select value */}
+                        <input type='hidden' name='subject' value={inquiryType} />
+
+                        <Select onValueChange={setInquiryType}>
+                            <SelectTrigger className='w-full h-11 bg-neutral-900/50 border border-neutral-700 text-white focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'>
+                                <SelectValue placeholder='Select an option' />
+                            </SelectTrigger>
+                            <SelectContent className='bg-neutral-900 border-neutral-700'>
+                                <SelectItem
+                                    value='general'
+                                    className='text-white hover:bg-neutral-800'
+                                >
+                                    General Information
+                                </SelectItem>
+                                <SelectItem
+                                    value='sales'
+                                    className='text-white hover:bg-neutral-800'
+                                >
+                                    Sales & Pricing
+                                </SelectItem>
+                                <SelectItem
+                                    value='support'
+                                    className='text-white hover:bg-neutral-800'
+                                >
+                                    Technical Support
+                                </SelectItem>
+                                <SelectItem
+                                    value='enterprise'
+                                    className='text-white hover:bg-neutral-800'
+                                >
+                                    Enterprise Solutions
+                                </SelectItem>
+                                <SelectItem
+                                    value='security'
+                                    className='text-white hover:bg-neutral-800'
+                                >
+                                    Security Question
+                                </SelectItem>
+                                <SelectItem
+                                    value='integration'
+                                    className='text-white hover:bg-neutral-800'
+                                >
+                                    Integration Help
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className='w-full'>
+                        <label
+                            className='text-neutral-300 text-sm font-medium mb-2 inline-block'
+                            htmlFor='message'
+                        >
+                            Message *
+                        </label>
+                        <textarea
+                            id='message'
+                            name='message'
+                            rows={4}
+                            required
+                            placeholder='Tell us about your email security needs, team size, or any specific requirements...'
+                            className='px-4 pt-3 w-full rounded-lg text-sm bg-neutral-900/50 border border-neutral-700 text-white placeholder-neutral-500 outline-none focus:outline-none active:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200 resize-none'
+                        />
+                    </div>
+
+                    <Button
+                        type='submit'
+                        disabled={isSubmitting}
+                        variant='primary'
+                        className='w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white border-0 h-11 transition-all duration-200'
+                    >
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
+                    </Button>
+                </form>
 
                 <p className='text-xs text-neutral-500 text-center w-full relative z-20'>
                     By submitting this form, you agree to our privacy policy. We'll only use your
@@ -210,4 +291,3 @@ export const ContactForm = () => {
         </Container>
     );
 };
-
