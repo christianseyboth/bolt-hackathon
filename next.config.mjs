@@ -2,17 +2,20 @@ import rehypePrism from '@mapbox/rehype-prism';
 import nextMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm';
 
+const withMDX = nextMDX({
+    extension: /\.mdx?$/,
+    options: {
+        remarkPlugins: [remarkGfm],
+        rehypePlugins: [rehypePrism],
+    },
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // MDX Configuration
+    pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
     experimental: {
-        mdxRs: true, // Disable the Rust-based MDX compiler
+        mdxRs: false,
     },
-
-    // File extensions Next.js should handle
-    pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'mdx'],
-
-    // Image configurations
     images: {
         remotePatterns: [
             {
@@ -27,36 +30,32 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'i.pravatar.cc',
+                hostname: 'api.microlink.io',
                 pathname: '/**',
             },
         ],
     },
 
-    // Add ESLint configuration
-    eslint: {
-        // Directories to run ESLint on during production builds
-        dirs: ['pages', 'components', 'lib', 'src', 'mdx'],
-        // Allow warnings but not errors
-        ignoreDuringBuilds: false,
-    },
+    // Properly handle Motion/Framer Motion
+    transpilePackages: ['motion'],
 
-    // TypeScript configuration
-    typescript: {
-        ignoreBuildErrors: false,
+    webpack: (config, { isServer }) => {
+        if (isServer) {
+            // Handle Motion on server-side
+            config.externals.push({
+                'motion/react': 'motion/react',
+                'framer-motion': 'framer-motion',
+            });
+        }
+
+        // Handle Motion module resolution
+        config.resolve.alias = {
+            ...config.resolve.alias,
+            'motion/react': require.resolve('motion/react'),
+        };
+
+        return config;
     },
 };
 
-// MDX Configuration with plugins
-const withMDX = nextMDX({
-    extension: /\.mdx?$/, // Handle both .mdx and .md files
-    options: {
-        remarkPlugins: [remarkGfm], // GitHub Flavored Markdown support
-        rehypePlugins: [rehypePrism], // Syntax highlighting
-        // Add optional MDX configuration
-        providerImportSource: '@mdx-js/react',
-    },
-});
-
-// Export the configured Next.js setup
 export default withMDX(nextConfig);
