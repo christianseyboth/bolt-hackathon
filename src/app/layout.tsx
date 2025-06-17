@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
+import { ViewTransitions } from 'next-view-transitions';
 import type { Viewport } from 'next';
 
 export const metadata: Metadata = {
@@ -93,21 +94,15 @@ export default function RootLayout({
     };
 
     return (
-        <html lang={locale} className='dark' style={{ position: 'relative' }}>
-            <head>
-                <script
-                    type='application/ld+json'
-                    dangerouslySetInnerHTML={{
-                        __html: JSON.stringify(structuredData),
-                    }}
-                />
-            </head>
-            <body
-                className={cn('bg-charcoal antialiased h-full w-full')}
-                style={{ position: 'relative' }}
-            >
-                {children}
-            </body>
-        </html>
+        <ViewTransitions>
+            <html lang={locale} className='dark' style={{ position: 'relative' }}>
+                <body
+                    className={cn('bg-charcoal antialiased h-full w-full')}
+                    style={{ position: 'relative' }}
+                >
+                    {children}
+                </body>
+            </html>
+        </ViewTransitions>
     );
 }
