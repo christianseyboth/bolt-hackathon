@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClient();
@@ -14,7 +14,7 @@ export async function GET(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const reportId = params.id;
+        const { id: reportId } = await params;
 
         // Get report details from database
         const { data: report, error: reportError } = await supabase
@@ -198,35 +198,33 @@ function getMockData(reportType: string) {
     };
 
     return mockData[reportType] || [
-        { id: 1, name: 'Sample Data', value: 'Demo Report', created_at: new Date().toISOString() }
+        { id: 1, name: 'Sample Data', value: 100, status: 'active' },
+        { id: 2, name: 'Test Record', value: 250, status: 'pending' },
     ];
 }
 
 function convertToCSV(reportData: any): string {
-    let csv = `Report Type,${reportData.reportType}\n`;
-    csv += `Generated At,${reportData.generatedAt}\n`;
-    csv += `Account ID,${reportData.accountId}\n\n`;
+    if (!reportData.data || !Array.isArray(reportData.data) || reportData.data.length === 0) {
+        return 'No data available';
+    }
 
-    reportData.data.forEach((dataset: any[], index: number) => {
-        if (dataset.length > 0) {
-            csv += `Dataset ${index + 1}\n`;
-            const headers = Object.keys(dataset[0]);
-            csv += headers.join(',') + '\n';
+    const firstDataset = reportData.data[0];
+    if (!Array.isArray(firstDataset) || firstDataset.length === 0) {
+        return 'No data available';
+    }
 
-            dataset.forEach(row => {
-                const values = headers.map(header => {
-                    const value = row[header];
-                    return typeof value === 'string' && value.includes(',')
-                        ? `"${value}"`
-                        : value;
-                });
-                csv += values.join(',') + '\n';
-            });
-            csv += '\n';
-        }
+    const headers = Object.keys(firstDataset[0]);
+    const csvRows = [headers.join(',')];
+
+    firstDataset.forEach((row: any) => {
+        const values = headers.map(header => {
+            const value = row[header];
+            return typeof value === 'string' && value.includes(',') ? `"${value}"` : String(value);
+        });
+        csvRows.push(values.join(','));
     });
 
-    return csv;
+    return csvRows.join('\n');
 }
 
 function generateReportHTML(reportData: any, reportType: string): string {
@@ -243,75 +241,62 @@ function generateReportHTML(reportData: any, reportType: string): string {
     const title = getReportTitle(reportType);
 
     return `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>${title}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        h1 { color: #2563eb; border-bottom: 3px solid #2563eb; padding-bottom: 10px; }
-        h2 { color: #1f2937; margin-top: 30px; border-left: 4px solid #3b82f6; padding-left: 15px; }
-        table { border-collapse: collapse; width: 100%; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #e5e7eb; padding: 12px 8px; text-align: left; }
-        th { background-color: #f8fafc; font-weight: 600; color: #374151; }
-        tr:nth-child(even) { background-color: #f9fafb; }
-        .metadata {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            padding: 20px; margin: 20px 0; border-radius: 8px;
-            border-left: 4px solid #0ea5e9;
-        }
-        .no-data { text-align: center; color: #6b7280; font-style: italic; padding: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .generated-time { color: #6b7280; font-size: 14px; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>${title}</h1>
-        <div class="generated-time">Generated on ${new Date(reportData.generatedAt).toLocaleString()}</div>
-    </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${title}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+                .title { font-size: 24px; font-weight: bold; color: #333; }
+                .subtitle { font-size: 14px; color: #666; margin-top: 5px; }
+                .content { margin: 20px 0; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f5f5f5; font-weight: bold; }
+                .summary-card {
+                    background: #f9f9f9;
+                    padding: 15px;
+                    margin: 10px 0;
+                    border-left: 4px solid #007cba;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="title">${title}</div>
+                <div class="subtitle">Generated on ${new Date().toLocaleDateString()}</div>
+                <div class="subtitle">Account ID: ${reportData.accountId}</div>
+            </div>
 
-    <div class="metadata">
-        <strong>Report Details:</strong><br>
-        <strong>Account ID:</strong> ${reportData.accountId}<br>
-        <strong>Report Type:</strong> ${reportType}<br>
-        <strong>Generated:</strong> ${reportData.generatedAt}<br>
-        <strong>Data Sets:</strong> ${reportData.data.length}
-    </div>
+            <div class="content">
+                ${reportData.data && reportData.data.length > 0 ?
+                    reportData.data.map((dataset: any[], index: number) => {
+                        if (!Array.isArray(dataset) || dataset.length === 0) return '';
 
-    ${reportData.data.map((dataset: any[], index: number) => {
-        if (!dataset || dataset.length === 0) {
-            return `
-            <h2>Dataset ${index + 1}</h2>
-            <div class="no-data">No data available for this section</div>
-            `;
-        }
+                        const headers = Object.keys(dataset[0]);
+                        return `
+                            <h3>Dataset ${index + 1}</h3>
+                            <table>
+                                <thead>
+                                    <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                                </thead>
+                                <tbody>
+                                    ${dataset.map(row =>
+                                        `<tr>${headers.map(h => `<td>${row[h]}</td>`).join('')}</tr>`
+                                    ).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    }).join('')
+                    : '<p>No data available for this report.</p>'
+                }
+            </div>
 
-        const headers = Object.keys(dataset[0]);
-        return `
-        <h2>Dataset ${index + 1} (${dataset.length} records)</h2>
-        <table>
-            <thead>
-                <tr>
-                    ${headers.map(header => `<th>${header.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</th>`).join('')}
-                </tr>
-            </thead>
-            <tbody>
-                ${dataset.slice(0, 50).map((row: any) => `
-                    <tr>
-                        ${headers.map(header => `<td>${row[header] || ''}</td>`).join('')}
-                    </tr>
-                `).join('')}
-                ${dataset.length > 50 ? `<tr><td colspan="${headers.length}" style="text-align: center; font-style: italic; color: #6b7280;">... and ${dataset.length - 50} more records</td></tr>` : ''}
-            </tbody>
-        </table>
-        `;
-    }).join('')}
-
-    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px;">
-        Report generated by ProActiv Security Dashboard
-    </div>
-</body>
-</html>
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
+                This report was generated automatically by SecPilot Security Platform.
+            </div>
+        </body>
+        </html>
     `;
 }

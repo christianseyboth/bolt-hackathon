@@ -3,11 +3,11 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClient();
-        const { id } = params;
+        const { id } = await params;
 
         console.log('Attempting to delete report with ID:', id);
 
@@ -47,7 +47,7 @@ export async function DELETE(
     } catch (error) {
         console.error('Delete report error:', error);
         return NextResponse.json(
-            { error: 'Internal server error', details: error.message },
+            { error: 'Internal server error', details: (error as Error).message },
             { status: 500 }
         );
     }

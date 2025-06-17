@@ -3,11 +3,11 @@ import { createClient } from '@/utils/supabase/server';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClient();
-        const { id } = params;
+        const { id } = await params;
 
         console.log('Getting scheduled report:', id);
 
@@ -36,7 +36,7 @@ export async function GET(
     } catch (error) {
         console.error('Get scheduled report error:', error);
         return NextResponse.json(
-            { error: 'Internal server error', details: error.message },
+            { error: 'Internal server error', details: (error as Error).message },
             { status: 500 }
         );
     }
@@ -44,11 +44,11 @@ export async function GET(
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClient();
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
 
         console.log('Updating scheduled report:', id, body);
@@ -106,7 +106,7 @@ export async function PATCH(
     } catch (error) {
         console.error('Update scheduled report error:', error);
         return NextResponse.json(
-            { error: 'Internal server error', details: error.message },
+            { error: 'Internal server error', details: (error as Error).message },
             { status: 500 }
         );
     }
@@ -114,11 +114,11 @@ export async function PATCH(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClient();
-        const { id } = params;
+        const { id } = await params;
 
         console.log('Attempting to delete scheduled report with ID:', id);
 
@@ -158,7 +158,7 @@ export async function DELETE(
     } catch (error) {
         console.error('Delete scheduled report error:', error);
         return NextResponse.json(
-            { error: 'Internal server error', details: error.message },
+            { error: 'Internal server error', details: (error as Error).message },
             { status: 500 }
         );
     }
