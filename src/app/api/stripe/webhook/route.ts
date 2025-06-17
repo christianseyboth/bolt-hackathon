@@ -30,34 +30,29 @@ export async function POST(request: NextRequest) {
         switch (event.type) {
             case 'customer.subscription.created':
             case 'customer.subscription.updated':
-                console.log(`📝 Processing subscription event: ${event.type}`);
                 await handleSubscriptionUpdate(event.data.object as Stripe.Subscription, supabase);
                 break;
 
             case 'customer.subscription.deleted':
-                console.log(`🗑️ Processing subscription deletion`);
                 await handleSubscriptionDeleted(event.data.object as Stripe.Subscription, supabase);
                 break;
 
             case 'invoice.payment_succeeded':
-                console.log(`💰 Processing successful payment`);
                 await handlePaymentSucceeded(event.data.object as Stripe.Invoice, supabase);
                 break;
 
             case 'invoice.payment_failed':
-                console.log(`❌ Processing failed payment`);
                 await handlePaymentFailed(event.data.object as Stripe.Invoice, supabase);
                 break;
 
             default:
-                console.log(`❓ Unhandled event type: ${event.type}`);
+                // Unhandled event type
         }
     } catch (error) {
         console.error('❗ Error handling webhook:', error);
         return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
     }
 
-    console.log(`✅ Webhook processed successfully: ${event.type}`);
     return NextResponse.json({ received: true });
 }
 
@@ -292,13 +287,27 @@ async function handlePaymentFailed(invoice: Stripe.Invoice, supabase: any) {
 // Helper functions for plan mapping
 async function getPlanNameFromPriceId(priceId: string): Promise<string> {
     const priceToPlans: Record<string, string> = {
-        // Current price IDs
-        'price_1RZ9HkCsZBRpsVkXiDJ1KICM': 'Team', // Team YEARLY
-        'price_1RZ9HkCsZBRpsVkXBQNNjw87': 'Team', // Team MONTHLY
-        'price_1RZ9EoCsZBRpsVkXVniKqUeU': 'Entrepreneur', // Entrepreneur YEARLY
-        'price_1RZ9EoCsZBRpsVkXxzMu3paC': 'Entrepreneur', // Entrepreneur MONTHLY
-        'price_1RZ9CfCsZBRpsVkXUefPaqVu': 'Solo', // Solo YEARLY
-        'price_1RZ9CfCsZBRpsVkXt0nTDOee': 'Solo', // Solo MONTHLY
+        // ✅ LIVE PRICE IDs - Updated with actual live price IDs
+
+        // Solo plan
+        'price_1RauH4CsZBRpsVkXOXdBujCQ': 'Solo', // Solo Monthly (LIVE)
+        'price_1RauH4CsZBRpsVkXa0dT3xwB': 'Solo', // Solo Yearly (LIVE)
+
+        // Entrepreneur plan
+        'price_1RauH0CsZBRpsVkXHz5yaTaZ': 'Entrepreneur', // Entrepreneur Monthly (LIVE)
+        'price_1RauH0CsZBRpsVkXnwphSPYL': 'Entrepreneur', // Entrepreneur Yearly (LIVE)
+
+        // Team plan
+        'price_1RauGuCsZBRpsVkXItMdS7b8': 'Team', // Team Monthly (LIVE)
+        'price_1RauGuCsZBRpsVkXqyMwPuFO': 'Team', // Team Yearly (LIVE)
+
+        // Keep old test IDs for fallback during transition (remove after fully migrated)
+        'price_1RZ9HkCsZBRpsVkXiDJ1KICM': 'Team', // Team YEARLY (TEST)
+        'price_1RZ9HkCsZBRpsVkXBQNNjw87': 'Team', // Team MONTHLY (TEST)
+        'price_1RZ9EoCsZBRpsVkXVniKqUeU': 'Entrepreneur', // Entrepreneur YEARLY (TEST)
+        'price_1RZ9EoCsZBRpsVkXxzMu3paC': 'Entrepreneur', // Entrepreneur MONTHLY (TEST)
+        'price_1RZ9CfCsZBRpsVkXUefPaqVu': 'Solo', // Solo YEARLY (TEST)
+        'price_1RZ9CfCsZBRpsVkXt0nTDOee': 'Solo', // Solo MONTHLY (TEST)
     };
 
     return priceToPlans[priceId] || 'Free';

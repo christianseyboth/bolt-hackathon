@@ -27,17 +27,12 @@ export default async function TeamPage() {
         .select('*');
 
     // Get the most current active subscription (handles multiple subscriptions correctly)
-    const { subscription: current_subscription, error: current_subscription_error, totalActiveSubscriptions } =
+    const { subscription: current_subscription, error: current_subscription_error } =
         await getCurrentActiveSubscription(account_data.id);
 
     if (current_subscription_error || !current_subscription) {
         console.error('No active subscription found:', current_subscription_error);
         redirect('/dashboard/subscription');
-    }
-
-    // Log for debugging subscription issues
-    if (totalActiveSubscriptions && totalActiveSubscriptions > 1) {
-        console.log(`Multiple active subscriptions found (${totalActiveSubscriptions}), using most recent`);
     }
 
     // Automatically enforce subscription limits when page loads
@@ -52,7 +47,6 @@ export default async function TeamPage() {
         .select('id, email, label, created_at, status')
         .eq('subscription_id', current_subscription.id)
         .order('created_at', { ascending: true });
-
 
     return (
         <>
