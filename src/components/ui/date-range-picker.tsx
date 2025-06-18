@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { Fragment } from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -39,13 +39,13 @@ export function DateRangePicker({
                                 format(date.from, 'LLL dd, y')
                             )
                         ) : (
-                            <span>Wähle Zeitraum</span>
+                            <span>Pick a date range</span>
                         )}
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className='w-auto p-0' align='start'>
                     <Calendar
-                        initialFocus
+                        autoFocus
                         mode='range'
                         defaultMonth={date.from}
                         selected={date}

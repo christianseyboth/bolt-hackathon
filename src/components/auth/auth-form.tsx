@@ -12,9 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { signIn, signUp, signInWithOAuth, resetPassword } from '@/app/auth/actions';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { signInWithOAuth, signIn, signUp, resetPassword } from '@/app/auth/actions';
 
 interface AuthFormProps {
     mode: 'login' | 'register' | 'reset';
@@ -47,7 +47,7 @@ export function AuthForm({ mode, className }: AuthFormProps) {
         });
     };
 
-        // Handle form submission for login/register
+    // Handle form submission for login/register
     const handleSubmit = async (formData: FormData) => {
         setFormError(null);
 
@@ -67,21 +67,28 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                     errorString: String(error),
                     errorMessage: error instanceof Error ? error.message : 'Unknown',
                     hasDigest: error && typeof error === 'object' && 'digest' in error,
-                    digest: error && typeof error === 'object' && 'digest' in error ? error.digest : null
+                    digest:
+                        error && typeof error === 'object' && 'digest' in error
+                            ? error.digest
+                            : null,
                 });
 
                 // Check if this is a redirect error (which is expected for MFA)
                 const errorString = String(error);
-                const isRedirect = (
-                    (error && typeof error === 'object' && 'digest' in error &&
-                     typeof error.digest === 'string' && error.digest.includes('NEXT_REDIRECT')) ||
+                const isRedirect =
+                    (error &&
+                        typeof error === 'object' &&
+                        'digest' in error &&
+                        typeof error.digest === 'string' &&
+                        error.digest.includes('NEXT_REDIRECT')) ||
                     errorString.includes('NEXT_REDIRECT') ||
-                    errorString.includes('redirect')
-                );
+                    errorString.includes('redirect');
 
                 if (isRedirect) {
                     // This is a redirect, which is expected for MFA - re-throw to allow redirect
-                    console.log('Redirect detected (likely MFA challenge), re-throwing to allow redirect');
+                    console.log(
+                        'Redirect detected (likely MFA challenge), re-throwing to allow redirect'
+                    );
                     throw error;
                 }
                 setFormError('An unexpected error occurred. Please try again.');

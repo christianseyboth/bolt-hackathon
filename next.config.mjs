@@ -1,22 +1,7 @@
-import rehypePrism from '@mapbox/rehype-prism';
-import nextMDX from '@next/mdx';
-import remarkGfm from 'remark-gfm';
-import lingoCompiler from 'lingo.dev/compiler';
-
-const withMDX = nextMDX({
-    extension: /\.mdx?$/,
-    options: {
-        remarkPlugins: [remarkGfm],
-        rehypePlugins: [rehypePrism],
-    },
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
-    experimental: {
-        mdxRs: false,
-    },
+    pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+
     images: {
         remotePatterns: [
             {
@@ -43,15 +28,4 @@ const nextConfig = {
     },
 };
 
-const withLingo = lingoCompiler.next({
-    sourceLocale: 'en',
-    targetLocales: ['es', 'fr', 'de'],
-    useDirective: true,
-    models: 'lingo.dev',
-    sourceRoot: 'src',
-    lingoDir: 'lingo',
-    debug: true,
-    rsc: true,
-});
-
-export default withLingo(withMDX(nextConfig));
+export default nextConfig;

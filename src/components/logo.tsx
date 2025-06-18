@@ -1,4 +1,4 @@
-
+'use client';
 import { Link } from 'next-view-transitions';
 import React from 'react';
 
@@ -89,4 +89,3 @@ export const Logo = () => {
         </Link>
     );
 };
-

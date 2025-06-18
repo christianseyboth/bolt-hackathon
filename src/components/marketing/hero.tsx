@@ -1,8 +1,6 @@
 'use client';
-'use i18n';
 import React, { useRef } from 'react';
 import { MotionValue, motion, useScroll, useTransform } from 'motion/react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/button';
 import { HiArrowRight } from 'react-icons/hi2';
 import Image from 'next/image';
@@ -91,7 +89,7 @@ export const Hero = () => {
                             width={1400}
                             className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full md:object-left-top'
                             draggable={false}
-                            loading='lazy'
+                            priority
                         />
                     </Card>
                 </div>

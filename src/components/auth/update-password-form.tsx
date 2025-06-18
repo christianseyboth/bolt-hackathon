@@ -32,7 +32,7 @@ export function UpdatePasswordForm({ className }: UpdatePasswordFormProps) {
         }
 
         if (password.length < 6) {
-            setFormError("Password must be at least 6 characters long");
+            setFormError('Password must be at least 6 characters long');
             return;
         }
 

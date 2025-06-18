@@ -7,11 +7,36 @@ import { IconMail, IconShieldCheck, IconHeadset, IconBuildingBank } from '@table
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Contact SecPilot | Email Security Software Support',
+    title: 'Contact SecPilot | Email Security Software Support & Sales',
     description:
-        'Contact SecPilot for email security software support, enterprise sales inquiries, and technical assistance. Get help with AI-powered phishing protection and malware detection.',
+        'Contact SecPilot for email security software support, enterprise sales inquiries, and technical assistance. Get help with AI-powered phishing protection and malware detection. 24/7 support available.',
+    keywords: [
+        'contact SecPilot',
+        'email security support',
+        'cybersecurity technical support',
+        'enterprise sales inquiry',
+        'phishing protection help',
+        'email security consultation',
+        'technical assistance',
+        'customer support',
+    ],
     openGraph: {
-        images: ['/banner.png'],
+        title: 'Contact SecPilot | Expert Email Security Support',
+        description:
+            'Get expert help with email security. Contact our team for technical support, sales inquiries, or security consultations.',
+        type: 'website',
+        url: 'https://secpilot.com/contact',
+        images: ['/og-contact.png'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Contact SecPilot | Email Security Support',
+        description:
+            'Expert email security support and consultation. Get help from our security professionals.',
+        images: ['/twitter-contact.png'],
+    },
+    alternates: {
+        canonical: 'https://secpilot.com/contact',
     },
 };
 

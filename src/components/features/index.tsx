@@ -1,4 +1,3 @@
-'use i18n';
 import React from 'react';
 import { Container } from '../container';
 import { Heading } from '../heading';
@@ -90,3 +89,4 @@ export const Features = () => {
         </div>
     );
 };
+
