@@ -6,6 +6,7 @@ import { Subheading } from '@/components/subheading';
 import { Container } from '@/components/container';
 import { FeatureIconContainer } from '@/components/features/feature-icon-container';
 import { IconHelp } from '@tabler/icons-react';
+import Link from 'next/link';
 
 const questions = [
     {
@@ -135,16 +136,15 @@ export const FAQs = () => {
                         >
                             Get Security Consultation
                         </a>
-                        <a
+                        <Link
                             href='/contact'
                             className='px-6 py-2 border border-neutral-700 hover:border-emerald-500/50 text-neutral-300 hover:text-white rounded-lg text-sm font-medium transition-all duration-200'
                         >
                             Request Demo
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </Container>
         </div>
     );
 };
-

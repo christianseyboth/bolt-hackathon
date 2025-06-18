@@ -18,6 +18,7 @@ import { signOut } from '@/app/auth/actions';
 import { useToast } from '../ui/use-toast';
 import { createClient } from '@/utils/supabase/client';
 import { NotificationBell } from '@/components/dashboard/NotificationBell';
+import Link from 'next/link';
 
 interface AccountProfile {
     id: string;
@@ -39,7 +40,9 @@ export function MobileHeader() {
 
     const fetchAccount = async () => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
             if (!user) return;
 
             const { data: accountData } = await supabase
@@ -96,9 +99,9 @@ export function MobileHeader() {
                                     />
                                     <AvatarFallback>
                                         {account ? (
-                                            account.full_name?.[0]?.toUpperCase() ??
+                                            (account.full_name?.[0]?.toUpperCase() ??
                                             account.billing_email?.[0]?.toUpperCase() ??
-                                            'U'
+                                            'U')
                                         ) : (
                                             <IconDeviceLaptop className='h-5 w-5' />
                                         )}
@@ -112,13 +115,10 @@ export function MobileHeader() {
                             </div>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                                <a href='/dashboard/profile'>Profile</a>
+                                <Link href='/dashboard/profile'>Profile</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                onClick={handleSignOut}
-                                disabled={pending}
-                            >
+                            <DropdownMenuItem onClick={handleSignOut} disabled={pending}>
                                 Logout
                             </DropdownMenuItem>
                         </DropdownMenuContent>

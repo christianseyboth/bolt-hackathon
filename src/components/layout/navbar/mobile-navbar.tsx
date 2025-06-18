@@ -7,6 +7,7 @@ import { IoIosClose } from 'react-icons/io';
 import { Button } from '@/components/button';
 import { Logo } from '@/components/logo';
 import { useMotionValueEvent, useScroll, motion } from 'motion/react';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export const MobileNavbar = ({ navItems, user }: any) => {
     const [open, setOpen] = useState(false);
@@ -82,40 +83,45 @@ export const MobileNavbar = ({ navItems, user }: any) => {
                             </>
                         ))}
                     </div>
-                    <div className='flex flex-row w-full items-start gap-2.5  px-8 py-4 '>
-                        {user ? (
-                            <Button
-                                as={Link}
-                                href='/dashboard'
-                                onClick={() => {
-                                    setOpen(false);
-                                }}
-                            >
-                                Dashboard
-                            </Button>
-                        ) : (
-                            <>
+                    <div className='flex flex-col w-full items-start gap-4 px-8 py-4'>
+                        <div className='mb-2'>
+                            <LanguageSwitcher />
+                        </div>
+                        <div className='flex flex-row gap-2.5'>
+                            {user ? (
                                 <Button
                                     as={Link}
-                                    href='/login'
+                                    href='/dashboard'
                                     onClick={() => {
                                         setOpen(false);
                                     }}
                                 >
-                                    Login
+                                    Dashboard
                                 </Button>
-                                <Button
-                                    variant='simple'
-                                    as={Link}
-                                    href='/register'
-                                    onClick={() => {
-                                        setOpen(false);
-                                    }}
-                                >
-                                    Register
-                                </Button>
-                            </>
-                        )}
+                            ) : (
+                                <>
+                                    <Button
+                                        as={Link}
+                                        href='/login'
+                                        onClick={() => {
+                                            setOpen(false);
+                                        }}
+                                    >
+                                        Login
+                                    </Button>
+                                    <Button
+                                        variant='simple'
+                                        as={Link}
+                                        href='/register'
+                                        onClick={() => {
+                                            setOpen(false);
+                                        }}
+                                    >
+                                        Register
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

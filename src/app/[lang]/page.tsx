@@ -1,3 +1,4 @@
+'use i18n';
 import { CTA } from '@/components/marketing/cta';
 import { FAQs } from '@/components/marketing/faqs';
 import { Features } from '@/components/features';
@@ -9,7 +10,13 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { BackgroundEffects } from '@/components/background-effects';
 
-export default function Page() {
+type Props = {
+    params: Promise<{ lang: string }>;
+};
+
+export default async function Home({ params }: Props) {
+    const { lang } = await params;
+
     return (
         <>
             <NavBar />

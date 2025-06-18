@@ -34,6 +34,7 @@ import {
 } from '@/app/(dashboard)/dashboard/team/actions';
 import { useToast } from '../ui/use-toast';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type TeamMember = {
     id: string;
@@ -352,12 +353,12 @@ export function TeamManagement({
                                 <div className='text-sm'>
                                     You've reached the maximum number of team members for your
                                     current plan.
-                                    <a
+                                    <Link
                                         href='/dashboard/settings'
                                         className='underline ml-1 hover:text-amber-300'
                                     >
                                         Upgrade your plan
-                                    </a>{' '}
+                                    </Link>{' '}
                                     to add more team members.
                                 </div>
                             </div>

@@ -12,6 +12,7 @@ import { Subheading } from '@/components/subheading';
 import { VideoModal } from '@/components/video-modal';
 import { FeaturedImages } from '@/components/featured-images';
 import Beam from '@/components/beam';
+import Link from 'next/link';
 
 export const Hero = () => {
     const containerRef = useRef<any>(null);
@@ -63,12 +64,12 @@ export const Hero = () => {
                     showStars
                 />
                 <div className='flex items-center gap-4 justify-center my-10 relative z-10'>
-                    <a href='/dashboard'>
+                    <Link href='/dashboard'>
                         <Button className='flex space-x-2 items-center group !text-lg'>
                             <span>Start Free Email Security Trial</span>{' '}
                             <HiArrowRight className='text-white group-hover:translate-x-1 stroke-[1px] h-3 w-3 mt-0.5 transition-transform duration-200' />
                         </Button>
-                    </a>
+                    </Link>
                 </div>
             </Container>
             <div

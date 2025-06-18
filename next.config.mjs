@@ -52,7 +52,6 @@ const withLingo = lingoCompiler.next({
     lingoDir: 'lingo',
     debug: true,
     rsc: true,
-    localeDetection: true,
 });
 
 export default withLingo(withMDX(nextConfig));

@@ -1,6 +1,33 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
+interface Particle {
+    id: number;
+    left: number;
+    top: number;
+    animationDelay: number;
+    animationDuration: number;
+}
+
 export function BackgroundEffects() {
+    const [particles, setParticles] = useState<Particle[]>([]);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        // Generate particles only on client side
+        const generatedParticles: Particle[] = Array.from({ length: 12 }, (_, i) => ({
+            id: i,
+            left: Math.random() * 100,
+            top: Math.random() * 100,
+            animationDelay: Math.random() * 4,
+            animationDuration: 3 + Math.random() * 2,
+        }));
+
+        setParticles(generatedParticles);
+        setMounted(true);
+    }, []);
+
     return (
         <div className='fixed inset-0 pointer-events-none'>
             <div className='absolute inset-0 bg-gradient-to-br from-neutral-950 via-neutral-950 to-neutral-900' />
@@ -12,20 +39,22 @@ export function BackgroundEffects() {
                 className='absolute bottom-32 left-20 w-24 h-24 bg-blue-500/8 rounded-full blur-2xl animate-pulse'
                 style={{ animationDelay: '2s' }}
             />
-            <div className='absolute inset-0'>
-                {[...Array(12)].map((_, i) => (
-                    <div
-                        key={i}
-                        className='absolute w-1 h-1 bg-emerald-400/20 rounded-full animate-pulse'
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 4}s`,
-                            animationDuration: `${3 + Math.random() * 2}s`,
-                        }}
-                    />
-                ))}
-            </div>
+            {mounted && (
+                <div className='absolute inset-0'>
+                    {particles.map((particle) => (
+                        <div
+                            key={particle.id}
+                            className='absolute w-1 h-1 bg-emerald-400/20 rounded-full animate-pulse'
+                            style={{
+                                left: `${particle.left}%`,
+                                top: `${particle.top}%`,
+                                animationDelay: `${particle.animationDelay}s`,
+                                animationDuration: `${particle.animationDuration}s`,
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
             <div className='absolute inset-0 opacity-[0.08] animate-grid-flow bg-grid-pattern' />
             <div className='absolute inset-0 opacity-[0.04] animate-diagonal-flow bg-diagonal-pattern' />
             <div className='absolute w-96 h-96 rounded-full opacity-30 animate-floating-glow bg-glow-pattern' />
