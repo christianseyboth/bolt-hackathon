@@ -9,6 +9,8 @@ package = "@netlify/plugin-nextjs"
 [build.environment]
 NEXT_TELEMETRY_DISABLED = "1"
 SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL"
+# Uncomment the line below to skip Netlify Forms validation if needed
+# NETLIFY_NEXT_VERIFY_FORMS = "false"
 
 [functions]
 node_bundler = "esbuild"

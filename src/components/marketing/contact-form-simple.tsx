@@ -20,13 +20,12 @@ export const ContactFormSimple = () => {
     const [inquiryType, setInquiryType] = useState('');
     const { toast } = useToast();
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        // Don't prevent default - let Netlify handle it
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setIsSubmitting(true);
 
         // If inquiry type is not selected, prevent submission
         if (!inquiryType) {
-            e.preventDefault();
             toast({
                 variant: 'destructive',
                 title: 'Missing Information',
@@ -36,26 +35,53 @@ export const ContactFormSimple = () => {
             return;
         }
 
-        // Show submitting toast
-        toast({
-            title: 'Submitting your message...',
-            description: 'Please wait while we process your request.',
-        });
+        try {
+            // Show submitting toast
+            toast({
+                title: 'Submitting your message...',
+                description: 'Please wait while we process your request.',
+            });
 
-        // Let the form submit naturally to Netlify
+            const formData = new FormData(e.currentTarget);
+
+            // Submit to the static HTML file as required by Netlify plugin v5
+            const response = await fetch('/__forms.html', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData as any).toString(),
+            });
+
+            if (response.ok) {
+                toast({
+                    title: 'Message sent successfully!',
+                    description: "We'll get back to you within 24 hours.",
+                });
+
+                // Reset form
+                e.currentTarget.reset();
+                setInquiryType('');
+
+                // Optionally redirect to success page
+                setTimeout(() => {
+                    window.location.href = '/contact/success';
+                }, 2000);
+            } else {
+                throw new Error('Form submission failed');
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Error sending message',
+                description: 'Please try again or contact us directly.',
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <Container className='py-20 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-16 px-6'>
-            {/* Hidden static form for Netlify detection */}
-            <form name='contact' data-netlify='true' data-netlify-honeypot='bot-field' hidden>
-                <input type='text' name='name' />
-                <input type='email' name='email' />
-                <input type='text' name='company' />
-                <input type='text' name='subject' />
-                <textarea name='message'></textarea>
-            </form>
-
             {/* Left Side - Contact Info */}
             <div className='space-y-8'>
                 <div>
@@ -167,20 +193,11 @@ export const ContactFormSimple = () => {
 
                 <form
                     name='contact'
-                    method='POST'
-                    action='/contact/success'
                     onSubmit={handleSubmit}
                     className='w-full relative z-20 space-y-4'
                 >
                     <input type='hidden' name='form-name' value='contact' />
                     <input type='hidden' name='subject' value={inquiryType} />
-
-                    {/* Honeypot field */}
-                    <div style={{ display: 'none' }}>
-                        <label>
-                            Don't fill this out if you're human: <input name='bot-field' />
-                        </label>
-                    </div>
 
                     <div className='w-full'>
                         <label
