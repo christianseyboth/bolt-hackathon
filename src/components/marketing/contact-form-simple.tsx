@@ -75,7 +75,11 @@ export const ContactFormSimple = () => {
                     window.location.href = '/contact/success';
                 }, 2000);
             } else {
-                throw new Error('Form submission failed');
+                // Get detailed error message
+                const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                throw new Error(
+                    `${response.status}: ${errorData.error || 'Form submission failed'}`
+                );
             }
         } catch (error) {
             console.error('Form submission error:', error);
