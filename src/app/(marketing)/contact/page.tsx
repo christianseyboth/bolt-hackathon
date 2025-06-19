@@ -1,4 +1,4 @@
-import { ContactForm } from '@/components/marketing/contact-form';
+import { ContactFormSimple } from '@/components/marketing/contact-form-simple';
 import { FeatureIconContainer } from '@/components/features/feature-icon-container';
 import { Heading } from '@/components/heading';
 import { Subheading } from '@/components/subheading';
@@ -166,7 +166,7 @@ export default function ContactPage() {
 
                 {/* Contact Form */}
                 <section aria-label='Contact form'>
-                    <ContactForm />
+                    <ContactFormSimple />
                 </section>
 
                 {/* Response Time Guarantee */}

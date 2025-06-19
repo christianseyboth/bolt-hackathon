@@ -15,7 +15,7 @@ import {
 import { IconMailFilled, IconPhone, IconMapPin, IconClock } from '@tabler/icons-react';
 import { useToast } from '@/components/ui/use-toast';
 
-export const ContactForm = () => {
+export const ContactFormSimple = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [inquiryType, setInquiryType] = useState('');
     const { toast } = useToast();
@@ -37,94 +37,53 @@ export const ContactForm = () => {
 
         try {
             const form = e.target as HTMLFormElement;
+            const formData = new FormData(form);
 
-            // Create URLSearchParams directly from form elements
+            // Convert to URLSearchParams for the function
             const params = new URLSearchParams();
-
-            // Add required Netlify fields
             params.append('form-name', 'contact');
             params.append('subject', inquiryType);
+            params.append('name', formData.get('name') as string);
+            params.append('email', formData.get('email') as string);
+            params.append('company', (formData.get('company') as string) || '');
+            params.append('message', formData.get('message') as string);
+            params.append('bot-field', ''); // Honeypot
 
-            // Get form data from individual form elements
-            const formElements = form.elements as HTMLFormControlsCollection;
+            console.log('Submitting form data:', Object.fromEntries(params.entries()));
 
-            // Add name field
-            const nameField = formElements.namedItem('name') as HTMLInputElement;
-            if (nameField?.value) {
-                params.append('name', nameField.value);
+            // Submit to Netlify Function
+            const response = await fetch('/.netlify/functions/contact-form', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString(),
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                const responseText = await response.text();
+                console.error('Response body:', responseText);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // Add email field
-            const emailField = formElements.namedItem('email') as HTMLInputElement;
-            if (emailField?.value) {
-                params.append('email', emailField.value);
-            }
+            // Success!
+            toast({
+                variant: 'success',
+                title: 'Message Sent Successfully! 🎉',
+                description:
+                    "Thank you for contacting SecPilot. We'll get back to you within 24 hours.",
+            });
 
-            // Add company field
-            const companyField = formElements.namedItem('company') as HTMLInputElement;
-            if (companyField?.value) {
-                params.append('company', companyField.value);
-            }
-
-            // Add message field
-            const messageField = formElements.namedItem('message') as HTMLTextAreaElement;
-            if (messageField?.value) {
-                params.append('message', messageField.value);
-            }
-
-            // Add honeypot field (should be empty)
-            const botField = formElements.namedItem('bot-field') as HTMLInputElement;
-            params.append('bot-field', botField?.value || '');
-
-            console.log('Form submission data:', Object.fromEntries(params.entries()));
-
-            // Try Netlify Forms first, then fallback to function
-            const endpoints = ['/', '/.netlify/functions/contact-form'];
-            let lastError: Error | null = null;
-
-            for (const endpoint of endpoints) {
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: params.toString(),
-                    });
-
-                    console.log(`${endpoint} - Response status:`, response.status);
-
-                    if (response.ok) {
-                        // Success! Show toast and reset form
-                        toast({
-                            variant: 'success',
-                            title: 'Message Sent Successfully! 🎉',
-                            description:
-                                "Thank you for contacting SecPilot. We'll get back to you within 24 hours.",
-                        });
-
-                        form.reset();
-                        setInquiryType('');
-                        setIsSubmitting(false);
-                        return; // Exit early on success
-                    }
-
-                    // If this endpoint failed, try the next one
-                    const responseText = await response.text();
-                    console.error(`${endpoint} failed:`, responseText);
-                    lastError = new Error(`${endpoint}: ${response.status} - ${responseText}`);
-                } catch (error) {
-                    console.error(`${endpoint} error:`, error);
-                    lastError = error as Error;
-                }
-            }
-
-            // If we get here, all endpoints failed
-            throw lastError || new Error('All submission endpoints failed');
+            form.reset();
+            setInquiryType('');
+            setIsSubmitting(false);
         } catch (error) {
             console.error('Form submission error:', error);
             toast({
                 variant: 'destructive',
                 title: 'Submission Failed',
-                description: `There was an error submitting your message. Please try again or contact us directly at support@secpilot.io.`,
+                description:
+                    'There was an error submitting your message. Please try again or contact us directly at support@secpilot.io.',
             });
             setIsSubmitting(false);
         }
@@ -236,26 +195,7 @@ export const ContactForm = () => {
                     </p>
                 </div>
 
-                <form
-                    name='contact'
-                    method='POST'
-                    data-netlify='true'
-                    data-netlify-honeypot='bot-field'
-                    onSubmit={handleSubmit}
-                    className='w-full relative z-20 space-y-4'
-                >
-                    {/* Hidden fields for Netlify */}
-                    <input type='hidden' name='form-name' value='contact' />
-                    <input type='hidden' name='subject' value={inquiryType} />
-
-                    {/* Honeypot field - hidden from users */}
-                    <div className='hidden'>
-                        <label>
-                            Don&apos;t fill this out if you&apos;re human:
-                            <input name='bot-field' />
-                        </label>
-                    </div>
-
+                <form onSubmit={handleSubmit} className='w-full relative z-20 space-y-4'>
                     <div className='w-full'>
                         <label
                             className='text-neutral-300 text-sm font-medium mb-2 inline-block'
