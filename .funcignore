@@ -1,0 +1,47 @@
+# Exclude documentation and test files
+*.md
+*.txt
+test-*
+*.test.*
+*.spec.*
+
+# Exclude source maps and development files
+*.map
+*.d.ts
+
+# Exclude git and IDE files
+.git/
+.vscode/
+.idea/
+
+# Exclude build artifacts that aren't needed
+.next/
+node_modules/
+.env*
+!.env.local
+
+# Exclude other unnecessary files
+*.log
+*.lock
+yarn.lock
+package-lock.json
+
+# Exclude images and static assets
+public/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+
+# Exclude documentation
+docs/
+*.md
+README*
+
+# Exclude configuration files not needed for functions
+next.config.js
+tsconfig.json
+tailwind.config.js
+postcss.config.js

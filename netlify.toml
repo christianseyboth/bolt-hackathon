@@ -15,3 +15,14 @@ SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL
 [functions]
 node_bundler = "esbuild"
 external_node_modules = ["@supabase/ssr", "@supabase/supabase-js", "next"]
+
+[functions.send-scheduled-report]
+node_bundler = "esbuild"
+external_node_modules = [
+    "@supabase/ssr",
+    "@supabase/supabase-js",
+    "next",
+    "react",
+    "react-dom",
+]
+bundle_format = "iife"

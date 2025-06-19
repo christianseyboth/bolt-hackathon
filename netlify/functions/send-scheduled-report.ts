@@ -1,19 +1,3 @@
-// import type { Handler } from "@netlify/functions";git 
-
-interface ReportEmailData {
-  recipients: string[];
-  reportType: string;
-  reportDate: string;
-  frequency: string;
-  periodStart: string;
-  periodEnd: string;
-  emailsScanned: number;
-  threatsBlocked: number;
-  securityScore: number;
-  downloadUrl: string;
-  reportFormat: string;
-}
-
 const handler = async function(event: any) {
   if (event.body === null) {
     return {
@@ -23,7 +7,7 @@ const handler = async function(event: any) {
   }
 
   try {
-    const requestBody = JSON.parse(event.body) as ReportEmailData;
+    const requestBody = JSON.parse(event.body);
 
     // Validate required fields
     if (!requestBody.recipients || requestBody.recipients.length === 0) {
@@ -48,7 +32,7 @@ const handler = async function(event: any) {
     } = requestBody;
 
     // Send email to each recipient
-    const emailPromises = recipients.map(async (recipient) => {
+    const emailPromises = recipients.map(async (recipient: string) => {
       const response = await fetch(`${process.env.URL}/.netlify/functions/emails/scheduled-report`, {
         headers: {
           "netlify-emails-secret": process.env.NETLIFY_EMAILS_SECRET as string,
