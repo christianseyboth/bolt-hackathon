@@ -48,7 +48,79 @@ export async function POST(request: NextRequest) {
         }
 
         if (!currentSubscription.stripe_customer_id) {
-            return NextResponse.json({ error: 'No Stripe customer ID found' }, { status: 400 });
+            console.log('⚠️ No Stripe customer ID found, attempting to recover from email...');
+
+            // Get account details to find billing email
+            const { data: account, error: accountError } = await supabase
+                .from('accounts')
+                .select('billing_email, email')
+                .eq('id', accountId)
+                .single();
+
+            if (accountError || !account) {
+                console.error('❌ Could not get account details:', accountError);
+                return NextResponse.json({ error: 'Could not get account details' }, { status: 400 });
+            }
+
+            const searchEmail = account.billing_email || account.email;
+            if (!searchEmail) {
+                console.error('❌ No email found to search for customer');
+                return NextResponse.json({ error: 'No email found to search for customer' }, { status: 400 });
+            }
+
+            console.log('🔍 Searching for Stripe customer by email:', searchEmail);
+
+            // Search for customer by email in Stripe
+            try {
+                const customers = await stripe.customers.list({
+                    email: searchEmail,
+                    limit: 10,
+                });
+
+                console.log('📧 Found', customers.data.length, 'customers with email:', searchEmail);
+
+                if (customers.data.length === 0) {
+                    console.log('❌ No Stripe customer found with email:', searchEmail);
+                    return NextResponse.json({
+                        error: 'No Stripe customer found with this email address. Please contact support.',
+                        email: searchEmail
+                    }, { status: 404 });
+                }
+
+                // Use the most recent customer (or first one if there's only one)
+                const customer = customers.data[0];
+                console.log('✅ Found Stripe customer:', customer.id);
+
+                // Update the subscription record with the found customer ID
+                const { data: customerUpdateResult, error: customerUpdateError } = await supabase
+                    .from('subscriptions')
+                    .update({
+                        stripe_customer_id: customer.id,
+                        updated_at: new Date().toISOString(),
+                    })
+                    .eq('account_id', accountId)
+                    .select();
+
+                if (customerUpdateError) {
+                    console.error('❌ Failed to update customer ID:', customerUpdateError);
+                    return NextResponse.json({
+                        error: 'Failed to update customer ID in database',
+                        details: customerUpdateError.message
+                    }, { status: 500 });
+                }
+
+                console.log('✅ Successfully updated customer ID in subscription record');
+
+                // Update currentSubscription object so the rest of the function works
+                currentSubscription.stripe_customer_id = customer.id;
+
+            } catch (stripeError) {
+                console.error('❌ Error searching Stripe customers:', stripeError);
+                return NextResponse.json({
+                    error: 'Error searching for customer in Stripe',
+                    details: stripeError instanceof Error ? stripeError.message : 'Unknown error'
+                }, { status: 500 });
+            }
         }
 
         console.log('🔄 Syncing subscription status for account:', accountId);
