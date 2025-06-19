@@ -1,22 +1,15 @@
-import type { Handler } from "@netlify/functions";
+import { NextRequest, NextResponse } from 'next/server';
 
-const handler: Handler = async (event: any) => {
-  if (event.body === null) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Payload required" }),
-    };
-  }
-
+export async function POST(request: NextRequest) {
   try {
-    const requestBody = JSON.parse(event.body);
+    const requestBody = await request.json();
 
     // Validate required fields
     if (!requestBody.recipients || requestBody.recipients.length === 0) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Recipients array is required" }),
-      };
+      return NextResponse.json(
+        { error: "Recipients array is required" },
+        { status: 400 }
+      );
     }
 
     const {
@@ -134,33 +127,27 @@ SecPilot - AI-Powered Email Security`;
       }
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: `Successfully sent ${successful} emails, ${failed} failed`,
-        successful,
-        failed,
-        total: recipients.length,
-        results: results.map((result, index) => ({
-          recipient: recipients[index],
-          status: result.status === 'fulfilled' ? 'sent' : 'failed',
-          messageId: result.status === 'fulfilled' ? result.value.id : undefined,
-          error: result.status === 'rejected' ? result.reason.message : undefined
-        }))
-      }),
-    };
+    return NextResponse.json({
+      message: `Successfully sent ${successful} emails, ${failed} failed`,
+      successful,
+      failed,
+      total: recipients.length,
+      results: results.map((result, index) => ({
+        recipient: recipients[index],
+        status: result.status === 'fulfilled' ? 'sent' : 'failed',
+        messageId: result.status === 'fulfilled' ? result.value.id : undefined,
+        error: result.status === 'rejected' ? result.reason.message : undefined
+      }))
+    });
 
   } catch (error) {
     console.error('Error sending scheduled report emails:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
+    return NextResponse.json(
+      {
         error: "Failed to send report emails",
         details: error instanceof Error ? error.message : 'Unknown error'
-      }),
-    };
+      },
+      { status: 500 }
+    );
   }
-};
-
-export { handler };
-
+}
