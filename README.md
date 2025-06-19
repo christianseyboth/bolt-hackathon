@@ -1,16 +1,20 @@
 # SecPilot - AI-Powered Email Security Platform
 
-**🚨 DEPLOYMENT FIX REQUIRED:** Temporarily remove these environment variables from Netlify to fix
-bundle size:
+**📧 EMAIL CONFIGURATION:** The following environment variables are required for Mailgun email
+functionality:
 
--   `NETLIFY_EMAILS_DIRECTORY`
--   `NETLIFY_EMAILS_MAILGUN_DOMAIN`
--   `NETLIFY_EMAILS_MAILGUN_HOST_REGION`
--   `NETLIFY_EMAILS_PROVIDER`
--   `NETLIFY_EMAILS_PROVIDER_API_KEY`
--   `NETLIFY_EMAILS_SECRET`
+-   `MAILGUN_API_KEY` - Your Mailgun API key
+-   `MAILGUN_DOMAIN` - Your verified Mailgun domain (e.g., mg.secpilot.io)
+-   `MAILGUN_HOST_REGION` - Either 'us' or 'eu' depending on your Mailgun region
 
-Also disable the `@netlify/plugin-emails` plugin in Netlify UI under Site Settings > Functions.
+**Legacy Netlify email variables can be removed:**
+
+-   ~~`NETLIFY_EMAILS_DIRECTORY`~~ (no longer needed)
+-   ~~`NETLIFY_EMAILS_MAILGUN_DOMAIN`~~ (replaced with `MAILGUN_DOMAIN`)
+-   ~~`NETLIFY_EMAILS_MAILGUN_HOST_REGION`~~ (replaced with `MAILGUN_HOST_REGION`)
+-   ~~`NETLIFY_EMAILS_PROVIDER`~~ (no longer needed)
+-   ~~`NETLIFY_EMAILS_PROVIDER_API_KEY`~~ (replaced with `MAILGUN_API_KEY`)
+-   ~~`NETLIFY_EMAILS_SECRET`~~ (no longer needed)
 
 This is **SecPilot**, a modern, security-focused SaaS platform built with Next.js 15, React 18, and
 TailwindCSS 4. It leverages advanced AI agent workflows and n8n automation to scan, classify, and
@@ -81,4 +85,3 @@ SecPilot aims to provide robust email security by:
 -   **n8n**: To orchestrate automated workflows for email ingestion, triggering AI agents for
     analysis, and managing the email processing pipeline.
 -   **AI Agents**: Integrated for advanced email scanning, classification, and threat detection.
-
