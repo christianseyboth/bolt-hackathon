@@ -48,7 +48,7 @@ export const ContactFormSimple = () => {
     return (
         <Container className='py-20 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-16 px-6'>
             {/* Hidden static form for Netlify detection */}
-            <form name='contact' netlify netlify-honeypot='bot-field' hidden>
+            <form name='contact' data-netlify='true' data-netlify-honeypot='bot-field' hidden>
                 <input type='text' name='name' />
                 <input type='email' name='email' />
                 <input type='text' name='company' />
