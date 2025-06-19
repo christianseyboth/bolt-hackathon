@@ -7,10 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(request: NextRequest) {
-    console.log('🚀 SYNC API CALLED - Starting sync process...');
     try {
         const { accountId } = await request.json();
-        console.log('📝 Account ID received:', accountId);
 
         if (!accountId) {
             return NextResponse.json({ error: 'Account ID is required' }, { status: 400 });
@@ -50,17 +48,12 @@ export async function POST(request: NextRequest) {
         }
 
         if (!currentSubscription.stripe_customer_id) {
-            console.log('⚠️ No Stripe customer ID found, attempting to recover from email...');
-
             // Get account details to find billing email
-            console.log('🔍 Looking up account details for account ID:', accountId);
             const { data: accountDetails, error: accountDetailsError } = await supabase
                 .from('accounts')
                 .select('billing_email')
                 .eq('id', accountId)
                 .single();
-
-            console.log('📧 Account details result:', { accountDetails, accountDetailsError });
 
             if (accountDetailsError || !accountDetails) {
                 console.error('❌ Could not get account details:', accountDetailsError);
@@ -71,8 +64,6 @@ export async function POST(request: NextRequest) {
                     .select('*')
                     .eq('id', accountId)
                     .single();
-
-                console.log('🔍 Full account lookup:', { fullAccount, fullAccountError });
 
                 return NextResponse.json({
                     error: 'Could not get account details',
@@ -87,8 +78,6 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: 'No email found to search for customer' }, { status: 400 });
             }
 
-            console.log('🔍 Searching for Stripe customer by email:', searchEmail);
-
             // Search for customer by email in Stripe
             try {
                 const customers = await stripe.customers.list({
@@ -96,10 +85,7 @@ export async function POST(request: NextRequest) {
                     limit: 10,
                 });
 
-                console.log('📧 Found', customers.data.length, 'customers with email:', searchEmail);
-
                 if (customers.data.length === 0) {
-                    console.log('❌ No Stripe customer found with email:', searchEmail);
                     return NextResponse.json({
                         error: 'No Stripe customer found with this email address. Please contact support.',
                         email: searchEmail
@@ -108,7 +94,6 @@ export async function POST(request: NextRequest) {
 
                 // Use the most recent customer (or first one if there's only one)
                 const customer = customers.data[0];
-                console.log('✅ Found Stripe customer:', customer.id);
 
                 // Update the subscription record with the found customer ID
                 const { data: customerUpdateResult, error: customerUpdateError } = await supabase
@@ -128,8 +113,6 @@ export async function POST(request: NextRequest) {
                     }, { status: 500 });
                 }
 
-                console.log('✅ Successfully updated customer ID in subscription record');
-
                 // Update currentSubscription object so the rest of the function works
                 currentSubscription.stripe_customer_id = customer.id;
 
@@ -142,19 +125,14 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        console.log('🔄 Syncing subscription status for account:', accountId);
-
         // Fetch all subscriptions from Stripe for this customer
         const subscriptions = await stripe.subscriptions.list({
             customer: currentSubscription.stripe_customer_id,
             limit: 10,
         });
 
-        console.log('📊 Found', subscriptions.data.length, 'subscriptions in Stripe');
-
         if (subscriptions.data.length === 0) {
             // No subscriptions in Stripe - user should be on free plan
-            console.log('🆓 No subscriptions found, setting to Free plan');
 
             const { data: freeUpdateResult, error: freeUpdateError } = await supabase
                 .from('subscriptions')
@@ -322,15 +300,7 @@ export async function POST(request: NextRequest) {
             type_end: typeof latestSubscription.current_period_end,
         });
 
-        // Convert timestamps to readable dates for debugging
-        const debugDates = {
-            current_period_start: latestSubscription.current_period_start ? new Date(latestSubscription.current_period_start * 1000).toISOString() : null,
-            current_period_end: latestSubscription.current_period_end ? new Date(latestSubscription.current_period_end * 1000).toISOString() : null,
-            canceled_at: latestSubscription.canceled_at ? new Date(latestSubscription.canceled_at * 1000).toISOString() : null,
-            ended_at: latestSubscription.ended_at ? new Date(latestSubscription.ended_at * 1000).toISOString() : null,
-            cancel_at: latestSubscription.cancel_at ? new Date(latestSubscription.cancel_at * 1000).toISOString() : null,
-        };
-        console.log('🗓️ Stripe dates converted:', debugDates);
+
 
         // Safely convert timestamps with null checking
         const currentPeriodStart = latestSubscription.current_period_start
@@ -342,13 +312,9 @@ export async function POST(request: NextRequest) {
         if (latestSubscription.cancel_at_period_end && latestSubscription.cancel_at) {
             // Use cancel_at for cancelled subscriptions (when subscription actually ends)
             currentPeriodEnd = new Date(latestSubscription.cancel_at * 1000).toISOString();
-            console.log('✅ Using cancel_at for subscription end date:', currentPeriodEnd);
         } else if (latestSubscription.current_period_end) {
             // Use current_period_end for active subscriptions
             currentPeriodEnd = new Date(latestSubscription.current_period_end * 1000).toISOString();
-            console.log('✅ Using current_period_end for subscription end date:', currentPeriodEnd);
-        } else {
-            console.log('⚠️ No end date available from Stripe');
         }
 
                 // If we don't have a period end but subscription is set to cancel at period end,
@@ -509,19 +475,7 @@ export async function POST(request: NextRequest) {
             status: 'active',
             planName,
             stripeSubscriptionStatus: latestSubscription.status,
-            debug: {
-                originalEndDate: currentSubscription.current_period_end,
-                newEndDate: currentPeriodEnd,
-                subscriptionEndsAt: subscriptionEndsAt,
-                cancelAtPeriodEnd: latestSubscription.cancel_at_period_end,
-                stripeCurrentPeriodEnd: latestSubscription.current_period_end,
-                stripeCanceledAt: latestSubscription.canceled_at,
-                stripeCancelAt: latestSubscription.cancel_at,
-                stripeEndedAt: latestSubscription.ended_at,
-                convertedStripeDate: latestSubscription.current_period_end ? new Date(latestSubscription.current_period_end * 1000).toISOString() : null,
-                convertedCancelAt: latestSubscription.cancel_at ? new Date(latestSubscription.cancel_at * 1000).toISOString() : null,
-                convertedCanceledAt: latestSubscription.canceled_at ? new Date(latestSubscription.canceled_at * 1000).toISOString() : null
-            }
+
         });
 
     } catch (error) {

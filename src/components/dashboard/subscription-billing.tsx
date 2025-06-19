@@ -74,7 +74,6 @@ export function SubscriptionBilling({
                 setProductsLoading(true);
                 setProductsError(null);
 
-                console.log('🚀 Fetching products client-side...');
                 const response = await fetch('/api/stripe/products', {
                     cache: 'no-store',
                 });
@@ -83,7 +82,6 @@ export function SubscriptionBilling({
                     const data = await response.json();
                     const fetchedProducts = data.products || [];
                     setClientProducts(fetchedProducts);
-                    console.log('✅ Products fetched:', fetchedProducts.length, 'products');
                 } else {
                     const errorText = await response.text();
                     console.error('❌ Products API failed:', response.status, errorText);
@@ -326,8 +324,6 @@ export function SubscriptionBilling({
                 title: 'Billing info synced!',
                 description: 'Your company information has been updated in Stripe for invoices.',
             });
-
-            console.log('✅ Billing info synced:', data);
         } catch (error) {
             console.error('Error syncing billing info:', error);
             toast({
@@ -432,7 +428,6 @@ export function SubscriptionBilling({
     const handleManualRefresh = async () => {
         if (isAutoSyncing) return;
 
-        console.log('🔄 Manual refresh button clicked, account ID:', account.id);
         setIsAutoSyncing(true);
 
         try {
@@ -441,7 +436,6 @@ export function SubscriptionBilling({
                 description: 'Getting the latest information from Stripe.',
             });
 
-            console.log('📡 Calling sync API...');
             // Call the sync API instead of just reloading
             const response = await fetch('/api/stripe/sync-subscription-status', {
                 method: 'POST',
@@ -451,34 +445,23 @@ export function SubscriptionBilling({
                 body: JSON.stringify({ accountId: account.id }),
             });
 
-            console.log('📡 Sync API response status:', response.status);
-            console.log(
-                '📡 Sync API response headers:',
-                Object.fromEntries(response.headers.entries())
-            );
-
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const result = await response.json();
-            console.log('📡 Sync API result:', result);
 
             if (result.success) {
-                console.log('✅ Sync successful! Result:', result);
                 toast({
                     title: 'Sync successful!',
-                    description: `Updated to ${result.planName} plan. Refreshing in 5 seconds...`,
+                    description: `Updated to ${result.planName} plan. Refreshing page...`,
                 });
 
-                // Give more time to see the logs before reload
-                console.log('⏰ Page will reload in 5 seconds. Check server logs now!');
+                // Now reload the page to show updated data
                 setTimeout(() => {
-                    console.log('🔄 Reloading page now...');
                     window.location.reload();
-                }, 5000); // Increased from 1500ms to 5000ms
+                }, 1500);
             } else {
-                console.error('Manual sync failed:', result);
                 toast({
                     title: 'Sync failed',
                     description: result.error || 'Failed to sync subscription status.',
@@ -486,7 +469,6 @@ export function SubscriptionBilling({
                 });
             }
         } catch (error) {
-            console.error('Manual sync error:', error);
             toast({
                 title: 'Sync error',
                 description: 'Failed to sync subscription status.',
@@ -579,9 +561,6 @@ export function SubscriptionBilling({
                             </div>
 
                             {(() => {
-                                // Debug: Log all subscription data
-                                console.log('🔍 Full subscription data:', currentSubscription);
-
                                 const now = new Date();
                                 const isCancelledAtPeriodEnd =
                                     currentSubscription.cancel_at_period_end;
@@ -592,23 +571,6 @@ export function SubscriptionBilling({
                                     : new Date(currentSubscription.current_period_end);
 
                                 const isStillActive = terminationDate > now;
-
-                                console.log('🔍 Subscription status check:', {
-                                    isCancelledAtPeriodEnd,
-                                    subscription_ends_at: currentSubscription.subscription_ends_at,
-                                    current_period_end: currentSubscription.current_period_end,
-                                    terminationDateStr: terminationDate.toISOString(),
-                                    nowStr: now.toISOString(),
-                                    isStillActive,
-                                    daysDifference: Math.ceil(
-                                        (terminationDate.getTime() - now.getTime()) /
-                                            (1000 * 60 * 60 * 24)
-                                    ),
-                                    hasSubscriptionEndsAt:
-                                        !!currentSubscription.subscription_ends_at,
-                                    rawSubscriptionEndsAt: currentSubscription.subscription_ends_at,
-                                    dataType: typeof currentSubscription.subscription_ends_at,
-                                });
 
                                 if (isCancelledAtPeriodEnd && isStillActive) {
                                     // Subscription is cancelled but still active until termination date
@@ -859,26 +821,6 @@ export function SubscriptionBilling({
 
                                 const isStillActive = terminationDate > now;
 
-                                console.log('🔍 Button logic check:', {
-                                    isCancelledAtPeriodEnd,
-                                    subscription_ends_at: currentSubscription.subscription_ends_at,
-                                    current_period_end: currentSubscription.current_period_end,
-                                    terminationDateStr: terminationDate.toISOString(),
-                                    isStillActive,
-                                    source: currentSubscription.subscription_ends_at
-                                        ? 'subscription_ends_at'
-                                        : 'current_period_end',
-                                    nowTimestamp: now.getTime(),
-                                    terminationTimestamp: terminationDate.getTime(),
-                                    timeDiffMs: terminationDate.getTime() - now.getTime(),
-                                    buttonAction:
-                                        isCancelledAtPeriodEnd && isStillActive
-                                            ? 'reactivate'
-                                            : isCancelledAtPeriodEnd && !isStillActive
-                                            ? 'choose_new_plan'
-                                            : 'cancel',
-                                });
-
                                 if (isCancelledAtPeriodEnd && isStillActive) {
                                     // Show reactivate button for cancelled subscriptions that are still active
                                     return (
@@ -914,9 +856,6 @@ export function SubscriptionBilling({
 
                                                         // Add a small delay to show the success message
                                                         setTimeout(() => {
-                                                            console.log(
-                                                                '🔄 Reactivation success - refreshing page'
-                                                            );
                                                             window.location.reload();
                                                         }, 1500);
                                                     } else {
@@ -1070,19 +1009,7 @@ export function SubscriptionBilling({
                                 (p) => p.interval === (billingCycle === 'yearly' ? 'year' : 'month')
                             );
 
-                            console.log(
-                                `Found price for ${product.name}:`,
-                                price,
-                                'for billing cycle:',
-                                billingCycle
-                            );
-
                             if (!price) {
-                                console.log(
-                                    `No price found for ${product.name} with interval ${
-                                        billingCycle === 'yearly' ? 'year' : 'month'
-                                    }`
-                                );
                                 return null;
                             }
 
