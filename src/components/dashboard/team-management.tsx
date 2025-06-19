@@ -68,17 +68,6 @@ export function TeamManagement({
     const isOverLimit = currentMemberCount > maxTeamMembers;
     const excessMembers = isOverLimit ? currentMemberCount - maxTeamMembers : 0;
 
-    // Debug logging for subscription issues
-    console.log('TeamManagement Debug:', {
-        subscriptionId: subscription?.id,
-        subscriptionSeats: subscription?.seats,
-        maxTeamMembers,
-        currentMemberCount,
-        isOverLimit,
-        subscriptionStatus: subscription?.status,
-        subscriptionPlan: subscription?.plan_name,
-    });
-
     const { toast } = useToast();
     const router = useRouter();
 
@@ -337,7 +326,9 @@ export function TeamManagement({
                         <div className='flex justify-between items-center'>
                             <div className='text-sm font-medium'>Team Members</div>
                             <div
-                                className={`text-sm ${isOverLimit ? 'text-red-400 font-medium' : 'text-neutral-400'}`}
+                                className={`text-sm ${
+                                    isOverLimit ? 'text-red-400 font-medium' : 'text-neutral-400'
+                                }`}
                             >
                                 {currentMemberCount} of {maxTeamMembers}{' '}
                                 {isOverLimit ? '(Over Limit)' : 'used'}
@@ -363,6 +354,52 @@ export function TeamManagement({
                                 </div>
                             </div>
                         )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Important Information for Account Creators */}
+            <Card className='border-blue-800 bg-blue-950/20'>
+                <CardHeader className='pb-3'>
+                    <div className='flex items-start space-x-3'>
+                        <div className='bg-blue-900/50 p-2 rounded-md'>
+                            <IconExclamationMark className='h-5 w-5 text-blue-400' />
+                        </div>
+                        <div>
+                            <CardTitle className='text-blue-300 text-lg'>Important Note</CardTitle>
+                            <CardDescription className='text-blue-400/80 mt-1'>
+                                Account creators should also add themselves as team members
+                            </CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <div className='space-y-3 text-sm text-blue-300/90'>
+                        <p>
+                            <strong>Why?</strong> Your account email and the email you use to send
+                            emails for analysis can be different.
+                        </p>
+                        <div className='bg-blue-900/30 p-3 rounded-lg border border-blue-800/50'>
+                            <p className='text-blue-200'>
+                                <strong>Example:</strong> If your account is registered with{' '}
+                                <code className='bg-blue-800/50 px-1 rounded'>
+                                    admin@company.com
+                                </code>{' '}
+                                but you send emails from{' '}
+                                <code className='bg-blue-800/50 px-1 rounded'>
+                                    john@company.com
+                                </code>
+                                , you need to add{' '}
+                                <code className='bg-blue-800/50 px-1 rounded'>
+                                    john@company.com
+                                </code>{' '}
+                                as a team member for analysis to work.
+                            </p>
+                        </div>
+                        <p>
+                            This ensures all emails you forward for analysis are properly authorized
+                            and processed.
+                        </p>
                     </div>
                 </CardContent>
             </Card>
@@ -455,7 +492,9 @@ export function TeamManagement({
                     </CardTitle>
                     <CardDescription>
                         {isOverLimit
-                            ? `Remove ${excessMembers} member${excessMembers > 1 ? 's' : ''} to comply with your subscription`
+                            ? `Remove ${excessMembers} member${
+                                  excessMembers > 1 ? 's' : ''
+                              } to comply with your subscription`
                             : 'Manage your existing team members'}
                     </CardDescription>
                 </CardHeader>
@@ -495,8 +534,8 @@ export function TeamManagement({
                                                     isDisabled
                                                         ? 'bg-red-950/30 border-red-900/50'
                                                         : isExcessMember
-                                                          ? 'bg-red-950/20 border-red-900/30'
-                                                          : ''
+                                                        ? 'bg-red-950/20 border-red-900/30'
+                                                        : ''
                                                 }
                                             >
                                                 <TableCell className='font-medium'>
@@ -548,8 +587,8 @@ export function TeamManagement({
                                                             isDisabled
                                                                 ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
                                                                 : isExcessMember
-                                                                  ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
-                                                                  : 'text-red-400 hover:text-red-300 hover:bg-red-950/30'
+                                                                ? 'text-red-400 hover:text-red-300 hover:bg-red-950/30 ring-1 ring-red-700/50'
+                                                                : 'text-red-400 hover:text-red-300 hover:bg-red-950/30'
                                                         }`}
                                                         onClick={() => {
                                                             setMemberToDelete(member);

@@ -215,7 +215,7 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
 
                 <button
                     onClick={handleLogout}
-                    className='flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors w-full text-neutral-400 hover:text-white hover:bg-neutral-900'
+                    className='flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors w-full text-neutral-400 hover:text-white hover:bg-neutral-900 cursor-pointer'
                 >
                     <IconLogout className='h-5 w-5' />
                     <span>Logout</span>
@@ -252,8 +252,8 @@ function SidebarItem({
                 isActive
                     ? 'bg-neutral-900 text-white'
                     : isRestricted
-                      ? 'text-neutral-500 hover:text-neutral-400 cursor-not-allowed'
-                      : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
+                    ? 'text-neutral-500 hover:text-neutral-400 cursor-not-allowed'
+                    : 'text-neutral-400 hover:text-white hover:bg-neutral-900'
             )}
             data-tour={dataTour}
             onClick={() => {

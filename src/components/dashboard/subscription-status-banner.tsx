@@ -36,15 +36,18 @@ export function SubscriptionStatusBanner({
 
     // Check for pending subscription changes
     useEffect(() => {
-        checkPendingChanges();
-
+        // Disabled: API endpoint doesn't exist and causes 404 errors
+        // checkPendingChanges();
         // Check every 5 minutes for changes
-        const interval = setInterval(checkPendingChanges, 5 * 60 * 1000);
-
-        return () => clearInterval(interval);
+        // const interval = setInterval(checkPendingChanges, 5 * 60 * 1000);
+        // return () => clearInterval(interval);
     }, [accountId]);
 
     const checkPendingChanges = async () => {
+        // Disabled: This API endpoint doesn't exist and causes 404 errors
+        return;
+
+        /*
         try {
             setIsChecking(true);
 
@@ -81,9 +84,19 @@ export function SubscriptionStatusBanner({
         } finally {
             setIsChecking(false);
         }
+        */
     };
 
     const handleApplyImmediately = async () => {
+        // Disabled: This API endpoint doesn't exist and causes 404 errors
+        toast({
+            variant: 'destructive',
+            title: 'Feature unavailable',
+            description: 'This feature is currently disabled.',
+        });
+        return;
+
+        /*
         try {
             const response = await fetch('/api/debug/sync-advanced', {
                 method: 'POST',
@@ -122,6 +135,7 @@ export function SubscriptionStatusBanner({
                 description: 'Could not process the immediate upgrade.',
             });
         }
+        */
     };
 
     // Show pending changes banner (but not for free plans)

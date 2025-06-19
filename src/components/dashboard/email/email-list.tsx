@@ -127,7 +127,9 @@ export function EmailList({ emails }: any) {
                                 paginatedEmails.map((email: any) => (
                                     <tr
                                         key={email.id}
-                                        onClick={() => window.location.href = `emails/${email.id}`}
+                                        onClick={() =>
+                                            (window.location.href = `emails/${email.id}`)
+                                        }
                                         className='hover:bg-neutral-800/50 transition-colors cursor-pointer'
                                     >
                                         <td className='p-4'>
@@ -171,7 +173,7 @@ export function EmailList({ emails }: any) {
                                 <tr>
                                     <td colSpan={6}>
                                         <div className='px-4 py-8 text-center text-neutral-400'>
-                                            Keine Emails gefunden.
+                                            No Analysis Yet.
                                         </div>
                                     </td>
                                 </tr>
@@ -188,9 +190,12 @@ export function EmailList({ emails }: any) {
                         <div className='flex flex-col sm:flex-row justify-between items-center gap-4'>
                             <div className='text-sm text-neutral-400 text-center sm:text-left'>
                                 <span className='hidden sm:inline'>
-                                    Page <span className='font-medium text-neutral-300'>{page}</span> of{' '}
-                                    <span className='font-medium text-neutral-300'>{totalPages}</span> (
-                                    {totalResults} Emails)
+                                    Page{' '}
+                                    <span className='font-medium text-neutral-300'>{page}</span> of{' '}
+                                    <span className='font-medium text-neutral-300'>
+                                        {totalPages}
+                                    </span>{' '}
+                                    ({totalResults} Emails)
                                 </span>
                                 <span className='sm:hidden'>
                                     {page}/{totalPages} ({totalResults} emails)

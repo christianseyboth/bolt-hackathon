@@ -122,8 +122,7 @@
         font-style: normal;
         font-weight: 400;
         font-display: swap;
-        src:
-            local('Spinnaker'),
+        src: local('Spinnaker'),
             url('https://fonts.cdnfonts.com/s/15444/Spinnaker-Regular.woff') format('woff');
     }
 
@@ -147,8 +146,7 @@
 @layer utilities {
     /* Background patterns */
     .bg-grid-pattern {
-        background-image:
-            linear-gradient(rgba(16, 185, 129, 0.1) 2px, transparent 2px),
+        background-image: linear-gradient(rgba(16, 185, 129, 0.1) 2px, transparent 2px),
             linear-gradient(90deg, rgba(16, 185, 129, 0.1) 2px, transparent 2px);
         background-size: 50px 50px;
     }

@@ -36,14 +36,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const isNewAccount = accountCreatedAt > twentyFourHoursAgo;
 
-    console.log('Dashboard Layout - Account info:', {
-        accountId: account_data.id,
-        createdAt: account_data.created_at,
-        accountCreatedAt: accountCreatedAt.toISOString(),
-        twentyFourHoursAgo: twentyFourHoursAgo.toISOString(),
-        isNewAccount
-    });
-
     return (
         <AccountProvider accountId={account_data.id}>
             <div className='h-screen flex dark:bg-neutral-950'>

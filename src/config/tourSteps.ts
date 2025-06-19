@@ -17,8 +17,8 @@ export const tourSteps = [
         content: 'Add the email addresses that will be sending emails for analysis. This is crucial for monitoring threats from your team members.',
         placement: 'left',
         action: () => {
-            // Preserve tour state before navigation
-            localStorage.setItem('tour-current-step', '3');
+            // Preserve tour state before navigation (save NEXT step)
+            localStorage.setItem('proactiv-tour-step', '3');
             localStorage.setItem('tour-navigating', 'true');
             // Navigate to team page
             window.location.href = '/dashboard/team';
@@ -30,7 +30,7 @@ export const tourSteps = [
         content: 'Add email addresses of team members who will be sending emails for security analysis. Each email added here will be monitored for threats. Click Next to proceed to email forwarding setup.',
         placement: 'top',
         action: () => {
-            localStorage.setItem('tour-current-step', '4');
+            localStorage.setItem('proactiv-tour-step', '4');
             localStorage.setItem('tour-navigating', 'true');
             window.location.href = '/dashboard/profile?tab=email';
         }
@@ -48,7 +48,7 @@ export const tourSteps = [
         placement: 'bottom',
         action: () => {
             // Preserve tour state before navigation to emails page
-            localStorage.setItem('tour-current-step', '6');
+            localStorage.setItem('proactiv-tour-step', '6');
             localStorage.setItem('tour-navigating', 'true');
             // Navigate to emails page
             window.location.href = '/dashboard/emails';

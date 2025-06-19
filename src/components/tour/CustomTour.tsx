@@ -46,29 +46,80 @@ export const CustomTour = () => {
         const delay = isEmailForwardingStep ? 1500 : isNavigationStep ? 1000 : 300; // Extra long for email forwarding
 
         const findAndHighlightElement = (retryCount = 0) => {
-            const element = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
+            // For threat-alerts step, find the visible element specifically
+            const isThreatAlertsStep =
+                tourSteps[currentStep].target === '[data-tour="threat-alerts"]';
+            let element: HTMLElement | null = null;
 
-            // Element search retry
+            if (isThreatAlertsStep) {
+                // Find all elements with the data-tour attribute
+                const allElements = document.querySelectorAll(tourSteps[currentStep].target);
+                // Find the first visible one
+                for (const el of allElements) {
+                    const htmlEl = el as HTMLElement;
+                    if (htmlEl.offsetParent !== null) {
+                        element = htmlEl;
+                        break;
+                    }
+                }
+            } else {
+                element = document.querySelector(tourSteps[currentStep].target) as HTMLElement;
+            }
+
+            let hiddenParent: HTMLElement | null = null;
+
+            if (isThreatAlertsStep && !element) {
+                // Find the hidden parent container and temporarily show it
+                const headerContainer = document.querySelector(
+                    '[data-tour-header-actions="true"]'
+                ) as HTMLElement;
+                if (headerContainer) {
+                    hiddenParent = headerContainer;
+                    headerContainer.style.display = 'flex';
+                    headerContainer.classList.add('tour-forced-visible');
+
+                    // Wait a moment for the element to become visible, then re-check
+                    setTimeout(() => {
+                        const allElementsAfter = document.querySelectorAll(
+                            tourSteps[currentStep].target
+                        );
+                        for (const el of allElementsAfter) {
+                            const htmlEl = el as HTMLElement;
+                            if (htmlEl.offsetParent !== null) {
+                                element = htmlEl;
+                                break;
+                            }
+                        }
+                    }, 100);
+                }
+            }
+
+            const finalElement = element;
 
             // Only proceed if element exists and we're still mounted
-            if (element && isMounted && isHydrated) {
-                setTargetElement(element);
+            if (finalElement && isMounted && isHydrated) {
+                setTargetElement(finalElement);
+
+                // Store reference to hidden parent if we made it visible
+                if (hiddenParent) {
+                    (finalElement as any)._tourHiddenParent = hiddenParent;
+                }
 
                 // Apply highlight styles only on client after hydration
                 requestAnimationFrame(() => {
-                    if (element && isHydrated) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (finalElement && isHydrated) {
+                        finalElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                         // Use a more specific class-based approach instead of inline styles
-                        element.classList.add('tour-highlight');
+                        finalElement.classList.add('tour-highlight');
 
                         // Fallback to inline styles if needed
-                        if (!element.classList.contains('tour-highlight')) {
-                            element.style.position = 'relative';
-                            element.style.zIndex = '1001';
-                            element.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
-                            element.style.borderRadius = '8px';
-                            element.style.transition = 'all 0.3s ease';
+                        if (!finalElement.classList.contains('tour-highlight')) {
+                            finalElement.style.position = 'relative';
+                            finalElement.style.zIndex = '1001';
+                            finalElement.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+                            finalElement.style.borderRadius = '8px';
+                            finalElement.style.transition = 'all 0.3s ease';
                         }
                     }
                 });
@@ -93,6 +144,14 @@ export const CustomTour = () => {
                     targetElement.style.boxShadow = '';
                     targetElement.style.borderRadius = '';
                     targetElement.style.transition = '';
+
+                    // Restore hidden parent if it was temporarily shown
+                    const hiddenParent = (targetElement as any)._tourHiddenParent;
+                    if (hiddenParent) {
+                        hiddenParent.style.display = '';
+                        hiddenParent.classList.remove('tour-forced-visible');
+                        delete (targetElement as any)._tourHiddenParent;
+                    }
                 });
             }
         };
@@ -109,6 +168,15 @@ export const CustomTour = () => {
             targetElement.style.boxShadow = '';
             targetElement.style.borderRadius = '';
             targetElement.style.transition = '';
+
+            // Restore hidden parent if it was temporarily shown
+            const hiddenParent = (targetElement as any)._tourHiddenParent;
+            if (hiddenParent) {
+                hiddenParent.style.display = '';
+                hiddenParent.classList.remove('tour-forced-visible');
+                delete (targetElement as any)._tourHiddenParent;
+            }
+
             setTargetElement(null);
         }
 
@@ -134,6 +202,15 @@ export const CustomTour = () => {
             targetElement.style.boxShadow = '';
             targetElement.style.borderRadius = '';
             targetElement.style.transition = '';
+
+            // Restore hidden parent if it was temporarily shown
+            const hiddenParent = (targetElement as any)._tourHiddenParent;
+            if (hiddenParent) {
+                hiddenParent.style.display = '';
+                hiddenParent.classList.remove('tour-forced-visible');
+                delete (targetElement as any)._tourHiddenParent;
+            }
+
             setTargetElement(null);
         }
 
