@@ -337,9 +337,19 @@ export async function POST(request: NextRequest) {
             ? new Date(latestSubscription.current_period_start * 1000).toISOString()
             : new Date().toISOString();
 
-        let currentPeriodEnd = latestSubscription.current_period_end
-            ? new Date(latestSubscription.current_period_end * 1000).toISOString()
-            : null;
+        // For cancelled subscriptions, prefer cancel_at over current_period_end
+        let currentPeriodEnd = null;
+        if (latestSubscription.cancel_at_period_end && latestSubscription.cancel_at) {
+            // Use cancel_at for cancelled subscriptions (when subscription actually ends)
+            currentPeriodEnd = new Date(latestSubscription.cancel_at * 1000).toISOString();
+            console.log('✅ Using cancel_at for subscription end date:', currentPeriodEnd);
+        } else if (latestSubscription.current_period_end) {
+            // Use current_period_end for active subscriptions
+            currentPeriodEnd = new Date(latestSubscription.current_period_end * 1000).toISOString();
+            console.log('✅ Using current_period_end for subscription end date:', currentPeriodEnd);
+        } else {
+            console.log('⚠️ No end date available from Stripe');
+        }
 
                 // If we don't have a period end but subscription is set to cancel at period end,
         // this is a problematic state - we need to fix it
