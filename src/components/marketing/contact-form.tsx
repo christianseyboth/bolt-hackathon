@@ -13,10 +13,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { IconMailFilled, IconPhone, IconMapPin, IconClock } from '@tabler/icons-react';
+import { useToast } from '@/components/ui/use-toast';
 
 export const ContactForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [inquiryType, setInquiryType] = useState('');
+    const { toast } = useToast();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -24,7 +26,11 @@ export const ContactForm = () => {
 
         // If inquiry type is not selected, prevent submission
         if (!inquiryType) {
-            alert('Please select an inquiry type before submitting.');
+            toast({
+                variant: 'destructive',
+                title: 'Missing Information',
+                description: 'Please select an inquiry type before submitting.',
+            });
             setIsSubmitting(false);
             return;
         }
@@ -32,19 +38,53 @@ export const ContactForm = () => {
         const form = e.target as HTMLFormElement;
         const formData = new FormData(form);
 
+        // Ensure form-name is set correctly
+        formData.set('form-name', 'contact');
+
+        // Ensure subject is set from inquiryType state
+        formData.set('subject', inquiryType);
+
+        // Convert FormData to URLSearchParams for Netlify
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+            params.append(key, value.toString());
+        }
+
         // Submit to Netlify Forms
         fetch('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams(formData as any).toString(),
+            body: params.toString(),
         })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response;
+            })
             .then(() => {
-                // Redirect to success page on successful submission
-                window.location.href = '/contact/success';
+                // Show success toast
+                toast({
+                    variant: 'success',
+                    title: 'Message Sent Successfully! 🎉',
+                    description:
+                        "Thank you for contacting SecPilot. We'll get back to you within 24 hours.",
+                });
+
+                // Reset form
+                form.reset();
+                setInquiryType('');
+                setIsSubmitting(false);
             })
             .catch((error) => {
                 console.error('Form submission error:', error);
-                alert('There was an error submitting the form. Please try again.');
+                console.error('Form data sent:', Object.fromEntries(params.entries()));
+
+                toast({
+                    variant: 'destructive',
+                    title: 'Submission Failed',
+                    description: `There was an error submitting your message (${error.message}). Please try again or contact us directly at support@secpilot.io.`,
+                });
                 setIsSubmitting(false);
             });
     };
@@ -297,7 +337,7 @@ export const ContactForm = () => {
 
                     <Button
                         type='submit'
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !inquiryType}
                         variant='primary'
                         className='w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white border-0 h-11 transition-all duration-200'
                     >
