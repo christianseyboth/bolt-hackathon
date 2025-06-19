@@ -838,6 +838,35 @@ export function SubscriptionBilling({
                     <p className='text-zinc-400 text-lg max-w-2xl mx-auto'>
                         Select the plan that best fits your needs. Upgrade or downgrade at any time.
                     </p>
+
+                    {/* Billing Cycle Toggle */}
+                    <div className='flex items-center justify-center mt-6'>
+                        <div className='bg-neutral-800 p-1 rounded-lg border border-neutral-700'>
+                            <button
+                                onClick={() => setBillingCycle('monthly')}
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                                    billingCycle === 'monthly'
+                                        ? 'bg-white text-black'
+                                        : 'text-neutral-400 hover:text-white'
+                                }`}
+                            >
+                                Monthly
+                            </button>
+                            <button
+                                onClick={() => setBillingCycle('yearly')}
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                                    billingCycle === 'yearly'
+                                        ? 'bg-white text-black'
+                                        : 'text-neutral-400 hover:text-white'
+                                }`}
+                            >
+                                Yearly
+                                <span className='ml-1 text-xs text-emerald-500 font-bold'>
+                                    Save 20%
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6' id='available-plans'>
@@ -857,7 +886,9 @@ export function SubscriptionBilling({
 
                         if (!price) {
                             console.log(
-                                `No price found for ${product.name} with interval ${billingCycle === 'yearly' ? 'year' : 'month'}`
+                                `No price found for ${product.name} with interval ${
+                                    billingCycle === 'yearly' ? 'year' : 'month'
+                                }`
                             );
                             return null;
                         }
@@ -873,8 +904,8 @@ export function SubscriptionBilling({
                                     isCurrentPlan
                                         ? 'border-amber-500 bg-amber-500/5'
                                         : isPopular
-                                          ? 'border-blue-500 bg-blue-500/5'
-                                          : 'border-neutral-800 bg-neutral-900/50'
+                                        ? 'border-blue-500 bg-blue-500/5'
+                                        : 'border-neutral-800 bg-neutral-900/50'
                                 }`}
                             >
                                 {isPopular && !isCurrentPlan && (
