@@ -1,4 +1,4 @@
-git const handler = async function(event: any) {
+const handler = async function(event: any) {
   if (event.body === null) {
     return {
       statusCode: 400,
