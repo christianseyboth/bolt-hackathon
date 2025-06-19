@@ -26,10 +26,7 @@ export const ContactForm = () => {
             const form = e.target as HTMLFormElement;
             const formData = new FormData(form);
 
-            // Add the inquiry type to the form data since it's controlled by React state
-            formData.set('subject', inquiryType);
-
-            const response = await fetch('/contact-form.html', {
+            const response = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(formData as any).toString(),
@@ -161,6 +158,7 @@ export const ContactForm = () => {
                 >
                     {/* Hidden fields for Netlify */}
                     <input type='hidden' name='form-name' value='contact' />
+                    <input type='hidden' name='subject' value={inquiryType} />
 
                     {/* Honeypot field - hidden from users */}
                     <div className='hidden'>
