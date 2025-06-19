@@ -7,8 +7,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(request: NextRequest) {
+    console.log('🚀 SYNC API CALLED - Starting sync process...');
     try {
         const { accountId } = await request.json();
+        console.log('📝 Account ID received:', accountId);
 
         if (!accountId) {
             return NextResponse.json({ error: 'Account ID is required' }, { status: 400 });
@@ -495,6 +497,14 @@ export async function POST(request: NextRequest) {
             status: 'active',
             planName,
             stripeSubscriptionStatus: latestSubscription.status,
+            debug: {
+                originalEndDate: currentSubscription.current_period_end,
+                newEndDate: currentPeriodEnd,
+                subscriptionEndsAt: subscriptionEndsAt,
+                cancelAtPeriodEnd: latestSubscription.cancel_at_period_end,
+                stripeCurrentPeriodEnd: latestSubscription.current_period_end,
+                convertedStripeDate: latestSubscription.current_period_end ? new Date(latestSubscription.current_period_end * 1000).toISOString() : null
+            }
         });
 
     } catch (error) {

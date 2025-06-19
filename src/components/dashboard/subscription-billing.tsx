@@ -432,6 +432,7 @@ export function SubscriptionBilling({
     const handleManualRefresh = async () => {
         if (isAutoSyncing) return;
 
+        console.log('🔄 Manual refresh button clicked, account ID:', account.id);
         setIsAutoSyncing(true);
 
         try {
@@ -440,6 +441,7 @@ export function SubscriptionBilling({
                 description: 'Getting the latest information from Stripe.',
             });
 
+            console.log('📡 Calling sync API...');
             // Call the sync API instead of just reloading
             const response = await fetch('/api/stripe/sync-subscription-status', {
                 method: 'POST',
@@ -449,18 +451,32 @@ export function SubscriptionBilling({
                 body: JSON.stringify({ accountId: account.id }),
             });
 
+            console.log('📡 Sync API response status:', response.status);
+            console.log(
+                '📡 Sync API response headers:',
+                Object.fromEntries(response.headers.entries())
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
             const result = await response.json();
+            console.log('📡 Sync API result:', result);
 
             if (result.success) {
+                console.log('✅ Sync successful! Result:', result);
                 toast({
                     title: 'Sync successful!',
-                    description: `Updated to ${result.planName} plan. Refreshing page...`,
+                    description: `Updated to ${result.planName} plan. Refreshing in 5 seconds...`,
                 });
 
-                // Now reload the page to show updated data
+                // Give more time to see the logs before reload
+                console.log('⏰ Page will reload in 5 seconds. Check server logs now!');
                 setTimeout(() => {
+                    console.log('🔄 Reloading page now...');
                     window.location.reload();
-                }, 1500);
+                }, 5000); // Increased from 1500ms to 5000ms
             } else {
                 console.error('Manual sync failed:', result);
                 toast({
