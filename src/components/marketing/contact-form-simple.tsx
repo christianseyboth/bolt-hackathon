@@ -44,15 +44,17 @@ export const ContactFormSimple = () => {
 
             const formData = new FormData(e.currentTarget);
 
-            // Ensure form-name is included
-            formData.set('form-name', 'contact');
-            formData.set('subject', inquiryType);
-
-            // Submit to the static HTML file as required by Netlify plugin v5
-            const response = await fetch('/__forms.html', {
+            // Submit to API route instead of Netlify Forms
+            const response = await fetch('/api/contact', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(formData as any).toString(),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    company: formData.get('company'),
+                    subject: inquiryType,
+                    message: formData.get('message'),
+                }),
             });
 
             if (response.ok) {
@@ -203,16 +205,6 @@ export const ContactFormSimple = () => {
                     onSubmit={handleSubmit}
                     className='w-full relative z-20 space-y-4'
                 >
-                    <input type='hidden' name='form-name' value='contact' />
-                    <input type='hidden' name='subject' value={inquiryType} />
-
-                    {/* Honeypot field - hidden from users */}
-                    <div style={{ display: 'none' }}>
-                        <label>
-                            Don't fill this out if you're human: <input name='bot-field' />
-                        </label>
-                    </div>
-
                     <div className='w-full'>
                         <label
                             className='text-neutral-300 text-sm font-medium mb-2 inline-block'
