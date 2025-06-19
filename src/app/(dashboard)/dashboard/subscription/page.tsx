@@ -38,10 +38,6 @@ export default async function SettingsPage() {
             .select('id, owner_id, billing_email, created_at')
             .eq('owner_id', user.id);
 
-        console.log('🔍 All accounts for user:', allAccounts);
-        console.log('🔍 User ID:', user.id);
-        console.log('🔍 User email:', user.email);
-
         // Try to find account by email as fallback
         const { data: accountByEmail, error: emailError } = await supabase
             .from('accounts')
@@ -87,16 +83,6 @@ export default async function SettingsPage() {
         autoSyncReason = 'Subscription missing Stripe customer ID';
     }
 
-    // Debug logging for auto-sync decision
-    console.log('🔍 Auto-sync check:', {
-        shouldAutoSync,
-        autoSyncReason,
-        currentSubscriptionStatus: currentSubscription?.subscription_status,
-        currentSubscriptionPlan: currentSubscription?.plan_name,
-        accountPlan: 'deprecated', // account.plan is deprecated, use currentSubscription.plan_name
-        subscriptionUpdatedAt: currentSubscription?.updated_at,
-    });
-
     // Fetch Stripe products
     let products = [];
     let usingMockData = false;
@@ -105,7 +91,7 @@ export default async function SettingsPage() {
         const baseUrl =
             process.env.NEXT_PUBLIC_SITE_URL ||
             (process.env.NODE_ENV === 'production'
-                ? `https://${process.env.VERCEL_URL}`
+                ? 'https://secpilot.io'
                 : 'http://localhost:3000');
 
         console.log('Fetching products from:', `${baseUrl}/api/stripe/products`);
@@ -122,7 +108,9 @@ export default async function SettingsPage() {
             console.log('Products fetched from Stripe:', products.length, 'products');
             console.log('Product data structure:', JSON.stringify(products, null, 2));
         } else {
+            const errorText = await response.text();
             console.error('Failed to fetch products, status:', response.status);
+            console.error('Error response:', errorText);
             usingMockData = true;
         }
     } catch (error) {
@@ -224,4 +212,3 @@ export default async function SettingsPage() {
         </>
     );
 }
-

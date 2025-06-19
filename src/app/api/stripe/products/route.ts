@@ -7,14 +7,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function GET() {
     try {
+        console.log('🚀 Fetching products from Stripe API...');
+        console.log('🔑 Using Stripe secret key:', process.env.STRIPE_SECRET_KEY ? 'SET' : 'NOT SET');
+
         // Fetch products with prices
         const { data: products } = await stripe.products.list({
             active: true,
             expand: ['data.default_price'],
         });
 
-        console.log('Raw products from Stripe:', products.length);
-        console.log('Products:', products.map(p => ({ id: p.id, name: p.name })));
+        console.log('✅ Raw products from Stripe:', products.length);
+        console.log('📋 Products:', products.map(p => ({ id: p.id, name: p.name })));
 
         // Fetch all prices for products
         const { data: prices } = await stripe.prices.list({
@@ -62,9 +65,17 @@ export async function GET() {
 
         return NextResponse.json({ products: productsWithPrices });
     } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('❌ Error fetching products:', error);
+        console.error('❌ Error details:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined,
+            type: error?.constructor?.name
+        });
         return NextResponse.json(
-            { error: 'Failed to fetch products' },
+            {
+                error: 'Failed to fetch products',
+                details: error instanceof Error ? error.message : 'Unknown error'
+            },
             { status: 500 }
         );
     }
