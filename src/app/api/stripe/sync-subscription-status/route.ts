@@ -327,6 +327,8 @@ export async function POST(request: NextRequest) {
             current_period_start: latestSubscription.current_period_start ? new Date(latestSubscription.current_period_start * 1000).toISOString() : null,
             current_period_end: latestSubscription.current_period_end ? new Date(latestSubscription.current_period_end * 1000).toISOString() : null,
             canceled_at: latestSubscription.canceled_at ? new Date(latestSubscription.canceled_at * 1000).toISOString() : null,
+            ended_at: latestSubscription.ended_at ? new Date(latestSubscription.ended_at * 1000).toISOString() : null,
+            cancel_at: latestSubscription.cancel_at ? new Date(latestSubscription.cancel_at * 1000).toISOString() : null,
         };
         console.log('🗓️ Stripe dates converted:', debugDates);
 
@@ -503,7 +505,12 @@ export async function POST(request: NextRequest) {
                 subscriptionEndsAt: subscriptionEndsAt,
                 cancelAtPeriodEnd: latestSubscription.cancel_at_period_end,
                 stripeCurrentPeriodEnd: latestSubscription.current_period_end,
-                convertedStripeDate: latestSubscription.current_period_end ? new Date(latestSubscription.current_period_end * 1000).toISOString() : null
+                stripeCanceledAt: latestSubscription.canceled_at,
+                stripeCancelAt: latestSubscription.cancel_at,
+                stripeEndedAt: latestSubscription.ended_at,
+                convertedStripeDate: latestSubscription.current_period_end ? new Date(latestSubscription.current_period_end * 1000).toISOString() : null,
+                convertedCancelAt: latestSubscription.cancel_at ? new Date(latestSubscription.cancel_at * 1000).toISOString() : null,
+                convertedCanceledAt: latestSubscription.canceled_at ? new Date(latestSubscription.canceled_at * 1000).toISOString() : null
             }
         });
 
