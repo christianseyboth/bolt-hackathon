@@ -7,6 +7,7 @@ export function middleware(request: NextRequest) {
   // Skip middleware for API routes, static files, _next, and dashboard routes
   if (
     pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/') ||
     pathname.startsWith('/auth') ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/register') ||
