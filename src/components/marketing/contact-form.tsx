@@ -18,31 +18,35 @@ export const ContactForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [inquiryType, setInquiryType] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        try {
-            const form = e.target as HTMLFormElement;
-            const formData = new FormData(form);
-
-            const response = await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(formData as any).toString(),
-            });
-
-            if (response.ok) {
-                // Redirect to success page
-                window.location.href = '/contact/success';
-            } else {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        } catch (error) {
-            console.error('Form submission error:', error);
-            alert('There was an error submitting the form. Please try again.');
+        // If inquiry type is not selected, prevent submission
+        if (!inquiryType) {
+            alert('Please select an inquiry type before submitting.');
             setIsSubmitting(false);
+            return;
         }
+
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+
+        // Submit to Netlify Forms
+        fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(formData as any).toString(),
+        })
+            .then(() => {
+                // Redirect to success page on successful submission
+                window.location.href = '/contact/success';
+            })
+            .catch((error) => {
+                console.error('Form submission error:', error);
+                alert('There was an error submitting the form. Please try again.');
+                setIsSubmitting(false);
+            });
     };
 
     return (
@@ -153,6 +157,9 @@ export const ContactForm = () => {
 
                 <form
                     name='contact'
+                    method='POST'
+                    data-netlify='true'
+                    data-netlify-honeypot='bot-field'
                     onSubmit={handleSubmit}
                     className='w-full relative z-20 space-y-4'
                 >

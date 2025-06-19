@@ -60,14 +60,12 @@ export default function ContactSuccessPage() {
 
                     {/* Action buttons */}
                     <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-                        <Button asChild variant='primary'>
-                            <Link href='/'>
-                                <IconArrowLeft className='w-4 h-4 mr-2' />
-                                Return to Homepage
-                            </Link>
+                        <Button as={Link} href='/' variant='primary'>
+                            <IconArrowLeft className='w-4 h-4 mr-2' />
+                            Return to Home
                         </Button>
-                        <Button asChild variant='outline'>
-                            <Link href='/dashboard'>Go to Dashboard</Link>
+                        <Button as={Link} href='/dashboard' variant='outline'>
+                            Go to Dashboard
                         </Button>
                     </div>
 
