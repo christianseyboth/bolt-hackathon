@@ -16,75 +16,46 @@ import { IconMailFilled, IconPhone, IconMapPin, IconClock } from '@tabler/icons-
 import { useToast } from '@/components/ui/use-toast';
 
 export const ContactFormSimple = () => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [inquiryType, setInquiryType] = useState('');
     const { toast } = useToast();
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+        // Don't prevent default - let Netlify handle it
+        setIsSubmitting(true);
 
-        // If inquiry type is not selected, show error
+        // If inquiry type is not selected, prevent submission
         if (!inquiryType) {
+            e.preventDefault();
             toast({
                 variant: 'destructive',
                 title: 'Missing Information',
                 description: 'Please select an inquiry type before submitting.',
             });
+            setIsSubmitting(false);
             return;
         }
 
-        const form = e.target as HTMLFormElement;
-        const formData = new FormData(form);
-
-        // Get form values
-        const name = formData.get('name') as string;
-        const email = formData.get('email') as string;
-        const company = formData.get('company') as string;
-        const message = formData.get('message') as string;
-
-        // Validate required fields
-        if (!name || !email || !message) {
-            toast({
-                variant: 'destructive',
-                title: 'Missing Information',
-                description: 'Please fill in all required fields.',
-            });
-            return;
-        }
-
-        // Create mailto link
-        const subject = `SecPilot Contact: ${
-            inquiryType.charAt(0).toUpperCase() + inquiryType.slice(1)
-        } Inquiry`;
-        const body = `Name: ${name}
-Email: ${email}
-Company: ${company || 'Not provided'}
-Inquiry Type: ${inquiryType}
-
-Message:
-${message}`;
-
-        const mailtoLink = `mailto:support@secpilot.io?subject=${encodeURIComponent(
-            subject
-        )}&body=${encodeURIComponent(body)}`;
-
-        // Open email client
-        window.location.href = mailtoLink;
-
-        // Show success message
+        // Show submitting toast
         toast({
-            variant: 'success',
-            title: 'Email Client Opened! 📧',
-            description:
-                'Your email client should open with a pre-filled message. Just click send!',
+            title: 'Submitting your message...',
+            description: 'Please wait while we process your request.',
         });
 
-        // Reset form
-        form.reset();
-        setInquiryType('');
+        // Let the form submit naturally to Netlify
     };
 
     return (
         <Container className='py-20 md:py-32 grid grid-cols-1 lg:grid-cols-2 gap-16 px-6'>
+            {/* Hidden static form for Netlify detection */}
+            <form name='contact' netlify netlify-honeypot='bot-field' hidden>
+                <input type='text' name='name' />
+                <input type='email' name='email' />
+                <input type='text' name='company' />
+                <input type='text' name='subject' />
+                <textarea name='message'></textarea>
+            </form>
+
             {/* Left Side - Contact Info */}
             <div className='space-y-8'>
                 <div>
@@ -189,12 +160,28 @@ ${message}`;
                 <div className='w-full relative z-20'>
                     <h3 className='text-lg font-semibold text-white mb-2'>Send us a message</h3>
                     <p className='text-sm text-neutral-400 mb-6'>
-                        Fill out the form below and we&apos;ll open your email client with a
-                        pre-filled message. Just click send!
+                        Tell us about your email security needs and we&apos;ll get back to you
+                        within 24 hours.
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className='w-full relative z-20 space-y-4'>
+                <form
+                    name='contact'
+                    method='POST'
+                    action='/contact/success'
+                    onSubmit={handleSubmit}
+                    className='w-full relative z-20 space-y-4'
+                >
+                    <input type='hidden' name='form-name' value='contact' />
+                    <input type='hidden' name='subject' value={inquiryType} />
+
+                    {/* Honeypot field */}
+                    <div style={{ display: 'none' }}>
+                        <label>
+                            Don't fill this out if you're human: <input name='bot-field' />
+                        </label>
+                    </div>
+
                     <div className='w-full'>
                         <label
                             className='text-neutral-300 text-sm font-medium mb-2 inline-block'
@@ -248,7 +235,7 @@ ${message}`;
                     <div className='w-full'>
                         <label
                             className='text-neutral-300 text-sm font-medium mb-2 inline-block'
-                            htmlFor='subject'
+                            htmlFor='subject-select'
                         >
                             Inquiry Type *
                         </label>
@@ -317,17 +304,17 @@ ${message}`;
 
                     <Button
                         type='submit'
-                        disabled={!inquiryType}
+                        disabled={isSubmitting || !inquiryType}
                         variant='primary'
                         className='w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white border-0 h-11 transition-all duration-200'
                     >
-                        Open Email Client
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                 </form>
 
                 <p className='text-xs text-neutral-500 text-center w-full relative z-20'>
-                    This will open your default email client with a pre-filled message to
-                    support@secpilot.io
+                    By submitting this form, you agree to our privacy policy. We&apos;ll only use
+                    your information to respond to your inquiry.
                 </p>
             </div>
         </Container>
