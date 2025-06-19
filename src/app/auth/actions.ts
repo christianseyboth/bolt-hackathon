@@ -149,15 +149,27 @@ export async function updatePassword(formData: FormData) {
 
 // Signout
 export async function signOut() {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signOut()
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signOut({
+      scope: 'global' // Sign out from all sessions
+    });
 
-  if (error) {
-    return { error: error.message };
+    if (error) {
+      console.error('Signout error:', error);
+      return { error: error.message };
+    }
+
+    // Clear cache and revalidate
+    revalidatePath('/', 'layout');
+
+    // Redirect to home page
+    redirect('/');
+  } catch (error) {
+    console.error('Signout exception:', error);
+    // Even if there's an error, try to redirect
+    redirect('/');
   }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
 }
 
 // MFA Verification

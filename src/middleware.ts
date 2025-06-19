@@ -10,7 +10,10 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
     pathname.includes('.') ||
-    pathname.startsWith('/favicon')
+    pathname.startsWith('/favicon') ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    pathname === '/manifest.json'
   ) {
     return NextResponse.next()
   }
@@ -47,6 +50,6 @@ export const config = {
     /*
      * Match all request paths except API and static files
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*|manifest.json|robots.txt|sitemap.xml).*)',
   ],
 }
