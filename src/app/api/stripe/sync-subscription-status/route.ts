@@ -51,18 +51,35 @@ export async function POST(request: NextRequest) {
             console.log('⚠️ No Stripe customer ID found, attempting to recover from email...');
 
             // Get account details to find billing email
-            const { data: account, error: accountError } = await supabase
+            console.log('🔍 Looking up account details for account ID:', accountId);
+            const { data: accountDetails, error: accountDetailsError } = await supabase
                 .from('accounts')
-                .select('billing_email, email')
+                .select('billing_email')
                 .eq('id', accountId)
                 .single();
 
-            if (accountError || !account) {
-                console.error('❌ Could not get account details:', accountError);
-                return NextResponse.json({ error: 'Could not get account details' }, { status: 400 });
+            console.log('📧 Account details result:', { accountDetails, accountDetailsError });
+
+            if (accountDetailsError || !accountDetails) {
+                console.error('❌ Could not get account details:', accountDetailsError);
+
+                // Try to get the account with all fields to see what's available
+                const { data: fullAccount, error: fullAccountError } = await supabase
+                    .from('accounts')
+                    .select('*')
+                    .eq('id', accountId)
+                    .single();
+
+                console.log('🔍 Full account lookup:', { fullAccount, fullAccountError });
+
+                return NextResponse.json({
+                    error: 'Could not get account details',
+                    accountId,
+                    details: accountDetailsError?.message
+                }, { status: 400 });
             }
 
-            const searchEmail = account.billing_email || account.email;
+            const searchEmail = accountDetails.billing_email;
             if (!searchEmail) {
                 console.error('❌ No email found to search for customer');
                 return NextResponse.json({ error: 'No email found to search for customer' }, { status: 400 });
@@ -203,7 +220,9 @@ export async function POST(request: NextRequest) {
         } else if (latestSubscription.cancel_at_period_end) {
             // Check if the subscription has actually ended
             const now = new Date();
-            const endDate = new Date(latestSubscription.current_period_end * 1000);
+            const endDate = latestSubscription.current_period_end
+                ? new Date(latestSubscription.current_period_end * 1000)
+                : new Date();
 
             if (endDate <= now) {
                 shouldBeFreePlan = true;
@@ -283,6 +302,27 @@ export async function POST(request: NextRequest) {
 
         // Update subscription in database with all current Stripe data
         console.log('🔄 Updating subscription in database with Stripe data...');
+        console.log('🔍 Raw Stripe timestamps:', {
+            current_period_start: latestSubscription.current_period_start,
+            current_period_end: latestSubscription.current_period_end,
+            type_start: typeof latestSubscription.current_period_start,
+            type_end: typeof latestSubscription.current_period_end,
+        });
+
+        // Safely convert timestamps with null checking
+        const currentPeriodStart = latestSubscription.current_period_start
+            ? new Date(latestSubscription.current_period_start * 1000).toISOString()
+            : new Date().toISOString();
+
+        const currentPeriodEnd = latestSubscription.current_period_end
+            ? new Date(latestSubscription.current_period_end * 1000).toISOString()
+            : null;
+
+        console.log('🔍 Converted timestamps:', {
+            currentPeriodStart,
+            currentPeriodEnd,
+        });
+
         const { data: syncUpdateResult, error: syncUpdateError } = await supabase
             .from('subscriptions')
             .update({
@@ -291,8 +331,8 @@ export async function POST(request: NextRequest) {
                 stripe_subscription_id: latestSubscription.id,
                 stripe_customer_id: currentSubscription.stripe_customer_id, // Ensure customer ID is maintained
                 cancel_at_period_end: latestSubscription.cancel_at_period_end,
-                current_period_start: new Date(latestSubscription.current_period_start * 1000).toISOString(),
-                current_period_end: new Date(latestSubscription.current_period_end * 1000).toISOString(),
+                current_period_start: currentPeriodStart,
+                current_period_end: currentPeriodEnd,
                 seats: getSeatsFromPlan(planName),
                 price_per_seat: latestSubscription.items.data[0]?.price.unit_amount ? latestSubscription.items.data[0].price.unit_amount / 100 : 0,
                 total_price: latestSubscription.items.data[0]?.price.unit_amount ? latestSubscription.items.data[0].price.unit_amount / 100 : 0,
