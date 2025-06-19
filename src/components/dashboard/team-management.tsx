@@ -112,7 +112,7 @@ export function TeamManagement({
                     description: 'Fetching latest subscription data from Stripe.',
                 });
 
-                const response = await fetch('/api/debug/sync-subscription', {
+                const response = await fetch('/api/stripe/sync-subscription-status', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

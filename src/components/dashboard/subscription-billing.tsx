@@ -255,7 +255,7 @@ export function SubscriptionBilling({
             // If subscription has no stripe_customer_id, use the after-checkout sync
             const syncEndpoint = !currentSubscription?.stripe_customer_id
                 ? '/api/stripe/sync-after-checkout'
-                : '/api/debug/sync-subscription';
+                : '/api/stripe/sync-subscription-status';
 
             const response = await fetch(syncEndpoint, {
                 method: 'POST',
