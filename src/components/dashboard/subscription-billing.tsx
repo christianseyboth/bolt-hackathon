@@ -563,14 +563,39 @@ export function SubscriptionBilling({
                             </div>
 
                             {(() => {
+                                // Debug: Log all subscription data
+                                console.log('🔍 Full subscription data:', currentSubscription);
+
                                 const now = new Date();
-                                const endDate = new Date(currentSubscription.current_period_end);
-                                const isStillActive = endDate > now;
                                 const isCancelledAtPeriodEnd =
                                     currentSubscription.cancel_at_period_end;
 
+                                // Use subscription_ends_at if available, fallback to current_period_end
+                                const terminationDate = currentSubscription.subscription_ends_at
+                                    ? new Date(currentSubscription.subscription_ends_at)
+                                    : new Date(currentSubscription.current_period_end);
+
+                                const isStillActive = terminationDate > now;
+
+                                console.log('🔍 Subscription status check:', {
+                                    isCancelledAtPeriodEnd,
+                                    subscription_ends_at: currentSubscription.subscription_ends_at,
+                                    current_period_end: currentSubscription.current_period_end,
+                                    terminationDateStr: terminationDate.toISOString(),
+                                    nowStr: now.toISOString(),
+                                    isStillActive,
+                                    daysDifference: Math.ceil(
+                                        (terminationDate.getTime() - now.getTime()) /
+                                            (1000 * 60 * 60 * 24)
+                                    ),
+                                    hasSubscriptionEndsAt:
+                                        !!currentSubscription.subscription_ends_at,
+                                    rawSubscriptionEndsAt: currentSubscription.subscription_ends_at,
+                                    dataType: typeof currentSubscription.subscription_ends_at,
+                                });
+
                                 if (isCancelledAtPeriodEnd && isStillActive) {
-                                    // Subscription is cancelled but still active until end date
+                                    // Subscription is cancelled but still active until termination date
                                     return (
                                         <Badge className='bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'>
                                             Active (Ending Soon)
@@ -594,11 +619,13 @@ export function SubscriptionBilling({
                             })()}
                         </div>
 
-                        {currentSubscription.current_period_end && (
+                        {(currentSubscription.subscription_ends_at ||
+                            currentSubscription.current_period_end) && (
                             <p className='text-sm text-neutral-400 mb-4'>
                                 {currentSubscription.cancel_at_period_end ? 'Ends on' : 'Renews on'}{' '}
                                 {new Date(
-                                    currentSubscription.current_period_end
+                                    currentSubscription.subscription_ends_at ||
+                                        currentSubscription.current_period_end
                                 ).toLocaleDateString()}
                             </p>
                         )}
@@ -806,10 +833,35 @@ export function SubscriptionBilling({
                                 }
 
                                 const now = new Date();
-                                const endDate = new Date(currentSubscription.current_period_end);
-                                const isStillActive = endDate > now;
                                 const isCancelledAtPeriodEnd =
                                     currentSubscription.cancel_at_period_end;
+
+                                // Use subscription_ends_at if available, fallback to current_period_end
+                                const terminationDate = currentSubscription.subscription_ends_at
+                                    ? new Date(currentSubscription.subscription_ends_at)
+                                    : new Date(currentSubscription.current_period_end);
+
+                                const isStillActive = terminationDate > now;
+
+                                console.log('🔍 Button logic check:', {
+                                    isCancelledAtPeriodEnd,
+                                    subscription_ends_at: currentSubscription.subscription_ends_at,
+                                    current_period_end: currentSubscription.current_period_end,
+                                    terminationDateStr: terminationDate.toISOString(),
+                                    isStillActive,
+                                    source: currentSubscription.subscription_ends_at
+                                        ? 'subscription_ends_at'
+                                        : 'current_period_end',
+                                    nowTimestamp: now.getTime(),
+                                    terminationTimestamp: terminationDate.getTime(),
+                                    timeDiffMs: terminationDate.getTime() - now.getTime(),
+                                    buttonAction:
+                                        isCancelledAtPeriodEnd && isStillActive
+                                            ? 'reactivate'
+                                            : isCancelledAtPeriodEnd && !isStillActive
+                                            ? 'choose_new_plan'
+                                            : 'cancel',
+                                });
 
                                 if (isCancelledAtPeriodEnd && isStillActive) {
                                     // Show reactivate button for cancelled subscriptions that are still active
@@ -902,7 +954,10 @@ export function SubscriptionBilling({
                                             subscriptionId={
                                                 currentSubscription.stripe_subscription_id
                                             }
-                                            periodEnd={currentSubscription.current_period_end}
+                                            periodEnd={
+                                                currentSubscription.subscription_ends_at ||
+                                                currentSubscription.current_period_end
+                                            }
                                             onCancelComplete={() => window.location.reload()}
                                         />
                                     );
@@ -926,7 +981,7 @@ export function SubscriptionBilling({
                         <div className='bg-neutral-800 p-1 rounded-lg border border-neutral-700'>
                             <button
                                 onClick={() => setBillingCycle('monthly')}
-                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                                     billingCycle === 'monthly'
                                         ? 'bg-white text-black'
                                         : 'text-neutral-400 hover:text-white'
@@ -936,14 +991,14 @@ export function SubscriptionBilling({
                             </button>
                             <button
                                 onClick={() => setBillingCycle('yearly')}
-                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                                     billingCycle === 'yearly'
                                         ? 'bg-white text-black'
                                         : 'text-neutral-400 hover:text-white'
                                 }`}
                             >
                                 Yearly
-                                <span className='ml-1 text-xs text-emerald-500 font-bold'>
+                                <span className='ml-2 text-xs text-emerald-500 font-bold'>
                                     Save 20%
                                 </span>
                             </button>
@@ -995,8 +1050,6 @@ export function SubscriptionBilling({
                     ) : (
                         // Products grid
                         actualProducts.map((product: Plan) => {
-                            console.log(`Processing product: ${product.name}`, product.prices);
-
                             const price = product.prices.find(
                                 (p) => p.interval === (billingCycle === 'yearly' ? 'year' : 'month')
                             );

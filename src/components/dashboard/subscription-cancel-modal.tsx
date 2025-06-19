@@ -78,7 +78,32 @@ export function SubscriptionCancelModal({
         });
     }, [showCancelDialog, step, selectedReason, isPending]);
 
-    const periodEndDate = new Date(periodEnd);
+    // Safely handle period end date with proper validation
+    const getPeriodEndDate = () => {
+        if (!periodEnd) {
+            console.warn('⚠️ No periodEnd provided, using 30 days from now');
+            return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+        }
+
+        const date = new Date(periodEnd);
+
+        // Check if date is valid
+        if (isNaN(date.getTime())) {
+            console.warn('⚠️ Invalid periodEnd date:', periodEnd, 'using 30 days from now');
+            return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+        }
+
+        // Check if date is too far in the past (Unix epoch issue)
+        const year = date.getFullYear();
+        if (year < 2020) {
+            console.warn('⚠️ Period end date is too old:', date, 'using 30 days from now');
+            return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+        }
+
+        return date;
+    };
+
+    const periodEndDate = getPeriodEndDate();
     const daysUntilEnd = Math.ceil((periodEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
     const handleCancel = async () => {
@@ -282,8 +307,8 @@ export function SubscriptionCancelModal({
                             <div>
                                 <h5 className='font-medium text-red-300'>Confirm Cancellation</h5>
                                 <p className='text-sm text-red-400/80 mt-1'>
-                                    Your ${currentPlan} plan will be cancelled but remain active
-                                    until ${periodEndDate.toLocaleDateString()}. You can reactivate
+                                    Your {currentPlan} plan will be cancelled but remain active
+                                    until {periodEndDate.toLocaleDateString()}. You can reactivate
                                     anytime before then.
                                 </p>
                             </div>
