@@ -25,11 +25,14 @@ export function SubscriptionStatusBanner({
     const [isChecking, setIsChecking] = useState(false);
     const { toast } = useToast();
 
+    // Don't show banner for free plans
+    const isFreeplan = currentPlan?.toLowerCase() === 'free';
+
     const periodEndDate = new Date(periodEnd);
     const daysUntilRenewal = Math.ceil(
         (periodEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
     );
-    const isNearRenewal = daysUntilRenewal <= 7;
+    const isNearRenewal = daysUntilRenewal <= 7 && !isFreeplan;
 
     // Check for pending subscription changes
     useEffect(() => {
@@ -121,8 +124,8 @@ export function SubscriptionStatusBanner({
         }
     };
 
-    // Show pending changes banner
-    if (pendingChanges?.hasScheduled) {
+    // Show pending changes banner (but not for free plans)
+    if (pendingChanges?.hasScheduled && !isFreeplan) {
         const scheduledPlan = pendingChanges.scheduledPlans?.[0];
 
         return (
