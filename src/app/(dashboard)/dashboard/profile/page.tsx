@@ -26,43 +26,28 @@ import {
     IconCopy,
 } from '@tabler/icons-react';
 import { useSearchParams } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/context/auth-context';
 import { AccountProfile } from '@/components/profile/account-profile';
 import { ApiKeyManagement } from '@/components/profile/api-key-management';
 import { SecuritySettings } from '@/components/profile/security-settings';
 import { getApiBaseUrl, getApiDocumentationExample } from '@/lib/api-config';
 
 export default function ProfilePage() {
-    const [user, setUser] = useState<any>(null);
+    const { user } = useAuth();
+    const { toast } = useToast();
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('account');
     const [isMounted, setIsMounted] = useState(false);
-    const supabase = createClient();
-    const { toast } = useToast();
 
-    // Prevent hydration mismatch and fetch user data
+    // Prevent hydration mismatch
     useEffect(() => {
         setIsMounted(true);
         const tab = searchParams.get('tab');
         if (tab) {
             setActiveTab(tab);
         }
-        fetchUser();
     }, [searchParams]);
-
-    const fetchUser = async () => {
-        try {
-            const {
-                data: { user: authUser },
-            } = await supabase.auth.getUser();
-            if (authUser) {
-                setUser(authUser);
-            }
-        } catch (error) {
-            console.error('Error fetching user:', error);
-        }
-    };
 
     // Don't render tabs until mounted to prevent hydration mismatch
     if (!isMounted) {

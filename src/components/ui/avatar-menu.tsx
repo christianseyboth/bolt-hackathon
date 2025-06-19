@@ -2,7 +2,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -14,7 +14,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { createClient } from '@/utils/supabase/client';
-import { signOut } from '@/app/auth/actions';
+import { useAuth } from '@/context/auth-context';
 
 interface AccountProfile {
     id: string;
@@ -27,18 +27,17 @@ interface AccountProfile {
 export function AvatarMenu() {
     const router = useRouter();
     const [account, setAccount] = useState<AccountProfile | null>(null);
-    const [pending, startTransition] = useTransition();
+    const { user, signOut: authSignOut } = useAuth();
     const supabase = createClient();
 
     useEffect(() => {
-        fetchAccount();
-    }, []);
+        if (user) {
+            fetchAccount();
+        }
+    }, [user]);
 
     const fetchAccount = async () => {
         try {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
             if (!user) return;
 
             const { data: accountData } = await supabase
@@ -56,25 +55,12 @@ export function AvatarMenu() {
     };
 
     const handleSignOut = async () => {
-        startTransition(async () => {
-            try {
-                const result = await signOut();
-                // Check if signOut returned an error
-                if (result?.error) {
-                    console.error('Logout failed:', result.error);
-                    return;
-                }
-                // Success case - the redirect() in signOut will handle navigation
-            } catch (error) {
-                // redirect() throws an error to trigger navigation, this is expected
-                // Only log if it's not a redirect
-                if (error && typeof error === 'object' && 'digest' in error) {
-                    // This is likely a Next.js redirect error, which is normal
-                    return;
-                }
-                console.error('Error signing out:', error);
-            }
-        });
+        try {
+            await authSignOut();
+            router.push('/');
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
     };
 
     return (
@@ -111,11 +97,7 @@ export function AvatarMenu() {
                     Settings
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                    onClick={handleSignOut}
-                    disabled={pending}
-                    className='text-red-400 cursor-pointer'
-                >
+                <DropdownMenuItem onClick={handleSignOut} className='text-red-400 cursor-pointer'>
                     Log out
                 </DropdownMenuItem>
             </DropdownMenuContent>

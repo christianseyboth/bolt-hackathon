@@ -13,9 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { useTransition } from 'react';
-import { signOut } from '@/app/auth/actions';
-import { useToast } from '../ui/use-toast';
+import { useAuth } from '@/context/auth-context';
 import { createClient } from '@/utils/supabase/client';
 import { NotificationBell } from '@/components/dashboard/NotificationBell';
 import Link from 'next/link';
@@ -30,19 +28,18 @@ interface AccountProfile {
 
 export function MobileHeader() {
     const [open, setOpen] = React.useState(false);
-    const [pending, startTransition] = useTransition();
     const [account, setAccount] = useState<AccountProfile | null>(null);
+    const { user, signOut: authSignOut } = useAuth();
     const supabase = createClient();
 
     useEffect(() => {
-        fetchAccount();
-    }, []);
+        if (user) {
+            fetchAccount();
+        }
+    }, [user]);
 
     const fetchAccount = async () => {
         try {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
             if (!user) return;
 
             const { data: accountData } = await supabase
@@ -60,25 +57,11 @@ export function MobileHeader() {
     };
 
     const handleSignOut = async () => {
-        startTransition(async () => {
-            try {
-                const result = await signOut();
-                // Check if signOut returned an error
-                if (result?.error) {
-                    console.error('Logout failed:', result.error);
-                    return;
-                }
-                // Success case - the redirect() in signOut will handle navigation
-            } catch (error) {
-                // redirect() throws an error to trigger navigation, this is expected
-                // Only log if it's not a redirect
-                if (error && typeof error === 'object' && 'digest' in error) {
-                    // This is likely a Next.js redirect error, which is normal
-                    return;
-                }
-                console.error('Error signing out:', error);
-            }
-        });
+        try {
+            await authSignOut();
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
     };
 
     return (
@@ -130,9 +113,7 @@ export function MobileHeader() {
                                 <Link href='/dashboard/profile'>Profile</Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleSignOut} disabled={pending}>
-                                Logout
-                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

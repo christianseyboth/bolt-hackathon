@@ -1,13 +1,15 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ClientProviders } from '@/components/providers/client-providers';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://secpilot.com'),
     title: {
         default: 'SecPilot - Advanced Email Security Software | Phishing Protection',
-        template: '%s | SecPilot'
+        template: '%s | SecPilot',
     },
-    description: "Protect your business from email threats with SecPilot's AI-powered security. Stop phishing, malware, and ransomware attacks with 99.9% accuracy.",
+    description:
+        "Protect your business from email threats with SecPilot's AI-powered security. Stop phishing, malware, and ransomware attacks with 99.9% accuracy.",
     keywords: [
         'email security',
         'phishing protection',
@@ -22,7 +24,7 @@ export const metadata: Metadata = {
         'secure email',
         'threat intelligence',
         'email security solution',
-        'enterprise email security'
+        'enterprise email security',
     ],
     authors: [{ name: 'SecPilot Team' }],
     creator: 'SecPilot',
@@ -38,7 +40,8 @@ export const metadata: Metadata = {
         url: 'https://secpilot.com',
         siteName: 'SecPilot',
         title: 'SecPilot - Advanced Email Security Software | Phishing Protection',
-        description: "Protect your business from email threats with SecPilot's AI-powered security. Stop phishing, malware, and ransomware attacks with 99.9% accuracy.",
+        description:
+            "Protect your business from email threats with SecPilot's AI-powered security. Stop phishing, malware, and ransomware attacks with 99.9% accuracy.",
         images: [
             {
                 url: '/og-image.png',
@@ -51,7 +54,8 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         title: 'SecPilot - Advanced Email Security Software',
-        description: "AI-powered email security that stops phishing, malware, and ransomware attacks with 99.9% accuracy.",
+        description:
+            'AI-powered email security that stops phishing, malware, and ransomware attacks with 99.9% accuracy.',
         images: ['/twitter-image.png'],
         creator: '@secpilot',
     },
@@ -77,32 +81,33 @@ export const metadata: Metadata = {
         'geo.region': 'US',
         'geo.country': 'United States',
         'geo.placename': 'United States',
-        'ICBM': '39.0458, -76.6413', // Example coordinates for US East Coast
+        ICBM: '39.0458, -76.6413', // Example coordinates for US East Coast
         'DC.title': 'SecPilot - Email Security Software',
-        'rating': 'general',
-        'distribution': 'global',
+        rating: 'general',
+        distribution: 'global',
         'revisit-after': '7 days',
-        'language': 'en',
-        'target': 'all',
-        'audience': 'all',
-        'coverage': 'worldwide',
-        'subject': 'Email Security, Cybersecurity, Phishing Protection',
-        'copyright': 'SecPilot',
+        language: 'en',
+        target: 'all',
+        audience: 'all',
+        coverage: 'worldwide',
+        subject: 'Email Security, Cybersecurity, Phishing Protection',
+        copyright: 'SecPilot',
         'reply-to': 'contact@secpilot.com',
-        'owner': 'SecPilot',
-        'url': 'https://secpilot.com',
+        owner: 'SecPilot',
+        url: 'https://secpilot.com',
         'identifier-URL': 'https://secpilot.com',
-        'directory': 'submission',
-        'pagename': 'SecPilot - Email Security Software',
+        directory: 'submission',
+        pagename: 'SecPilot - Email Security Software',
         'business-category': 'Business, Technology, Security',
         'geographic-coverage': 'Worldwide',
         'content-distribution': 'Global',
         'content-rating': 'General',
         'cache-control': '7 days',
-        'subtitle': 'AI-Powered Email Security Software',
-        'target-audience': 'Business owners, IT administrators, Security professionals, Freelancers, Small Business Owners, Startups, Entrepreneurs, and more.',
-        'HandheldFriendly': 'True',
-        'MobileOptimized': '320',
+        subtitle: 'AI-Powered Email Security Software',
+        'target-audience':
+            'Business owners, IT administrators, Security professionals, Freelancers, Small Business Owners, Startups, Entrepreneurs, and more.',
+        HandheldFriendly: 'True',
+        MobileOptimized: '320',
     },
 };
 
@@ -114,40 +119,53 @@ export default async function RootLayout({ children }: Props) {
     return (
         <html className='dark' lang='en'>
             <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-                <meta name="format-detection" content="telephone=no" />
-                <link rel="canonical" href="https://secpilot.com" />
-                <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+                <meta
+                    name='viewport'
+                    content='width=device-width, initial-scale=1, maximum-scale=5'
+                />
+                <meta name='format-detection' content='telephone=no' />
+                <link rel='canonical' href='https://secpilot.com' />
+                <link rel='sitemap' type='application/xml' href='/sitemap.xml' />
 
                 {/* Favicon - Multiple formats for maximum compatibility */}
-                <link rel="icon" href="/favicon.ico" sizes="any" />
-                <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-                <link rel="icon" href="/favicon-16x16.png" sizes="16x16" type="image/png" />
-                <link rel="icon" href="/favicon-32x32.png" sizes="32x32" type="image/png" />
-                <link rel="icon" href="/favicon-96x96.png" sizes="96x96" type="image/png" />
+                <link rel='icon' href='/favicon.ico' sizes='any' />
+                <link rel='icon' href='/icon.svg' type='image/svg+xml' />
+                <link rel='icon' href='/favicon-16x16.png' sizes='16x16' type='image/png' />
+                <link rel='icon' href='/favicon-32x32.png' sizes='32x32' type='image/png' />
+                <link rel='icon' href='/favicon-96x96.png' sizes='96x96' type='image/png' />
 
                 {/* Apple Touch Icons */}
-                <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+                <link rel='apple-touch-icon' href='/apple-touch-icon.png' />
+                <link rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png' />
 
                 {/* Android Chrome Icons */}
-                <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
-                <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
+                <link
+                    rel='icon'
+                    type='image/png'
+                    sizes='192x192'
+                    href='/android-chrome-192x192.png'
+                />
+                <link
+                    rel='icon'
+                    type='image/png'
+                    sizes='512x512'
+                    href='/android-chrome-512x512.png'
+                />
 
                 {/* PWA Manifest */}
-                <link rel="manifest" href="/manifest.json" />
-                <meta name="mobile-web-app-capable" content="yes" />
-                <meta name="apple-mobile-web-app-capable" content="yes" />
-                <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-                <meta name="apple-mobile-web-app-title" content="SecPilot" />
-                <meta name="application-name" content="SecPilot" />
-                <meta name="msapplication-TileColor" content="#10b981" />
-                <meta name="msapplication-TileImage" content="/mstile-144x144.png" />
-                <meta name="theme-color" content="#10b981" />
+                <link rel='manifest' href='/manifest.json' />
+                <meta name='mobile-web-app-capable' content='yes' />
+                <meta name='apple-mobile-web-app-capable' content='yes' />
+                <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+                <meta name='apple-mobile-web-app-title' content='SecPilot' />
+                <meta name='application-name' content='SecPilot' />
+                <meta name='msapplication-TileColor' content='#10b981' />
+                <meta name='msapplication-TileImage' content='/mstile-144x144.png' />
+                <meta name='theme-color' content='#10b981' />
 
                 {/* Structured Data for Organization */}
                 <script
-                    type="application/ld+json"
+                    type='application/ld+json'
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
@@ -155,35 +173,36 @@ export default async function RootLayout({ children }: Props) {
                             name: 'SecPilot',
                             url: 'https://secpilot.com',
                             logo: 'https://secpilot.com/logo.png',
-                            description: "Advanced email security software with AI-powered phishing protection",
+                            description:
+                                'Advanced email security software with AI-powered phishing protection',
                             address: {
                                 '@type': 'PostalAddress',
                                 addressLocality: 'United States',
-                                addressCountry: 'US'
+                                addressCountry: 'US',
                             },
                             contactPoint: [
                                 {
                                     '@type': 'ContactPoint',
                                     contactType: 'customer service',
-                                    email: 'support@secpilot.com'
+                                    email: 'support@secpilot.com',
                                 },
                                 {
                                     '@type': 'ContactPoint',
                                     contactType: 'sales',
-                                    email: 'sales@secpilot.com'
-                                }
+                                    email: 'sales@secpilot.com',
+                                },
                             ],
                             sameAs: [
                                 'https://twitter.com/secpilot',
-                                'https://linkedin.com/company/secpilot'
-                            ]
-                        })
+                                'https://linkedin.com/company/secpilot',
+                            ],
+                        }),
                     }}
                 />
 
                 {/* Structured Data for Software Application */}
                 <script
-                    type="application/ld+json"
+                    type='application/ld+json'
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify({
                             '@context': 'https://schema.org',
@@ -199,29 +218,32 @@ export default async function RootLayout({ children }: Props) {
                                     '@type': 'UnitPriceSpecification',
                                     price: '9.90',
                                     priceCurrency: 'USD',
-                                    unitCode: 'MON'
-                                }
+                                    unitCode: 'MON',
+                                },
                             },
-                            description: 'AI-powered email security software that protects businesses from phishing, malware, and ransomware attacks',
+                            description:
+                                'AI-powered email security software that protects businesses from phishing, malware, and ransomware attacks',
                             featureList: [
                                 'AI-powered threat detection',
                                 'Phishing protection',
                                 'Malware detection',
                                 'Real-time security analytics',
-                                'Zero-storage privacy'
+                                'Zero-storage privacy',
                             ],
                             screenshot: 'https://secpilot.com/screenshot.png',
                             softwareVersion: '1.0',
                             aggregateRating: {
                                 '@type': 'AggregateRating',
                                 ratingValue: '4.9',
-                                ratingCount: '127'
-                            }
-                        })
+                                ratingCount: '127',
+                            },
+                        }),
                     }}
                 />
             </head>
-            <body>{children}</body>
+            <body>
+                <ClientProviders>{children}</ClientProviders>
+            </body>
         </html>
     );
 }

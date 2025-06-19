@@ -18,7 +18,7 @@ import {
     IconLock,
 } from '@tabler/icons-react';
 import { useToast } from '@/components/ui/use-toast';
-import { signOut } from '@/app/auth/actions';
+import { useAuth } from '@/context/auth-context';
 import { createClient } from '@/utils/supabase/client';
 
 interface SidebarProps {
@@ -29,6 +29,7 @@ interface SidebarProps {
 export function Sidebar({ className, onNavigate }: SidebarProps) {
     const pathname = usePathname();
     const { toast } = useToast();
+    const { user, signOut: authSignOut } = useAuth();
     const [subscriptionAccess, setSubscriptionAccess] = useState<{
         hasReportsAccess: boolean;
         hasSecurityAnalyticsAccess: boolean;
@@ -37,16 +38,14 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
     } | null>(null);
 
     useEffect(() => {
-        checkSubscriptionAccess();
-    }, []);
+        if (user) {
+            checkSubscriptionAccess();
+        }
+    }, [user]);
 
     const checkSubscriptionAccess = async () => {
         try {
             const supabase = createClient();
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-
             if (!user) return;
 
             // Get user's account
@@ -113,25 +112,9 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
 
     const handleLogout = async () => {
         try {
-            const result = await signOut();
-            // Check if signOut returned an error
-            if (result?.error) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Logout failed',
-                    description: result.error,
-                });
-                return;
-            }
-            // Success case - the redirect() in signOut will handle navigation
-            // Don't show toast here as user will be redirected away
+            await authSignOut();
+            if (onNavigate) onNavigate();
         } catch (error) {
-            // redirect() throws an error to trigger navigation, this is expected
-            // Only show error if it's not a redirect
-            if (error && typeof error === 'object' && 'digest' in error) {
-                // This is likely a Next.js redirect error, which is normal
-                return;
-            }
             console.error('Logout error:', error);
             toast({
                 variant: 'destructive',

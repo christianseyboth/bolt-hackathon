@@ -1,33 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/client';
+import { useAuth } from '@/context/auth-context';
 
 export function ClientNavBar() {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const getUser = async () => {
-            try {
-                const supabase = createClient();
-                const {
-                    data: { user },
-                    error,
-                } = await supabase.auth.getUser();
-                if (!error) {
-                    setUser(user);
-                }
-            } catch (error) {
-                console.error('Error getting user:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getUser();
-    }, []);
+    const { user, loading } = useAuth();
 
     return (
         <nav

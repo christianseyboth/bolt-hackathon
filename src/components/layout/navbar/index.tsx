@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { DesktopNavbar } from './desktop-navbar';
 import { MobileNavbar } from './mobile-navbar';
 import { motion } from 'motion/react';
-import { createClient } from '@/utils/supabase/client';
+import { useAuth } from '@/context/auth-context';
 
 const navItems = [
     {
@@ -18,29 +17,7 @@ const navItems = [
 ];
 
 export function NavBar() {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const getUser = async () => {
-            try {
-                const supabase = createClient();
-                const {
-                    data: { user },
-                    error,
-                } = await supabase.auth.getUser();
-                if (!error) {
-                    setUser(user);
-                }
-            } catch (error) {
-                console.error('Error getting user:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getUser();
-    }, []);
+    const { user, loading } = useAuth();
     return (
         <motion.nav
             initial={{
