@@ -1,27 +1,25 @@
 // src/middleware.ts
 import { NextRequest, NextResponse } from 'next/server'
+import { updateSession } from '@/utils/supabase/middleware'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip middleware for API routes, static files, _next, and dashboard routes
+  // Always update Supabase session first
+  const response = await updateSession(request)
+
+  // Skip additional middleware logic for static files and API routes
   if (
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/') ||
-    pathname.startsWith('/auth') ||
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/register') ||
-    pathname.startsWith('/account') ||
-    pathname.startsWith('/setup-account') ||
-    pathname.startsWith('/api-keys') ||
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
-    pathname.includes('.')
+    pathname.includes('.') ||
+    pathname.startsWith('/favicon')
   ) {
-    return NextResponse.next()
+    return response
   }
 
-  return NextResponse.next()
+  // For all other routes, return the Supabase response (which handles auth)
+  return response
 }
 
 export const config = {
