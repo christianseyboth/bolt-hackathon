@@ -62,6 +62,47 @@ export function SubscriptionBilling({
     const { toast } = useToast();
     const [isAutoSyncing, setIsAutoSyncing] = useState(false);
 
+    // Client-side products state
+    const [clientProducts, setClientProducts] = useState<Plan[]>([]);
+    const [productsLoading, setProductsLoading] = useState(true);
+    const [productsError, setProductsError] = useState<string | null>(null);
+
+    // Fetch products client-side
+    useEffect(() => {
+        async function fetchProducts() {
+            try {
+                setProductsLoading(true);
+                setProductsError(null);
+
+                console.log('🚀 Fetching products client-side...');
+                const response = await fetch('/api/stripe/products', {
+                    cache: 'no-store',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const fetchedProducts = data.products || [];
+                    setClientProducts(fetchedProducts);
+                    console.log('✅ Products fetched:', fetchedProducts.length, 'products');
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Products API failed:', response.status, errorText);
+                    setProductsError(`Failed to load plans (${response.status})`);
+                }
+            } catch (error) {
+                console.error('❌ Products fetch error:', error);
+                setProductsError('Failed to load plans');
+            } finally {
+                setProductsLoading(false);
+            }
+        }
+
+        fetchProducts();
+    }, []);
+
+    // Use client-side products if available, fallback to server products
+    const actualProducts = clientProducts.length > 0 ? clientProducts : products;
+
     // Set last auto-sync time on client mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -870,136 +911,181 @@ export function SubscriptionBilling({
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6' id='available-plans'>
-                    {products.map((product: Plan) => {
-                        console.log(`Processing product: ${product.name}`, product.prices);
-
-                        const price = product.prices.find(
-                            (p) => p.interval === (billingCycle === 'yearly' ? 'year' : 'month')
-                        );
-
-                        console.log(
-                            `Found price for ${product.name}:`,
-                            price,
-                            'for billing cycle:',
-                            billingCycle
-                        );
-
-                        if (!price) {
-                            console.log(
-                                `No price found for ${product.name} with interval ${
-                                    billingCycle === 'yearly' ? 'year' : 'month'
-                                }`
-                            );
-                            return null;
-                        }
-
-                        const isCurrentPlan = currentSubscription?.plan_name === product.name;
-                        const features = getPlanFeatures(product.name);
-                        const isPopular = product.name.toLowerCase() === 'pro';
-
-                        return (
+                    {productsLoading ? (
+                        // Loading state
+                        [1, 2, 3].map((i) => (
                             <div
-                                key={product.id}
-                                className={`relative border rounded-lg p-6 ${
-                                    isCurrentPlan
-                                        ? 'border-amber-500 bg-amber-500/5'
-                                        : isPopular
-                                        ? 'border-blue-500 bg-blue-500/5'
-                                        : 'border-neutral-800 bg-neutral-900/50'
-                                }`}
+                                key={i}
+                                className='border border-neutral-800 bg-neutral-900/50 rounded-lg p-6'
                             >
-                                {isPopular && !isCurrentPlan && (
-                                    <div className='absolute -top-3 left-1/2 transform -translate-x-1/2'>
-                                        <Badge className='bg-blue-500 text-white'>
-                                            Most Popular
-                                        </Badge>
+                                <div className='animate-pulse space-y-4'>
+                                    <div className='h-6 bg-neutral-700 rounded w-1/2'></div>
+                                    <div className='h-4 bg-neutral-700 rounded w-3/4'></div>
+                                    <div className='h-8 bg-neutral-700 rounded w-1/3'></div>
+                                    <div className='space-y-2'>
+                                        {[1, 2, 3, 4].map((j) => (
+                                            <div
+                                                key={j}
+                                                className='h-4 bg-neutral-700 rounded'
+                                            ></div>
+                                        ))}
                                     </div>
-                                )}
-
-                                <div className='flex items-center justify-between mb-2'>
-                                    <div className='flex items-center space-x-2'>
-                                        {getPlanIcon(product.name)}
-                                        <h3 className='font-semibold text-lg'>{product.name}</h3>
-                                    </div>
-                                    {isCurrentPlan && (
-                                        <Badge className='bg-amber-500/20 text-amber-400'>
-                                            Current
-                                        </Badge>
-                                    )}
+                                    <div className='h-10 bg-neutral-700 rounded'></div>
                                 </div>
-                                <p className='text-neutral-400 text-sm mb-4'>
-                                    {product.description}
-                                </p>
+                            </div>
+                        ))
+                    ) : productsError ? (
+                        // Error state
+                        <div className='col-span-3 text-center py-12'>
+                            <p className='text-red-400 mb-4'>❌ {productsError}</p>
+                            <Button
+                                onClick={() => window.location.reload()}
+                                variant='outline'
+                                className='text-red-400 border-red-600 hover:bg-red-950/30'
+                            >
+                                Try Again
+                            </Button>
+                        </div>
+                    ) : actualProducts.length === 0 ? (
+                        // No products state
+                        <div className='col-span-3 text-center py-12'>
+                            <p className='text-neutral-400'>No subscription plans available</p>
+                        </div>
+                    ) : (
+                        // Products grid
+                        actualProducts.map((product: Plan) => {
+                            console.log(`Processing product: ${product.name}`, product.prices);
 
-                                <div className='mb-6'>
-                                    <span className='text-3xl font-bold'>
-                                        {formatPrice(price.amount, price.currency)}
-                                    </span>
-                                    <span className='text-neutral-400 ml-1'>
-                                        /{billingCycle === 'yearly' ? 'year' : 'month'}
-                                    </span>
-                                    {billingCycle === 'yearly' && price.amount > 0 && (
-                                        <div className='text-xs text-emerald-400 mt-1'>
-                                            Save 20% with annual billing
+                            const price = product.prices.find(
+                                (p) => p.interval === (billingCycle === 'yearly' ? 'year' : 'month')
+                            );
+
+                            console.log(
+                                `Found price for ${product.name}:`,
+                                price,
+                                'for billing cycle:',
+                                billingCycle
+                            );
+
+                            if (!price) {
+                                console.log(
+                                    `No price found for ${product.name} with interval ${
+                                        billingCycle === 'yearly' ? 'year' : 'month'
+                                    }`
+                                );
+                                return null;
+                            }
+
+                            const isCurrentPlan = currentSubscription?.plan_name === product.name;
+                            const features = getPlanFeatures(product.name);
+                            const isPopular = product.name.toLowerCase() === 'pro';
+
+                            return (
+                                <div
+                                    key={product.id}
+                                    className={`relative border rounded-lg p-6 ${
+                                        isCurrentPlan
+                                            ? 'border-amber-500 bg-amber-500/5'
+                                            : isPopular
+                                            ? 'border-blue-500 bg-blue-500/5'
+                                            : 'border-neutral-800 bg-neutral-900/50'
+                                    }`}
+                                >
+                                    {isPopular && !isCurrentPlan && (
+                                        <div className='absolute -top-3 left-1/2 transform -translate-x-1/2'>
+                                            <Badge className='bg-blue-500 text-white'>
+                                                Most Popular
+                                            </Badge>
                                         </div>
                                     )}
-                                </div>
 
-                                {/* Plan Features */}
-                                <ul className='space-y-2 mb-6'>
-                                    {features.map((feature, index) => {
-                                        const isIncluded = feature.included !== false;
-                                        const displayValue =
-                                            typeof feature.included === 'string'
-                                                ? feature.included
-                                                : feature.name;
+                                    <div className='flex items-center justify-between mb-2'>
+                                        <div className='flex items-center space-x-2'>
+                                            {getPlanIcon(product.name)}
+                                            <h3 className='font-semibold text-lg'>
+                                                {product.name}
+                                            </h3>
+                                        </div>
+                                        {isCurrentPlan && (
+                                            <Badge className='bg-amber-500/20 text-amber-400'>
+                                                Current
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <p className='text-neutral-400 text-sm mb-4'>
+                                        {product.description}
+                                    </p>
 
-                                        return (
-                                            <li key={index} className='flex items-start'>
-                                                {isIncluded ? (
-                                                    <IconCheck className='h-5 w-5 text-emerald-400 mr-2 flex-shrink-0 mt-0.5' />
-                                                ) : (
-                                                    <IconX className='h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5' />
-                                                )}
-                                                <span
-                                                    className={cn(
-                                                        'text-sm',
-                                                        isIncluded
-                                                            ? 'text-neutral-300'
-                                                            : 'text-neutral-500 line-through'
+                                    <div className='mb-6'>
+                                        <span className='text-3xl font-bold'>
+                                            {formatPrice(price.amount, price.currency)}
+                                        </span>
+                                        <span className='text-neutral-400 ml-1'>
+                                            /{billingCycle === 'yearly' ? 'year' : 'month'}
+                                        </span>
+                                        {billingCycle === 'yearly' && price.amount > 0 && (
+                                            <div className='text-xs text-emerald-400 mt-1'>
+                                                Save 20% with annual billing
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Plan Features */}
+                                    <ul className='space-y-2 mb-6'>
+                                        {features.map((feature, index) => {
+                                            const isIncluded = feature.included !== false;
+                                            const displayValue =
+                                                typeof feature.included === 'string'
+                                                    ? feature.included
+                                                    : feature.name;
+
+                                            return (
+                                                <li key={index} className='flex items-start'>
+                                                    {isIncluded ? (
+                                                        <IconCheck className='h-5 w-5 text-emerald-400 mr-2 flex-shrink-0 mt-0.5' />
+                                                    ) : (
+                                                        <IconX className='h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5' />
                                                     )}
-                                                >
-                                                    {displayValue}
-                                                </span>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
+                                                    <span
+                                                        className={cn(
+                                                            'text-sm',
+                                                            isIncluded
+                                                                ? 'text-neutral-300'
+                                                                : 'text-neutral-500 line-through'
+                                                        )}
+                                                    >
+                                                        {displayValue}
+                                                    </span>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
 
-                                {isCurrentPlan ? (
-                                    <Button className='w-full' variant='outline' disabled>
-                                        Current Plan
-                                    </Button>
-                                ) : (
-                                    <SubscriptionUpgradeModal
-                                        currentPlan={currentSubscription?.plan_name || 'Free'}
-                                        currentSeats={currentSubscription?.seats || 1}
-                                        targetPlan={product.name}
-                                        targetSeats={getSeatsFromPlan(product.name)}
-                                        targetPriceId={price.id}
-                                        accountId={account.id}
-                                        currentPeriodEnd={
-                                            currentSubscription?.current_period_end ||
-                                            new Date(
-                                                Date.now() + 30 * 24 * 60 * 60 * 1000
-                                            ).toISOString()
-                                        }
-                                        onUpgradeComplete={() => window.location.reload()}
-                                    />
-                                )}
-                            </div>
-                        );
-                    })}
+                                    {isCurrentPlan ? (
+                                        <Button className='w-full' variant='outline' disabled>
+                                            Current Plan
+                                        </Button>
+                                    ) : (
+                                        <SubscriptionUpgradeModal
+                                            currentPlan={currentSubscription?.plan_name || 'Free'}
+                                            currentSeats={currentSubscription?.seats || 1}
+                                            targetPlan={product.name}
+                                            targetSeats={getSeatsFromPlan(product.name)}
+                                            targetPriceId={price.id}
+                                            accountId={account.id}
+                                            currentPeriodEnd={
+                                                currentSubscription?.current_period_end ||
+                                                new Date(
+                                                    Date.now() + 30 * 24 * 60 * 60 * 1000
+                                                ).toISOString()
+                                            }
+                                            onUpgradeComplete={() => window.location.reload()}
+                                        />
+                                    )}
+                                </div>
+                            );
+                        })
+                    )}
                 </div>
             </div>
 
@@ -1027,6 +1113,12 @@ export function SubscriptionBilling({
                             </div>
                             <div>
                                 <strong>Last Auto-Sync:</strong> {lastAutoSyncTime}
+                            </div>
+                            <div>
+                                <strong>Products Loading:</strong> {productsLoading ? 'Yes' : 'No'}
+                            </div>
+                            <div>
+                                <strong>Products Count:</strong> {actualProducts.length}
                             </div>
                         </div>
 
