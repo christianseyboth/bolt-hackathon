@@ -58,7 +58,10 @@ export const ContactFormSimple = () => {
                 });
 
                 // Reset form
-                e.currentTarget.reset();
+                const form = e.currentTarget;
+                if (form) {
+                    form.reset();
+                }
                 setInquiryType('');
 
                 // Optionally redirect to success page
