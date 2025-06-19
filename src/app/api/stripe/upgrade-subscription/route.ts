@@ -482,12 +482,44 @@ export async function POST(request: NextRequest) {
         const planName = getPlanNameFromPriceId(newPriceId);
         console.log('📋 Plan mapping:', { newPriceId, planName });
 
+        // Determine usage reset logic for different upgrade scenarios
+        const currentAnalysisAmount = getAnalysisAmountFromPlan(currentSubscription.plan_name);
+        const newAnalysisAmount = getAnalysisAmountFromPlan(planName);
+        const isUpgradeFromFree = currentSubscription.plan_name === 'Free' && planName !== 'Free';
+        const isPaidToPaidUpgrade = currentSubscription.plan_name !== 'Free' && planName !== 'Free' && newAnalysisAmount > currentAnalysisAmount;
+
+        // Reset usage for:
+        // 1. Upgrades from Free plan (always reset to get full benefit)
+        // 2. New subscriptions (always start fresh)
+        // 3. Immediate paid-to-paid upgrades (give full benefit of new plan)
+        const shouldResetUsage = isUpgradeFromFree || isNewSubscription || isPaidToPaidUpgrade;
+
+        console.log(`🔄 Usage reset logic:`, {
+            currentPlan: currentSubscription.plan_name,
+            newPlan: planName,
+            currentAnalysisAmount,
+            newAnalysisAmount,
+            isUpgradeFromFree,
+            isPaidToPaidUpgrade,
+            isNewSubscription,
+            currentUsage: currentSubscription.analysis_used,
+            currentEmailsLeft: currentSubscription.emails_left,
+            shouldResetUsage,
+            resetReason: shouldResetUsage ?
+                (isUpgradeFromFree ? 'Free upgrade' :
+                 isNewSubscription ? 'New subscription' :
+                 isPaidToPaidUpgrade ? 'Paid-to-paid upgrade' : 'Unknown') : 'No reset needed'
+        });
+
         const subscriptionData = {
             plan_name: planName,
             seats: getSeatsFromPlan(planName),
             price_per_seat: updatedSubscription.items.data[0]?.price.unit_amount ? updatedSubscription.items.data[0].price.unit_amount / 100 : 0,
             total_price: updatedSubscription.items.data[0]?.price.unit_amount ? updatedSubscription.items.data[0].price.unit_amount / 100 : 0,
-            analysis_amount: getAnalysisAmountFromPlan(planName),
+            analysis_amount: newAnalysisAmount,
+            // Reset usage counters for Free upgrades, new subscriptions, and paid-to-paid upgrades
+            analysis_used: shouldResetUsage ? 0 : currentSubscription.analysis_used,
+            emails_left: shouldResetUsage ? newAnalysisAmount : currentSubscription.emails_left,
             subscription_status: updatedSubscription.status,
             stripe_subscription_id: updatedSubscription.id,
             current_period_start: new Date(updatedSubscription.current_period_start * 1000).toISOString(),

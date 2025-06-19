@@ -121,6 +121,34 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
     const planName = await getPlanNameFromPriceId(priceId);
     console.log(`📋 Mapped to plan: ${planName} with ${getSeatsFromPlan(planName)} seats`);
 
+    // Get current subscription to check if this is an upgrade from Free
+    const { data: currentSub } = await supabase
+        .from('subscriptions')
+        .select('plan_name, analysis_used, emails_left')
+        .eq('account_id', accountId)
+        .single();
+
+    const currentAnalysisAmount = getAnalysisAmountFromPlan(currentSub?.plan_name || 'Free');
+    const newAnalysisAmount = getAnalysisAmountFromPlan(planName);
+    const isUpgradeFromFree = currentSub?.plan_name === 'Free' && planName !== 'Free';
+    const isPaidToPaidUpgrade = currentSub?.plan_name !== 'Free' && planName !== 'Free' && newAnalysisAmount > currentAnalysisAmount;
+
+    // Reset usage for Free upgrades, new subscriptions, and paid-to-paid upgrades
+    const shouldResetUsage = isUpgradeFromFree || isPaidToPaidUpgrade;
+
+    console.log(`🔄 Webhook usage reset logic:`, {
+        currentPlan: currentSub?.plan_name || 'Unknown',
+        newPlan: planName,
+        currentAnalysisAmount,
+        newAnalysisAmount,
+        isUpgradeFromFree,
+        isPaidToPaidUpgrade,
+        shouldResetUsage,
+        resetReason: shouldResetUsage ?
+            (isUpgradeFromFree ? 'Free upgrade' :
+             isPaidToPaidUpgrade ? 'Paid-to-paid upgrade' : 'Unknown') : 'No reset needed'
+    });
+
     // Update or create subscription record
     const subscriptionData = {
         account_id: accountId,
@@ -133,8 +161,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription, supab
         seats: getSeatsFromPlan(planName),
         price_per_seat: subscription.items.data[0]?.price.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0,
         total_price: subscription.items.data[0]?.price.unit_amount ? subscription.items.data[0].price.unit_amount / 100 : 0,
-        analysis_amount: getAnalysisAmountFromPlan(planName),
-        analysis_used: 0,
+        analysis_amount: newAnalysisAmount,
+        // Reset usage for Free upgrades and paid-to-paid upgrades, otherwise preserve current usage
+        analysis_used: shouldResetUsage ? 0 : (currentSub?.analysis_used || 0),
+        emails_left: shouldResetUsage ? newAnalysisAmount : (currentSub?.emails_left || newAnalysisAmount),
         stripe_subscription_id: subscription.id,
         stripe_customer_id: customerId,
     };
@@ -244,24 +274,39 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice, supabase: any) {
     console.log(`💰 Processing payment success for customer: ${customerId}, subscription: ${subscriptionId}`);
 
     if (subscriptionId && customerId) {
-        // Get subscription by customer ID from subscriptions table
+        // Get current subscription data to show what we're resetting
         const { data: subscription, error: subError } = await supabase
             .from('subscriptions')
-            .select('account_id, plan_name')
+            .select('account_id, plan_name, analysis_used, emails_left, analysis_amount')
             .eq('stripe_customer_id', customerId)
             .single();
 
         if (subscription && !subError) {
             const planName = subscription.plan_name;
             const newAnalysisAmount = getAnalysisAmountFromPlan(planName);
+            const unusedAnalyses = subscription.emails_left || 0;
 
-            console.log(`🔄 Resetting usage for ${planName} plan: ${newAnalysisAmount} analyses`);
+            console.log(`🔄 Subscription renewal for ${planName} plan:`, {
+                accountId: subscription.account_id,
+                previousPeriod: {
+                    analysisUsed: subscription.analysis_used || 0,
+                    emailsLeft: unusedAnalyses,
+                    totalAllowed: subscription.analysis_amount || newAnalysisAmount
+                },
+                newPeriod: {
+                    analysisUsed: 0,
+                    emailsLeft: newAnalysisAmount,
+                    totalAllowed: newAnalysisAmount
+                },
+                unusedFromPreviousPeriod: unusedAnalyses,
+                renewalPolicy: 'Reset to full plan allowance (standard SaaS behavior)'
+            });
 
             const { error: updateError } = await supabase
                 .from('subscriptions')
                 .update({
-                    analysis_used: 0, // Reset usage counter to 0
-                    emails_left: newAnalysisAmount, // Reset emails left to plan limit
+                    analysis_used: 0, // Reset usage counter to 0 (fresh start)
+                    emails_left: newAnalysisAmount, // Reset emails left to full plan limit
                     updated_at: new Date().toISOString(),
                 })
                 .eq('account_id', subscription.account_id);
@@ -269,7 +314,10 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice, supabase: any) {
             if (updateError) {
                 console.error('❌ Failed to reset usage counters:', updateError);
             } else {
-                console.log(`✅ Reset usage counters for account: ${subscription.account_id}`);
+                console.log(`✅ Subscription renewed for account: ${subscription.account_id}`);
+                if (unusedAnalyses > 0) {
+                    console.log(`ℹ️  Note: ${unusedAnalyses} unused analyses from previous period were reset (standard renewal behavior)`);
+                }
             }
         } else {
             console.error('❌ Could not find subscription for customer:', customerId, subError);
