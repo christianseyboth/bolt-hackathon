@@ -112,11 +112,33 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
     };
 
     const handleLogout = async () => {
-        await signOut();
-        toast({
-            title: 'Logged out',
-            description: 'You have been successfully logged out.',
-        });
+        try {
+            const result = await signOut();
+            // Check if signOut returned an error
+            if (result?.error) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Logout failed',
+                    description: result.error,
+                });
+                return;
+            }
+            // Success case - the redirect() in signOut will handle navigation
+            // Don't show toast here as user will be redirected away
+        } catch (error) {
+            // redirect() throws an error to trigger navigation, this is expected
+            // Only show error if it's not a redirect
+            if (error && typeof error === 'object' && 'digest' in error) {
+                // This is likely a Next.js redirect error, which is normal
+                return;
+            }
+            console.error('Logout error:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Logout failed',
+                description: 'An unexpected error occurred',
+            });
+        }
     };
 
     return (

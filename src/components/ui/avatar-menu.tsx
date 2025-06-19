@@ -58,8 +58,20 @@ export function AvatarMenu() {
     const handleSignOut = async () => {
         startTransition(async () => {
             try {
-                await signOut();
+                const result = await signOut();
+                // Check if signOut returned an error
+                if (result?.error) {
+                    console.error('Logout failed:', result.error);
+                    return;
+                }
+                // Success case - the redirect() in signOut will handle navigation
             } catch (error) {
+                // redirect() throws an error to trigger navigation, this is expected
+                // Only log if it's not a redirect
+                if (error && typeof error === 'object' && 'digest' in error) {
+                    // This is likely a Next.js redirect error, which is normal
+                    return;
+                }
                 console.error('Error signing out:', error);
             }
         });
@@ -82,7 +94,7 @@ export function AvatarMenu() {
                                       .join('')
                                       .slice(0, 2)
                                       .toUpperCase()
-                                : (account?.billing_email?.[0]?.toUpperCase() ?? 'U')}
+                                : account?.billing_email?.[0]?.toUpperCase() ?? 'U'}
                         </AvatarFallback>
                     </Avatar>
                 </Button>
