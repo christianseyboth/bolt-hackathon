@@ -36,19 +36,46 @@ export const ContactForm = () => {
         }
 
         const form = e.target as HTMLFormElement;
-        const formData = new FormData(form);
 
-        // Ensure form-name is set correctly
-        formData.set('form-name', 'contact');
-
-        // Ensure subject is set from inquiryType state
-        formData.set('subject', inquiryType);
-
-        // Convert FormData to URLSearchParams for Netlify
+        // Create URLSearchParams directly from form elements
         const params = new URLSearchParams();
-        for (const [key, value] of formData.entries()) {
-            params.append(key, value.toString());
+
+        // Add required Netlify fields
+        params.append('form-name', 'contact');
+        params.append('subject', inquiryType);
+
+        // Get form data from individual form elements
+        const formElements = form.elements as HTMLFormControlsCollection;
+
+        // Add name field
+        const nameField = formElements.namedItem('name') as HTMLInputElement;
+        if (nameField?.value) {
+            params.append('name', nameField.value);
         }
+
+        // Add email field
+        const emailField = formElements.namedItem('email') as HTMLInputElement;
+        if (emailField?.value) {
+            params.append('email', emailField.value);
+        }
+
+        // Add company field
+        const companyField = formElements.namedItem('company') as HTMLInputElement;
+        if (companyField?.value) {
+            params.append('company', companyField.value);
+        }
+
+        // Add message field
+        const messageField = formElements.namedItem('message') as HTMLTextAreaElement;
+        if (messageField?.value) {
+            params.append('message', messageField.value);
+        }
+
+        // Add honeypot field (should be empty)
+        const botField = formElements.namedItem('bot-field') as HTMLInputElement;
+        params.append('bot-field', botField?.value || '');
+
+        console.log('Form submission data:', Object.fromEntries(params.entries()));
 
         // Submit to Netlify Forms
         fetch('/', {
@@ -57,8 +84,12 @@ export const ContactForm = () => {
             body: params.toString(),
         })
             .then((response) => {
+                console.log('Response status:', response.status);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.text().then((text) => {
+                        console.error('Response body:', text);
+                        throw new Error(`HTTP error! status: ${response.status} - ${text}`);
+                    });
                 }
                 return response;
             })
@@ -78,7 +109,6 @@ export const ContactForm = () => {
             })
             .catch((error) => {
                 console.error('Form submission error:', error);
-                console.error('Form data sent:', Object.fromEntries(params.entries()));
 
                 toast({
                     variant: 'destructive',
