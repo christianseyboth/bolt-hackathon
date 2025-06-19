@@ -44,6 +44,10 @@ export const ContactFormSimple = () => {
 
             const formData = new FormData(e.currentTarget);
 
+            // Ensure form-name is included
+            formData.set('form-name', 'contact');
+            formData.set('subject', inquiryType);
+
             // Submit to the static HTML file as required by Netlify plugin v5
             const response = await fetch('/__forms.html', {
                 method: 'POST',
