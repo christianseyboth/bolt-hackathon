@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
         }
 
         console.log('🔄 Syncing subscription status for account:', accountId);
+        console.log('🔍 Using Stripe customer ID:', currentSubscription.stripe_customer_id);
 
         // Fetch all subscriptions from Stripe for this customer
         const subscriptions = await stripe.subscriptions.list({
@@ -60,6 +61,12 @@ export async function POST(request: NextRequest) {
         });
 
         console.log('📊 Found', subscriptions.data.length, 'subscriptions in Stripe');
+        console.log('📋 Subscription details:', subscriptions.data.map(sub => ({
+            id: sub.id,
+            status: sub.status,
+            price_id: sub.items.data[0]?.price.id,
+            amount: sub.items.data[0]?.price.unit_amount,
+        })));
 
         if (subscriptions.data.length === 0) {
             // No subscriptions in Stripe - user should be on free plan
@@ -182,11 +189,22 @@ export async function POST(request: NextRequest) {
         // If we reach here, the subscription is active and should be synced
         // Get price details to determine plan
         const priceId = latestSubscription.items.data[0]?.price.id;
+        console.log('🔍 Price ID from latest subscription:', priceId);
+
         const planName = await getPlanNameFromPriceId(priceId);
+        console.log('📋 Plan name lookup result:', { priceId, planName });
 
         if (!planName) {
             console.error('❌ Could not determine plan name from price ID:', priceId);
-            return NextResponse.json({ error: 'Could not determine plan name' }, { status: 400 });
+            console.error('❌ Available price mappings:', Object.keys({
+                'price_1RauH4CsZBRpsVkXOXdBujCQ': 'Solo',
+                'price_1RauH4CsZBRpsVkXa0dT3xwB': 'Solo',
+                'price_1RauH0CsZBRpsVkXHz5yaTaZ': 'Entrepreneur',
+                'price_1RauH0CsZBRpsVkXnwphSPYL': 'Entrepreneur',
+                'price_1RauGuCsZBRpsVkXItMdS7b8': 'Team',
+                'price_1RauGuCsZBRpsVkXqyMwPuFO': 'Team',
+            }));
+            return NextResponse.json({ error: 'Could not determine plan name', priceId }, { status: 400 });
         }
 
         console.log('📋 Determined plan:', planName);
@@ -241,17 +259,23 @@ export async function POST(request: NextRequest) {
 
 // Helper functions for plan mapping
 async function getPlanNameFromPriceId(priceId: string): Promise<string | null> {
-    // Map price IDs to plan names based on the price ID you're seeing
+    // Map price IDs to plan names based on the actual price IDs from Stripe
     const priceToPlans: Record<string, string> = {
-        // Current price IDs
+        // Current actual price IDs from Stripe
+        'price_1RauH4CsZBRpsVkXOXdBujCQ': 'Solo', // Solo MONTHLY ($9.90)
+        'price_1RauH4CsZBRpsVkXa0dT3xwB': 'Solo', // Solo YEARLY ($99.90)
+        'price_1RauH0CsZBRpsVkXHz5yaTaZ': 'Entrepreneur', // Entrepreneur MONTHLY ($29.90)
+        'price_1RauH0CsZBRpsVkXnwphSPYL': 'Entrepreneur', // Entrepreneur YEARLY ($299.90)
+        'price_1RauGuCsZBRpsVkXItMdS7b8': 'Team', // Team MONTHLY ($99.90)
+        'price_1RauGuCsZBRpsVkXqyMwPuFO': 'Team', // Team YEARLY ($999.00)
+
+        // Legacy price IDs (keep for backward compatibility)
         'price_1RZ9HkCsZBRpsVkXiDJ1KICM': 'Team', // Team YEARLY
         'price_1RZ9HkCsZBRpsVkXBQNNjw87': 'Team', // Team MONTHLY
         'price_1RZ9EoCsZBRpsVkXVniKqUeU': 'Entrepreneur', // Entrepreneur YEARLY
         'price_1RZ9EoCsZBRpsVkXxzMu3paC': 'Entrepreneur', // Entrepreneur MONTHLY
         'price_1RZ9CfCsZBRpsVkXUefPaqVu': 'Solo', // Solo YEARLY
-        'price_1RZ9CfCsZBRpsVkXt0nTDOee': 'Solo', // Solo MONTHLY - This is your price ID!
-
-        // Legacy/backup price IDs (keep for backward compatibility)
+        'price_1RZ9CfCsZBRpsVkXt0nTDOee': 'Solo', // Solo MONTHLY
         'price_1QKvr6P1PkxNKhO76LR6FHvU': 'Pro',
         'price_1QKvrCP1PkxNKhO7HkIZRGj7': 'Pro',
         'price_1QKvs5P1PkxNKhO7CILWcjpP': 'Enterprise',
