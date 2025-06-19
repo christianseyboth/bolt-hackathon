@@ -17,12 +17,8 @@ export const Footer = () => {
             href: '/pricing',
         },
         {
-            name: 'Security',
-            href: '/security',
-        },
-        {
-            name: 'API Docs',
-            href: '/docs',
+            name: 'Features',
+            href: '/#features',
         },
     ];
 
@@ -34,10 +30,6 @@ export const Footer = () => {
         {
             name: 'Contact',
             href: '/contact',
-        },
-        {
-            name: 'Careers',
-            href: '/careers',
         },
     ];
 

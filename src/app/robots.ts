@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/pricing', '/contact'],
+        allow: ['/', '/pricing', '/contact', '/about', '/privacy', '/terms', '/gdpr', '/security-policy'],
         disallow: [
           '/dashboard/*',
           '/auth/*',
@@ -23,7 +23,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'GPTBot',
-        allow: ['/', '/pricing', '/contact'],
+        allow: ['/', '/pricing', '/contact', '/about', '/privacy', '/terms', '/gdpr', '/security-policy'],
         disallow: [
           '/dashboard/*',
           '/auth/*',
@@ -39,7 +39,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'ChatGPT-User',
-        allow: ['/', '/pricing', '/contact'],
+        allow: ['/', '/pricing', '/contact', '/about', '/privacy', '/terms', '/gdpr', '/security-policy'],
         disallow: [
           '/dashboard/*',
           '/auth/*',
@@ -55,7 +55,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'CCBot',
-        allow: ['/', '/pricing', '/contact'],
+        allow: ['/', '/pricing', '/contact', '/about', '/privacy', '/terms', '/gdpr', '/security-policy'],
         disallow: [
           '/dashboard/*',
           '/auth/*',
@@ -71,7 +71,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'PerplexityBot',
-        allow: ['/', '/pricing', '/contact'],
+        allow: ['/', '/pricing', '/contact', '/about', '/privacy', '/terms', '/gdpr', '/security-policy'],
         disallow: [
           '/dashboard/*',
           '/auth/*',
@@ -87,7 +87,7 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'ClaudeBot',
-        allow: ['/', '/pricing', '/contact'],
+        allow: ['/', '/pricing', '/contact', '/about', '/privacy', '/terms', '/gdpr', '/security-policy'],
         disallow: [
           '/dashboard/*',
           '/auth/*',
