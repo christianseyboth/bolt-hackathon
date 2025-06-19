@@ -5,9 +5,6 @@ publish = ".next"
 [[plugins]]
 package = "@netlify/plugin-nextjs"
 
-# Temporarily disabled due to bundle size issues
-# [[plugins]]
-# package = "@netlify/plugin-emails"
 
 [build.environment]
 NEXT_TELEMETRY_DISABLED = "1"
@@ -22,11 +19,22 @@ external_node_modules = [
     "react",
     "react-dom",
     "@netlify/functions",
+    "mailgun.js",
+    "form-data",
 ]
 
-# Explicitly exclude emails directory from all function bundles
+# Explicitly exclude heavy directories from all function bundles
 [functions."*"]
-excluded_files = ["emails/**"]
+excluded_files = [
+    "emails/**",
+    "emails_backup/**",
+    "src/**",
+    ".next/**",
+    "public/**",
+    "node_modules/**",
+    "*.md",
+    "*.json",
+]
 
 [functions.send-scheduled-report]
 node_bundler = "esbuild"
@@ -37,5 +45,16 @@ external_node_modules = [
     "react",
     "react-dom",
     "@netlify/functions",
+    "mailgun.js",
+    "form-data",
 ]
-excluded_files = ["emails/**"]
+excluded_files = [
+    "emails/**",
+    "emails_backup/**",
+    "src/**",
+    ".next/**",
+    "public/**",
+    "node_modules/**",
+    "*.md",
+    "*.json",
+]
