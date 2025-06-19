@@ -1,47 +1,103 @@
-# Exclude documentation and test files
-*.md
-*.txt
-test-*
-*.test.*
-*.spec.*
+# Email templates are handled by @netlify/plugin-emails
+# Don't bundle them with functions - this is CRITICAL for bundle size
+emails/
 
-# Exclude source maps and development files
-*.map
-*.d.ts
+# Exclude heavy Next.js source directories
+src/app/
+src/components/
+src/lib/
+src/utils/
+src/hooks/
+src/config/
+src/types/
+src/constants/
+src/contexts/
+src/store/
 
-# Exclude git and IDE files
-.git/
-.vscode/
-.idea/
-
-# Exclude build artifacts that aren't needed
+# Exclude build artifacts
 .next/
 node_modules/
-.env*
-!.env.local
+dist/
+build/
+out/
 
-# Exclude other unnecessary files
-*.log
-*.lock
-yarn.lock
-package-lock.json
-
-# Exclude images and static assets
+# Exclude static assets (large files)
 public/
+static/
+assets/
 *.png
 *.jpg
 *.jpeg
 *.gif
 *.svg
 *.ico
+*.webp
+*.avif
+*.pdf
+*.zip
+*.tar.gz
 
 # Exclude documentation
 docs/
+documentation/
 *.md
 README*
+CHANGELOG*
+LICENSE*
 
-# Exclude configuration files not needed for functions
-next.config.js
+# Exclude config files not needed for functions
+next.config.*
 tsconfig.json
-tailwind.config.js
-postcss.config.js
+jsconfig.json
+tailwind.config.*
+postcss.config.*
+webpack.config.*
+babel.config.*
+jest.config.*
+cypress.config.*
+
+# Exclude development files
+*.map
+*.d.ts
+*.tsbuildinfo
+test-*
+*.test.*
+*.spec.*
+*.stories.*
+__tests__/
+coverage/
+cypress/
+.storybook/
+
+# Exclude git and IDE
+.git/
+.gitignore
+.gitattributes
+.vscode/
+.idea/
+.DS_Store
+
+# Exclude logs and locks
+*.log
+*.lock
+yarn.lock
+package-lock.json
+npm-debug.log*
+
+# Exclude environment files (except local)
+.env*
+!.env.local
+
+# Exclude SQL and migrations
+*.sql
+migrations/
+supabase/migrations/
+supabase/functions/
+sql-migrations/
+
+# Exclude other directories
+other/
+temp/
+tmp/
+cache/
+.cache/

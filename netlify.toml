@@ -14,7 +14,18 @@ SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL
 
 [functions]
 node_bundler = "esbuild"
-external_node_modules = ["@supabase/ssr", "@supabase/supabase-js", "next"]
+external_node_modules = [
+    "@supabase/ssr",
+    "@supabase/supabase-js",
+    "next",
+    "react",
+    "react-dom",
+    "@netlify/functions",
+]
+
+# Explicitly exclude emails directory from all function bundles
+[functions."*"]
+excluded_files = ["emails/**"]
 
 [functions.send-scheduled-report]
 node_bundler = "esbuild"
@@ -24,5 +35,6 @@ external_node_modules = [
     "next",
     "react",
     "react-dom",
+    "@netlify/functions",
 ]
-bundle_format = "iife"
+excluded_files = ["emails/**"]

@@ -1,4 +1,4 @@
-const handler = async function(event: any) {
+git const handler = async function(event: any) {
   if (event.body === null) {
     return {
       statusCode: 400,
@@ -103,5 +103,5 @@ const handler = async function(event: any) {
     };
   }
 };
-
 export { handler };
+
