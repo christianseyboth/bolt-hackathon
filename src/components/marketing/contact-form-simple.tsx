@@ -202,6 +202,13 @@ export const ContactFormSimple = () => {
                     <input type='hidden' name='form-name' value='contact' />
                     <input type='hidden' name='subject' value={inquiryType} />
 
+                    {/* Honeypot field - hidden from users */}
+                    <div style={{ display: 'none' }}>
+                        <label>
+                            Don't fill this out if you're human: <input name='bot-field' />
+                        </label>
+                    </div>
+
                     <div className='w-full'>
                         <label
                             className='text-neutral-300 text-sm font-medium mb-2 inline-block'
