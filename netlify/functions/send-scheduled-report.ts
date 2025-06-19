@@ -1,4 +1,4 @@
-import type { Handler } from "@netlify/functions";
+// import type { Handler } from "@netlify/functions";git 
 
 interface ReportEmailData {
   recipients: string[];
@@ -14,7 +14,7 @@ interface ReportEmailData {
   reportFormat: string;
 }
 
-const handler: Handler = async function(event) {
+const handler = async function(event: any) {
   if (event.body === null) {
     return {
       statusCode: 400,

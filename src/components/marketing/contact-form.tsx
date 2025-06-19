@@ -18,10 +18,34 @@ export const ContactForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [inquiryType, setInquiryType] = useState('');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setIsSubmitting(true);
-        // Let the form submit naturally to Netlify
-        // No need to prevent default or use fetch
+
+        try {
+            const form = e.target as HTMLFormElement;
+            const formData = new FormData(form);
+
+            // Add the inquiry type to the form data since it's controlled by React state
+            formData.set('subject', inquiryType);
+
+            const response = await fetch('/contact-form.html', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData as any).toString(),
+            });
+
+            if (response.ok) {
+                // Redirect to success page
+                window.location.href = '/contact/success';
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            alert('There was an error submitting the form. Please try again.');
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -132,10 +156,6 @@ export const ContactForm = () => {
 
                 <form
                     name='contact'
-                    method='POST'
-                    action='/contact/success'
-                    data-netlify='true'
-                    data-netlify-honeypot='bot-field'
                     onSubmit={handleSubmit}
                     className='w-full relative z-20 space-y-4'
                 >
@@ -207,9 +227,6 @@ export const ContactForm = () => {
                         >
                             Inquiry Type
                         </label>
-
-                        {/* Hidden input for Netlify to capture the select value */}
-                        <input type='hidden' name='subject' value={inquiryType} />
 
                         <Select onValueChange={setInquiryType}>
                             <SelectTrigger className='w-full h-11 bg-neutral-900/50 border border-neutral-700 text-white focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'>
