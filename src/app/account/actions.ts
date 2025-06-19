@@ -262,8 +262,8 @@ export async function getAccountData(): Promise<{
             (sub: any) => sub.status === 'active' && new Date(sub.current_period_end) > new Date()
         ) || false;
 
-        // Calculate emails used (assuming 100 is the free limit)
-        const emailsUsed = account.plan === 'Free' ? (100 - (account.emails_left || 0)) : 0;
+        // Calculate emails used (assuming 5 is the free limit)
+        const emailsUsed = account.plan === 'Free' ? (5 - (account.emails_left || 0)) : 0;
 
         return {
             success: true,
@@ -332,7 +332,7 @@ export async function exportAccountData(): Promise<{
                         updated_at: new Date().toISOString(),
                         full_name: 'Not provided',
                         role: 'user',
-                        emails_left: 100,
+                        emails_left: 5,
                         avatar_url: null,
                         provider: 'email',
                     },

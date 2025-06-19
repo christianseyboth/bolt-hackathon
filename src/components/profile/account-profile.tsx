@@ -452,22 +452,17 @@ export function AccountProfile() {
     const displayAvatarUrl = previewUrl || account.avatar_url;
     const canEditAvatar = account.provider === 'email';
 
-    // Debug logging for avatar issues
-    console.log('🔍 Avatar Debug:', {
-        account_avatar_url: account.avatar_url,
-        displayAvatarUrl,
-        previewUrl,
-        provider: account.provider,
-        canEditAvatar,
-    });
-
     return (
         <div className='space-y-6'>
             {/* Profile Header */}
             <div className='flex items-center space-x-4'>
                 <div className='relative'>
                     <Avatar
-                        className={`h-16 w-16 ${canEditAvatar && isEditing ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+                        className={`h-16 w-16 ${
+                            canEditAvatar && isEditing
+                                ? 'cursor-pointer hover:opacity-80 transition-opacity'
+                                : ''
+                        }`}
                         onClick={handleAvatarClick}
                     >
                         <AvatarImage

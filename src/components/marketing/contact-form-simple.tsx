@@ -16,77 +16,71 @@ import { IconMailFilled, IconPhone, IconMapPin, IconClock } from '@tabler/icons-
 import { useToast } from '@/components/ui/use-toast';
 
 export const ContactFormSimple = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [inquiryType, setInquiryType] = useState('');
     const { toast } = useToast();
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsSubmitting(true);
 
-        // If inquiry type is not selected, prevent submission
+        // If inquiry type is not selected, show error
         if (!inquiryType) {
             toast({
                 variant: 'destructive',
                 title: 'Missing Information',
                 description: 'Please select an inquiry type before submitting.',
             });
-            setIsSubmitting(false);
             return;
         }
 
-        try {
-            const form = e.target as HTMLFormElement;
-            const formData = new FormData(form);
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
 
-            // Convert to URLSearchParams for the function
-            const params = new URLSearchParams();
-            params.append('form-name', 'contact');
-            params.append('subject', inquiryType);
-            params.append('name', formData.get('name') as string);
-            params.append('email', formData.get('email') as string);
-            params.append('company', (formData.get('company') as string) || '');
-            params.append('message', formData.get('message') as string);
-            params.append('bot-field', ''); // Honeypot
+        // Get form values
+        const name = formData.get('name') as string;
+        const email = formData.get('email') as string;
+        const company = formData.get('company') as string;
+        const message = formData.get('message') as string;
 
-            console.log('Submitting form data:', Object.fromEntries(params.entries()));
-
-            // Submit to Netlify Function
-            const response = await fetch('/.netlify/functions/contact-form', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: params.toString(),
-            });
-
-            console.log('Response status:', response.status);
-
-            if (!response.ok) {
-                const responseText = await response.text();
-                console.error('Response body:', responseText);
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            // Success!
-            toast({
-                variant: 'success',
-                title: 'Message Sent Successfully! 🎉',
-                description:
-                    "Thank you for contacting SecPilot. We'll get back to you within 24 hours.",
-            });
-
-            form.reset();
-            setInquiryType('');
-            setIsSubmitting(false);
-        } catch (error) {
-            console.error('Form submission error:', error);
+        // Validate required fields
+        if (!name || !email || !message) {
             toast({
                 variant: 'destructive',
-                title: 'Submission Failed',
-                description:
-                    'There was an error submitting your message. Please try again or contact us directly at support@secpilot.io.',
+                title: 'Missing Information',
+                description: 'Please fill in all required fields.',
             });
-            setIsSubmitting(false);
+            return;
         }
+
+        // Create mailto link
+        const subject = `SecPilot Contact: ${
+            inquiryType.charAt(0).toUpperCase() + inquiryType.slice(1)
+        } Inquiry`;
+        const body = `Name: ${name}
+Email: ${email}
+Company: ${company || 'Not provided'}
+Inquiry Type: ${inquiryType}
+
+Message:
+${message}`;
+
+        const mailtoLink = `mailto:support@secpilot.io?subject=${encodeURIComponent(
+            subject
+        )}&body=${encodeURIComponent(body)}`;
+
+        // Open email client
+        window.location.href = mailtoLink;
+
+        // Show success message
+        toast({
+            variant: 'success',
+            title: 'Email Client Opened! 📧',
+            description:
+                'Your email client should open with a pre-filled message. Just click send!',
+        });
+
+        // Reset form
+        form.reset();
+        setInquiryType('');
     };
 
     return (
@@ -112,7 +106,12 @@ export const ContactFormSimple = () => {
                         </div>
                         <div>
                             <p className='text-sm font-medium text-neutral-200'>Email Support</p>
-                            <p className='text-sm text-neutral-400'>support@secpilot.io</p>
+                            <a
+                                href='mailto:support@secpilot.io'
+                                className='text-sm text-emerald-400 hover:text-emerald-300 transition-colors'
+                            >
+                                support@secpilot.io
+                            </a>
                             <p className='text-xs text-neutral-500 mt-1'>
                                 Typical response within 2 hours
                             </p>
@@ -190,8 +189,8 @@ export const ContactFormSimple = () => {
                 <div className='w-full relative z-20'>
                     <h3 className='text-lg font-semibold text-white mb-2'>Send us a message</h3>
                     <p className='text-sm text-neutral-400 mb-6'>
-                        Tell us about your email security needs and we&apos;ll get back to you
-                        within 24 hours.
+                        Fill out the form below and we&apos;ll open your email client with a
+                        pre-filled message. Just click send!
                     </p>
                 </div>
 
@@ -251,10 +250,10 @@ export const ContactFormSimple = () => {
                             className='text-neutral-300 text-sm font-medium mb-2 inline-block'
                             htmlFor='subject'
                         >
-                            Inquiry Type
+                            Inquiry Type *
                         </label>
 
-                        <Select onValueChange={setInquiryType}>
+                        <Select onValueChange={setInquiryType} value={inquiryType}>
                             <SelectTrigger className='w-full h-11 bg-neutral-900/50 border border-neutral-700 text-white focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all duration-200'>
                                 <SelectValue placeholder='Select an option' />
                             </SelectTrigger>
@@ -318,17 +317,17 @@ export const ContactFormSimple = () => {
 
                     <Button
                         type='submit'
-                        disabled={isSubmitting || !inquiryType}
+                        disabled={!inquiryType}
                         variant='primary'
                         className='w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white border-0 h-11 transition-all duration-200'
                     >
-                        {isSubmitting ? 'Sending...' : 'Send Message'}
+                        Open Email Client
                     </Button>
                 </form>
 
                 <p className='text-xs text-neutral-500 text-center w-full relative z-20'>
-                    By submitting this form, you agree to our privacy policy. We&apos;ll only use
-                    your information to respond to your inquiry.
+                    This will open your default email client with a pre-filled message to
+                    support@secpilot.io
                 </p>
             </div>
         </Container>
