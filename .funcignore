@@ -1,6 +1,20 @@
 # Email templates are handled by @netlify/plugin-emails
 # Don't bundle them with functions - this is CRITICAL for bundle size
 emails/
+emails_backup/
+*.email.*
+email-*
+*email*
+scheduled-report*
+node_modules/
+.git/
+.next/
+public/
+src/
+*.md
+*.json
+package-lock.json
+yarn.lock
 
 # Exclude heavy Next.js source directories
 src/app/
