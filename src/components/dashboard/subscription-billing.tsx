@@ -429,15 +429,56 @@ export function SubscriptionBilling({
         }
     };
 
-    const handleManualRefresh = () => {
-        toast({
-            title: 'Refreshing subscription data...',
-            description: 'Getting the latest information from Stripe.',
-        });
+    const handleManualRefresh = async () => {
+        if (isAutoSyncing) return;
 
-        setTimeout(() => {
-            window.location.reload();
-        }, 500);
+        setIsAutoSyncing(true);
+
+        try {
+            toast({
+                title: 'Syncing subscription data...',
+                description: 'Getting the latest information from Stripe.',
+            });
+
+            // Call the sync API instead of just reloading
+            const response = await fetch('/api/stripe/sync-subscription-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ accountId: account.id }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                toast({
+                    title: 'Sync successful!',
+                    description: `Updated to ${result.planName} plan. Refreshing page...`,
+                });
+
+                // Now reload the page to show updated data
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                console.error('Manual sync failed:', result);
+                toast({
+                    title: 'Sync failed',
+                    description: result.error || 'Failed to sync subscription status.',
+                    variant: 'destructive',
+                });
+            }
+        } catch (error) {
+            console.error('Manual sync error:', error);
+            toast({
+                title: 'Sync error',
+                description: 'Failed to sync subscription status.',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsAutoSyncing(false);
+        }
     };
 
     return (
