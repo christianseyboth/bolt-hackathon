@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Logo } from '../logo';
 import {
     IconDashboard,
@@ -28,6 +28,7 @@ interface SidebarProps {
 
 export function Sidebar({ className, onNavigate }: SidebarProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const { toast } = useToast();
     const { user, signOut: authSignOut } = useAuth();
     const [subscriptionAccess, setSubscriptionAccess] = useState<{
@@ -113,7 +114,10 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
     const handleLogout = async () => {
         try {
             await authSignOut();
+            // Close mobile sidebar if open
             if (onNavigate) onNavigate();
+            // Redirect to home page
+            router.push('/');
         } catch (error) {
             console.error('Logout error:', error);
             toast({
