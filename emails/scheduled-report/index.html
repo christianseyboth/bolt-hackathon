@@ -1,0 +1,69 @@
+<html>
+  <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8fafc;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+      <!-- Header -->
+      <div style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 30px; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">
+          SecPilot Security Report
+        </h1>
+        <p style="color: #cbd5e1; margin: 10px 0 0 0; font-size: 16px;">
+          {{reportType}} | {{reportDate}}
+        </p>
+      </div>
+
+      <!-- Content -->
+      <div style="padding: 30px;">
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1e293b; margin: 0 0 15px 0; font-size: 20px;">
+            Security Summary
+          </h2>
+          <p style="color: #64748b; margin: 0; font-size: 16px; line-height: 1.6;">
+            Your {{frequency}} security report is ready for download. This report covers the period from {{periodStart}} to {{periodEnd}}.
+          </p>
+        </div>
+
+        <!-- Key Metrics -->
+        <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+          <h3 style="color: #1e293b; margin: 0 0 15px 0; font-size: 18px;">Key Metrics</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <div style="flex: 1; min-width: 120px;">
+              <div style="font-size: 24px; font-weight: 600; color: #059669;">{{emailsScanned}}</div>
+              <div style="font-size: 14px; color: #64748b;">Emails Scanned</div>
+            </div>
+            <div style="flex: 1; min-width: 120px;">
+              <div style="font-size: 24px; font-weight: 600; color: #dc2626;">{{threatsBlocked}}</div>
+              <div style="font-size: 14px; color: #64748b;">Threats Blocked</div>
+            </div>
+            <div style="flex: 1; min-width: 120px;">
+              <div style="font-size: 24px; font-weight: 600; color: #2563eb;">{{securityScore}}%</div>
+              <div style="font-size: 14px; color: #64748b;">Security Score</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Download Button -->
+        <div style="text-align: center; margin-bottom: 30px;">
+          <a href="{{downloadUrl}}"
+             style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 16px;">
+            Download Full Report ({{reportFormat}})
+          </a>
+        </div>
+
+        <!-- Additional Info -->
+        <div style="border-top: 1px solid #e2e8f0; padding-top: 20px;">
+          <p style="color: #64748b; margin: 0; font-size: 14px; line-height: 1.6;">
+            This is an automated report from SecPilot. If you have any questions, please contact our support team.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+        <p style="color: #64748b; margin: 0; font-size: 12px;">
+          SecPilot - Advanced AI-powered Email Security<br>
+          <a href="https://secpilot.io" style="color: #2563eb; text-decoration: none;">secpilot.io</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

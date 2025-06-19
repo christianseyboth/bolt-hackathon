@@ -178,22 +178,14 @@ export default function ProfilePage() {
                                     <Label>Your Unique Forwarding Address</Label>
                                     <div className='flex gap-2 mt-1'>
                                         <Input
-                                            value={
-                                                user
-                                                    ? `${user.email?.split('@')[0]}-security@secpilot.ai`
-                                                    : 'Loading...'
-                                            }
+                                            value='check@secpilot.io'
                                             disabled
                                             className='flex-1'
                                         />
                                         <Button
                                             variant='outline'
                                             size='sm'
-                                            onClick={() =>
-                                                copyToClipboard(
-                                                    `${user?.email?.split('@')[0]}-security@secpilot.ai`
-                                                )
-                                            }
+                                            onClick={() => copyToClipboard('check@secpilot.io')}
                                         >
                                             <IconCopy className='h-4 w-4' />
                                         </Button>
@@ -205,7 +197,8 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
 
-                        {/* Additional Settings Card */}
+                        {/* Preferences Section - Hidden for now as lingo implementation failed */}
+                        {/*
                         <Card className='border border-neutral-800 bg-neutral-900'>
                             <CardHeader>
                                 <CardTitle>Preferences</CardTitle>
@@ -244,6 +237,7 @@ export default function ProfilePage() {
                                 </div>
                             </CardContent>
                         </Card>
+                        */}
                     </TabsContent>
 
                     {/* API Tab */}
