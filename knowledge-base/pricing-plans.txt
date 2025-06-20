@@ -1,0 +1,125 @@
+# SecPilot Pricing Plans
+
+## Overview
+
+SecPilot offers transparent, scalable pricing starting at $19/month for small business teams. All
+plans include real-time threat detection, phishing protection, malware scanning, detailed security
+reports, and customer support.
+
+## Pricing Tiers
+
+### Solo Plan - $19/month ($190/year)
+
+**Perfect for individual professionals**
+
+**Features:**
+
+-   10 email scans per month
+-   AI threat analysis and detection
+-   Real-time phishing protection
+-   Malware scanning
+-   Email & Chat Support
+-   Works with all major email providers
+-   Zero-storage privacy protection
+-   SOC2 Type II compliance
+
+**Best For:** Individual freelancers, remote workers, consultants
+
+---
+
+### Entrepreneur Plan - $49/month ($490/year) ⭐ MOST POPULAR
+
+**Ideal for growing businesses**
+
+**Features:**
+
+-   30 email scans per month
+-   AI threat analysis and detection
+-   Advanced Analytics and reporting
+-   Real-time threat detection
+-   Business email compromise (BEC) protection
+-   Email & Chat Support
+-   API access for integrations
+-   Advanced threat intelligence
+-   Custom security policies
+
+**Best For:** Small businesses, startups, growing teams (up to 10 users)
+
+---
+
+### Team Plan - $99/month ($990/year)
+
+**Advanced features for teams**
+
+**Features:**
+
+-   100 email scans per month
+-   Full AI threat analysis suite
+-   Advanced Analytics dashboard
+-   Priority Support (phone + email + chat)
+-   Complete API access
+-   Advanced Reporting capabilities
+-   Team management tools
+-   Custom threat policies
+-   Dedicated customer success manager
+-   Advanced threat intelligence feeds
+
+**Best For:** Growing companies, larger teams (up to 50 users)
+
+---
+
+### Enterprise Plan - Custom Pricing
+
+**Custom pricing for large organizations**
+
+**Features:**
+
+-   Unlimited email scans
+-   All Team features included
+-   Custom SLA agreements
+-   SOC2 Type II compliance
+-   HIPAA compliance
+-   Custom integrations
+-   Dedicated security analyst
+-   24/7 phone support
+-   Custom threat intelligence
+-   Advanced compliance reporting
+
+**Best For:** Large organizations, regulated industries, custom requirements
+
+## Savings & Value
+
+-   **Annual Billing**: Save 20% when billed yearly
+-   **Free Trial**: 14-day free trial with full access to all features (up to 5 email accounts)
+-   **No Credit Card Required**: Start your trial without payment information
+-   **ROI**: Most customers save $50,000+ annually by preventing just one successful email attack
+
+## What's Included in All Plans
+
+-   Real-time email threat detection
+-   99.9% accuracy phishing protection
+-   Malware and ransomware scanning
+-   Zero-storage privacy architecture
+-   Works with Gmail, Outlook, Office 365
+-   Mobile and desktop protection
+-   Secure API integration
+-   Threat quarantine with 30-day retention
+-   Detailed threat explanations
+-   False positive resolution tools
+
+## Billing & Support
+
+-   **Monthly or Annual Billing**: Flexible payment options
+-   **24/7 Support**: Email and chat for all plans, phone for Team+
+-   **No Hidden Fees**: Transparent pricing with no surprise charges
+-   **Satisfaction Guarantee**: 30-day money-back guarantee
+-   **Easy Cancellation**: Cancel anytime, no long-term contracts
+
+## Getting Started
+
+1. **Start Free Trial**: 14 days with full feature access
+2. **Quick Setup**: 5-minute integration with existing email
+3. **Immediate Protection**: Real-time threat detection starts instantly
+4. **Choose Your Plan**: Upgrade to the plan that fits your needs
+
+Contact our sales team for Enterprise pricing and custom requirements.

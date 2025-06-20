@@ -293,6 +293,14 @@ export default function Home() {
             </main>
             <Footer />
             <Toaster />
+
+            {/* ElevenLabs ConvAI Widget */}
+            <elevenlabs-convai agent-id='agent_01jvw1s8axewkvfpz9grfdzrtz'></elevenlabs-convai>
+            <script
+                src='https://unpkg.com/@elevenlabs/convai-widget-embed'
+                async
+                type='text/javascript'
+            ></script>
         </>
     );
 }
