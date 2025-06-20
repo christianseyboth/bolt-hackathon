@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -70,9 +70,7 @@ export function SecuritySettings() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showMfaDisableDialog, setShowMfaDisableDialog] = useState(false);
     const [mfaDisableCode, setMfaDisableCode] = useState('');
-    const [mfaDisableResolver, setMfaDisableResolver] = useState<
-        ((value: string | null) => void) | null
-    >(null);
+    const mfaDisableResolver = useRef<((value: string | null) => void) | null>(null);
     const supabase = createClient();
     const { toast } = useToast();
 
@@ -281,7 +279,7 @@ export function SecuritySettings() {
     const showMfaVerificationDialog = (): Promise<string | null> => {
         return new Promise((resolve) => {
             setShowMfaDisableDialog(true);
-            setMfaDisableResolver(resolve);
+            mfaDisableResolver.current = resolve;
         });
     };
 
@@ -694,9 +692,9 @@ export function SecuritySettings() {
                 open={showMfaDisableDialog}
                 onOpenChange={(open) => {
                     setShowMfaDisableDialog(open);
-                    if (!open && mfaDisableResolver) {
-                        mfaDisableResolver(null); // User cancelled
-                        setMfaDisableResolver(null);
+                    if (!open && mfaDisableResolver.current) {
+                        mfaDisableResolver.current(null); // User cancelled
+                        mfaDisableResolver.current = null;
                         setMfaDisableCode('');
                     }
                 }}
@@ -733,9 +731,9 @@ export function SecuritySettings() {
                             variant='outline'
                             onClick={() => {
                                 setShowMfaDisableDialog(false);
-                                if (mfaDisableResolver) {
-                                    mfaDisableResolver(null);
-                                    setMfaDisableResolver(null);
+                                if (mfaDisableResolver.current) {
+                                    mfaDisableResolver.current(null);
+                                    mfaDisableResolver.current = null;
                                     setMfaDisableCode('');
                                 }
                             }}
@@ -744,23 +742,15 @@ export function SecuritySettings() {
                         </Button>
                         <Button
                             onClick={() => {
-                                console.log('MFA Disable button clicked', {
-                                    mfaDisableCode,
-                                    codeLength: mfaDisableCode.length,
-                                    hasResolver: !!mfaDisableResolver,
-                                });
-
-                                if (mfaDisableCode.length === 6 && mfaDisableResolver) {
+                                if (mfaDisableCode.length === 6 && mfaDisableResolver.current) {
                                     try {
-                                        mfaDisableResolver(mfaDisableCode);
-                                        setMfaDisableResolver(null);
+                                        mfaDisableResolver.current(mfaDisableCode);
+                                        mfaDisableResolver.current = null;
                                         setMfaDisableCode('');
                                         setShowMfaDisableDialog(false);
                                     } catch (error) {
                                         console.error('Error in MFA disable resolver:', error);
                                     }
-                                } else {
-                                    console.log('Button click ignored - invalid conditions');
                                 }
                             }}
                             disabled={mfaDisableCode.length !== 6}
