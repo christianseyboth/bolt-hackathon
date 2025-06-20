@@ -49,15 +49,9 @@ export const NotificationBell = () => {
         }
 
         console.log('NotificationBell: Setting up with accountId:', accountId);
-        console.log('NotificationBell: Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-        console.log(
-            'NotificationBell: Supabase anon key exists:',
-            !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-        );
-
         loadNotifications();
 
-        // Set up real-time subscription with better error handling
+        // Set up real-time subscription following Supabase API docs pattern
         const setupRealtimeSubscription = async () => {
             try {
                 setConnectionStatus('connecting');
@@ -65,46 +59,41 @@ export const NotificationBell = () => {
                 // Clean up any existing subscription first
                 if (channelRef.current) {
                     console.log('Cleaning up existing subscription');
-                    supabase.removeChannel(channelRef.current);
+                    await supabase.removeChannel(channelRef.current);
                     channelRef.current = null;
                 }
 
                 console.log('Setting up realtime subscription for accountId:', accountId);
 
-                // Test basic connection first
-                const { data: testData, error: testError } = await supabase
-                    .from('mail_events')
-                    .select('count')
-                    .eq('account_id', accountId)
-                    .limit(1);
-
-                if (testError) {
-                    console.error('Database connection test failed:', testError);
-                    throw new Error(`Database connection failed: ${testError.message}`);
-                }
-
-                console.log('Database connection test successful');
-
-                // First, try a simple test subscription (like in Supabase dashboard)
-                const testChannel = supabase
-                    .channel('test-mail-events')
+                // Create channel following API docs pattern
+                const channel = supabase
+                    .channel(`mail-events-${accountId}`)
                     .on(
                         'postgres_changes',
-                        { event: '*', schema: 'public', table: 'mail_events' },
+                        {
+                            event: '*',
+                            schema: 'public',
+                            table: 'mail_events',
+                            filter: `account_id=eq.${accountId}`,
+                        },
                         (payload) => {
-                            console.log('Test subscription - Change received!', payload);
+                            console.log('Change received!', payload);
+
+                            if (payload.eventType === 'INSERT') {
+                                handleNewThreatDetected(payload.new);
+                            } else if (payload.eventType === 'UPDATE') {
+                                handleThreatUpdated(payload.new);
+                            }
                         }
                     )
                     .subscribe((status) => {
-                        console.log('Test subscription status:', status);
+                        console.log('Subscription status:', status);
+
                         if (status === 'SUBSCRIBED') {
-                            console.log(
-                                'Test subscription successful - now setting up filtered subscription'
-                            );
-                            // If test succeeds, set up the filtered subscription
-                            setupFilteredSubscription();
+                            console.log('Successfully subscribed to realtime updates');
+                            setConnectionStatus('connected');
                         } else if (status === 'CHANNEL_ERROR') {
-                            console.error('Test subscription failed');
+                            console.error('Realtime subscription error');
                             setConnectionStatus('error');
                             toast({
                                 title: 'Connection Error',
@@ -112,11 +101,22 @@ export const NotificationBell = () => {
                                     'Unable to connect to real-time updates. Please check if mail_events table is enabled for realtime.',
                                 variant: 'destructive',
                             });
+                        } else if (status === 'TIMED_OUT') {
+                            console.error('Realtime subscription timed out');
+                            setConnectionStatus('error');
+                            toast({
+                                title: 'Connection Timeout',
+                                description:
+                                    'Real-time connection timed out. Please refresh the page.',
+                                variant: 'destructive',
+                            });
+                        } else if (status === 'CLOSED') {
+                            console.log('Realtime subscription closed');
+                            setConnectionStatus('disconnected');
                         }
                     });
 
-                // Store test channel for cleanup
-                channelRef.current = testChannel;
+                channelRef.current = channel;
             } catch (error) {
                 console.error('Error setting up realtime subscription:', error);
                 setConnectionStatus('error');
@@ -128,70 +128,6 @@ export const NotificationBell = () => {
                     variant: 'destructive',
                 });
             }
-        };
-
-        // Set up the filtered subscription (only for user's account)
-        const setupFilteredSubscription = () => {
-            const filteredChannel = supabase
-                .channel(`mail_events_${accountId}`)
-                .on(
-                    'postgres_changes',
-                    {
-                        event: 'INSERT',
-                        schema: 'public',
-                        table: 'mail_events',
-                        filter: `account_id=eq.${accountId}`,
-                    },
-                    (payload) => {
-                        console.log('New threat detected via realtime:', payload.new);
-                        handleNewThreatDetected(payload.new);
-                    }
-                )
-                .on(
-                    'postgres_changes',
-                    {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'mail_events',
-                        filter: `account_id=eq.${accountId}`,
-                    },
-                    (payload) => {
-                        console.log('Threat updated via realtime:', payload.new);
-                        handleThreatUpdated(payload.new);
-                    }
-                )
-                .subscribe((status) => {
-                    console.log('Filtered subscription status:', status);
-                    setConnectionStatus(status === 'SUBSCRIBED' ? 'connected' : 'error');
-
-                    if (status === 'SUBSCRIBED') {
-                        console.log('Successfully subscribed to filtered realtime updates');
-                    } else if (status === 'CHANNEL_ERROR') {
-                        console.error('Filtered realtime subscription error');
-                        toast({
-                            title: 'Connection Error',
-                            description: 'Unable to connect to filtered real-time updates.',
-                            variant: 'destructive',
-                        });
-                    } else if (status === 'TIMED_OUT') {
-                        console.error('Filtered realtime subscription timed out');
-                        toast({
-                            title: 'Connection Timeout',
-                            description:
-                                'Filtered real-time connection timed out. Please refresh the page.',
-                            variant: 'destructive',
-                        });
-                    } else if (status === 'CLOSED') {
-                        console.log('Filtered realtime subscription closed');
-                        setConnectionStatus('disconnected');
-                    }
-                });
-
-            // Replace the test channel with the filtered channel
-            if (channelRef.current) {
-                supabase.removeChannel(channelRef.current);
-            }
-            channelRef.current = filteredChannel;
         };
 
         setupRealtimeSubscription();
