@@ -5,7 +5,6 @@ import { Container } from '@/components/container';
 import { IconReceiptFilled } from '@tabler/icons-react';
 import { Metadata } from 'next';
 import { PricingSection } from '@/components/marketing/pricing-section';
-import '@/types/elevenlabs';
 
 export const metadata: Metadata = {
     title: 'Email Security Pricing Plans | SecPilot Transparent Pricing',
@@ -251,12 +250,14 @@ export default function PricingPage() {
             </main>
 
             {/* ElevenLabs ConvAI Widget */}
-            <elevenlabs-convai agent-id='agent_01jvw1s8axewkvfpz9grfdzrtz'></elevenlabs-convai>
-            <script
-                src='https://unpkg.com/@elevenlabs/convai-widget-embed'
-                async
-                type='text/javascript'
-            ></script>
+            <div
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        <elevenlabs-convai agent-id="agent_01jvw1s8axewkvfpz9grfdzrtz"></elevenlabs-convai>
+                        <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+                    `,
+                }}
+            />
         </>
     );
 }
