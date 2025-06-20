@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { Metadata } from 'next';
 import { LazyTestimonialsSlider, LazyBackgroundEffects } from '@/components/LazyComponents';
+import { ElevenLabsWidget } from '@/components/ElevenLabsWidget';
 
 export const metadata: Metadata = {
     title: 'SecPilot - Advanced Email Security Software | AI-Powered Phishing Protection',
@@ -295,14 +296,7 @@ export default function Home() {
             <Toaster />
 
             {/* ElevenLabs ConvAI Widget */}
-            <div
-                dangerouslySetInnerHTML={{
-                    __html: `
-                        <elevenlabs-convai agent-id="agent_01jvw1s8axewkvfpz9grfdzrtz"></elevenlabs-convai>
-                        <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
-                    `,
-                }}
-            />
+            <ElevenLabsWidget agentId='agent_01jvw1s8axewkvfpz9grfdzrtz' />
         </>
     );
 }

@@ -5,6 +5,7 @@ import { Subheading } from '@/components/subheading';
 import { Container } from '@/components/container';
 import { IconMail, IconShieldCheck, IconHeadset, IconBuildingBank } from '@tabler/icons-react';
 import { Metadata } from 'next';
+import { ElevenLabsWidget } from '@/components/ElevenLabsWidget';
 
 export const metadata: Metadata = {
     title: 'Contact SecPilot | Email Security Software Support & Sales',
@@ -208,14 +209,7 @@ export default function ContactPage() {
             </div>
 
             {/* ElevenLabs ConvAI Widget */}
-            <div
-                dangerouslySetInnerHTML={{
-                    __html: `
-                        <elevenlabs-convai agent-id="agent_01jvw1s8axewkvfpz9grfdzrtz"></elevenlabs-convai>
-                        <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
-                    `,
-                }}
-            />
+            <ElevenLabsWidget agentId='agent_01jvw1s8axewkvfpz9grfdzrtz' />
         </main>
     );
 }
