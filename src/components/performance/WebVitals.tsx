@@ -31,9 +31,10 @@ export const WebVitalsTracker = () => {
         // Only track in production
         if (process.env.NODE_ENV !== 'production') return;
 
-        import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+        // Note: web-vitals v4+ uses onINP instead of onFID
+        import('web-vitals').then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
             onCLS(reportWebVitals);
-            onFID(reportWebVitals);
+            onINP(reportWebVitals); // INP (Interaction to Next Paint) replaced FID
             onFCP(reportWebVitals);
             onLCP(reportWebVitals);
             onTTFB(reportWebVitals);
