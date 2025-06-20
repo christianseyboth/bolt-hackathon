@@ -18,10 +18,10 @@ export const Hero = () => {
         target: containerRef,
     });
     const [isMobile, setIsMobile] = useState(false);
-    const [isClient, setIsClient] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setIsClient(true);
+        setMounted(true);
         const checkMobile = () => {
             setIsMobile(window.innerWidth <= 768);
         };
@@ -75,6 +75,7 @@ export const Hero = () => {
             <div
                 className='flex items-center justify-center relative p-2 md:p-20 cursor-pointer md:-mt-20'
                 style={{ position: 'relative' }}
+                suppressHydrationWarning
             >
                 <div
                     className='w-full relative'
@@ -83,7 +84,7 @@ export const Hero = () => {
                         position: 'relative',
                     }}
                 >
-                    {isClient ? (
+                    {mounted ? (
                         <Card rotate={rotate} translate={translate} scale={scale}>
                             <Image
                                 src={`/hero-screenshot.avif`}

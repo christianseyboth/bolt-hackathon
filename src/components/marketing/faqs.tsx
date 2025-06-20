@@ -85,11 +85,10 @@ const questions = [
 
 export const FAQs = () => {
     const [expanded, setExpanded] = useState<number | false>(false);
-    const [isClient, setIsClient] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
-    // Only enable interactivity on client-side
     useEffect(() => {
-        setIsClient(true);
+        setMounted(true);
     }, []);
 
     return (
@@ -113,9 +112,9 @@ export const FAQs = () => {
                 </div>
 
                 {/* FAQ Grid */}
-                <div className='space-y-4'>
+                <div className='space-y-4' suppressHydrationWarning>
                     {questions.map((item, i) =>
-                        isClient ? (
+                        mounted ? (
                             <Accordion
                                 key={i}
                                 i={i}

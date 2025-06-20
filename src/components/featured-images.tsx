@@ -43,19 +43,19 @@ export const FeaturedImages = ({
     showStars?: boolean;
     containerClassName?: string;
 }) => {
-    const [isClient, setIsClient] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setIsClient(true);
+        setMounted(true);
     }, []);
 
     return (
         <div className={cn('flex flex-col items-center mt-10 mb-10', containerClassName)}>
             {/* Target audience indicators */}
-            <div className='mb-6'>
+            <div className='mb-6' suppressHydrationWarning>
                 <div className='flex flex-wrap justify-center gap-4 max-w-2xl mx-auto'>
                     {trustIndicators.map((indicator, index) =>
-                        isClient ? (
+                        mounted ? (
                             <motion.div
                                 key={indicator.label}
                                 initial={{ opacity: 0, y: 20 }}
