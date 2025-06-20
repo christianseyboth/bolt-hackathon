@@ -110,7 +110,10 @@ export function EmailList({ emails }: any) {
             </Card>
 
             <div className='border rounded-lg border-neutral-800 bg-neutral-900'>
-                <div className='overflow-x-auto relative'>
+                <div
+                    className='overflow-x-auto relative [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                    style={{ scrollbarWidth: 'thin', scrollbarColor: '#525252 #262626' }}
+                >
                     <table className='w-full min-w-[800px] border-collapse'>
                         <thead className='bg-neutral-800/50'>
                             <tr className='text-xs font-medium'>

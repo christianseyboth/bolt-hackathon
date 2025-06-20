@@ -25,7 +25,7 @@ export function DashboardHeader({
             )}
         >
             <div>
-                <h1 className='text-2xl [@media(min-width:1025px)]:text-3xl font-bold'>
+                <h1 className='text-xl [@media(min-width:1025px)]:text-3xl font-bold'>
                     {heading}
                 </h1>
                 {subheading && <p className='text-neutral-400 text-sm mt-1'>{subheading}</p>}

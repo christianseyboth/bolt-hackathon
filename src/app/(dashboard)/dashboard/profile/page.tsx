@@ -289,7 +289,13 @@ export default function ProfilePage() {
                                             <summary className='cursor-pointer text-blue-400 hover:text-blue-300'>
                                                 View example
                                             </summary>
-                                            <pre className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs'>
+                                            <pre
+                                                className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                                                style={{
+                                                    scrollbarWidth: 'thin',
+                                                    scrollbarColor: '#525252 #404040',
+                                                }}
+                                            >
                                                 {getApiDocumentationExample(
                                                     '/analyses',
                                                     'GET',
@@ -314,7 +320,13 @@ export default function ProfilePage() {
                                             <summary className='cursor-pointer text-blue-400 hover:text-blue-300'>
                                                 View example
                                             </summary>
-                                            <pre className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs'>
+                                            <pre
+                                                className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                                                style={{
+                                                    scrollbarWidth: 'thin',
+                                                    scrollbarColor: '#525252 #404040',
+                                                }}
+                                            >
                                                 {getApiDocumentationExample('/account')}
                                             </pre>
                                         </details>
@@ -335,7 +347,13 @@ export default function ProfilePage() {
                                             <summary className='cursor-pointer text-blue-400 hover:text-blue-300'>
                                                 View example
                                             </summary>
-                                            <pre className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs'>
+                                            <pre
+                                                className='bg-neutral-800 p-3 rounded mt-2 overflow-x-auto font-mono text-xs [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                                                style={{
+                                                    scrollbarWidth: 'thin',
+                                                    scrollbarColor: '#525252 #404040',
+                                                }}
+                                            >
                                                 {getApiDocumentationExample(
                                                     '/usage',
                                                     'GET',

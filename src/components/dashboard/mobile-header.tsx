@@ -1,8 +1,15 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '../ui/sheet';
+import {
+    Sheet,
+    SheetContent,
+    SheetTrigger,
+    SheetTitle,
+    SheetDescription,
+    SheetClose,
+} from '../ui/sheet';
 import { Button } from '../ui/button';
-import { IconDeviceLaptop, IconMenu2 } from '@tabler/icons-react';
+import { IconDeviceLaptop, IconMenu2, IconX } from '@tabler/icons-react';
 import { Logo } from '../logo';
 import { Sidebar } from './sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -72,12 +79,31 @@ export function MobileHeader() {
                         <IconMenu2 className='h-5 w-5' />
                     </Button>
                 </SheetTrigger>
-                <SheetContent side='left' className='p-0 w-64'>
+                <SheetContent side='left' className='p-0 w-64 [&>button]:hidden'>
                     <SheetTitle className='sr-only'>Navigation Menu</SheetTitle>
                     <SheetDescription className='sr-only'>
                         Access dashboard navigation and menu items
                     </SheetDescription>
-                    <Sidebar onNavigate={() => setOpen(false)} />
+                    {/* Custom Header with Logo and Close Button */}
+                    <div className='flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-950'>
+                        <Logo />
+                        <SheetClose asChild>
+                            <Button
+                                variant='ghost'
+                                size='icon'
+                                className='h-8 w-8 text-neutral-400 hover:text-white'
+                            >
+                                <IconX className='h-5 w-5' />
+                            </Button>
+                        </SheetClose>
+                    </div>
+                    {/* Sidebar Content with Custom Mobile Layout */}
+                    <div
+                        className='h-[calc(100vh-73px)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                        style={{ scrollbarWidth: 'thin', scrollbarColor: '#525252 #262626' }}
+                    >
+                        <Sidebar onNavigate={() => setOpen(false)} isMobile={true} />
+                    </div>
                 </SheetContent>
             </Sheet>
             <Logo />

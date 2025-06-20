@@ -44,7 +44,7 @@ const TrustIndicators = () => {
 
 export const Testimonials = () => {
     return (
-        <div className='relative mt-24'>
+        <div className='relative mt-8'>
             <div className='pb-20'>
                 <FeatureIconContainer className='flex justify-center items-center overflow-hidden'>
                     <div className='relative'>

@@ -42,7 +42,7 @@ export const Tools = () => {
     ];
 
     return (
-        <div className='w-full relative h-full pt-20 md:pt-40'>
+        <div className='w-full relative h-full pt-20 md:pt-40 -mt-12'>
             <div className='px-6'>
                 <FeatureIconContainer className='flex justify-center items-center overflow-hidden'>
                     <div className='relative'>
@@ -65,17 +65,17 @@ export const Tools = () => {
 
 const PlatformContainer = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className='p-4 bg-zinc-900 border border-zinc-800 rounded-lg relative shadow-2xl'>
+        <div className='p-2 md:p-4 bg-zinc-900 border border-zinc-800 rounded-lg relative shadow-2xl'>
             {children}
             <div className='absolute bottom-0 w-full h-px inset-x-0 bg-gradient-to-r from-transparent via-emerald-500 to-transparent' />
-            <div className='absolute bottom-0 w-40 mx-auto h-px inset-x-10 bg-gradient-to-r from-transparent via-emerald-400 to-transparent' />
+            <div className='absolute bottom-0 w-20 md:w-40 mx-auto h-px inset-x-5 md:inset-x-10 bg-gradient-to-r from-transparent via-emerald-400 to-transparent' />
         </div>
     );
 };
 
 const SecurityDashboardMockup = () => {
     return (
-        <div className='w-full h-100 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg p-4 relative overflow-hidden'>
+        <div className='w-full h-96 md:h-100 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg p-3 md:p-4 relative overflow-hidden'>
             {/* Header */}
             <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center gap-2'>
@@ -88,25 +88,25 @@ const SecurityDashboardMockup = () => {
             </div>
 
             {/* Main Stats Grid */}
-            <div className='grid grid-cols-4 gap-3 mb-4'>
-                <div className='bg-zinc-800/50 rounded p-3 border border-emerald-500/20'>
+            <div className='grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-4'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-emerald-500/20'>
                     <div className='text-xs text-emerald-400 mb-1'>Threats Blocked</div>
-                    <div className='text-lg font-bold text-emerald-400'>1,247</div>
+                    <div className='text-sm md:text-lg font-bold text-emerald-400'>1,247</div>
                     <div className='text-xs text-neutral-500'>↑ 12% today</div>
                 </div>
-                <div className='bg-zinc-800/50 rounded p-3 border border-blue-500/20'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-blue-500/20'>
                     <div className='text-xs text-blue-400 mb-1'>Emails Scanned</div>
-                    <div className='text-lg font-bold text-blue-400'>15.2K</div>
+                    <div className='text-sm md:text-lg font-bold text-blue-400'>15.2K</div>
                     <div className='text-xs text-neutral-500'>↑ 8% today</div>
                 </div>
-                <div className='bg-zinc-800/50 rounded p-3 border border-amber-500/20'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-amber-500/20'>
                     <div className='text-xs text-amber-400 mb-1'>Quarantined</div>
-                    <div className='text-lg font-bold text-amber-400'>89</div>
+                    <div className='text-sm md:text-lg font-bold text-amber-400'>89</div>
                     <div className='text-xs text-neutral-500'>↓ 3% today</div>
                 </div>
-                <div className='bg-zinc-800/50 rounded p-3 border border-purple-500/20'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-purple-500/20'>
                     <div className='text-xs text-purple-400 mb-1'>Risk Score</div>
-                    <div className='text-lg font-bold text-purple-400'>Low</div>
+                    <div className='text-sm md:text-lg font-bold text-purple-400'>Low</div>
                     <div className='text-xs text-neutral-500'>Stable</div>
                 </div>
             </div>
@@ -156,8 +156,8 @@ const SecurityDashboardMockup = () => {
                                         threat.severity === 'critical'
                                             ? 'bg-red-500'
                                             : threat.severity === 'high'
-                                              ? 'bg-amber-500'
-                                              : 'bg-yellow-500'
+                                            ? 'bg-amber-500'
+                                            : 'bg-yellow-500'
                                     }`}
                                 ></div>
                                 <span className='text-neutral-300'>{threat.type}</span>
@@ -174,7 +174,7 @@ const SecurityDashboardMockup = () => {
 
 const APIIntegrationMockup = () => {
     return (
-        <div className='w-full h-80 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg p-4 relative overflow-hidden'>
+        <div className='w-full h-96 md:h-80 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg p-3 md:p-4 relative overflow-hidden'>
             {/* Header */}
             <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center gap-2'>
@@ -189,8 +189,8 @@ const APIIntegrationMockup = () => {
 
             {/* API Endpoints */}
             <div className='space-y-4'>
-                <div className='bg-zinc-800/50 rounded p-3 border border-zinc-700'>
-                    <div className='text-sm text-neutral-300 font-medium mb-3'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-zinc-700'>
+                    <div className='text-sm text-neutral-300 font-medium mb-2 md:mb-3'>
                         REST API Endpoints
                     </div>
                     <div className='space-y-2'>
@@ -239,8 +239,8 @@ const APIIntegrationMockup = () => {
                 </div>
 
                 {/* Webhook Configuration */}
-                <div className='bg-zinc-800/50 rounded p-3 border border-zinc-700'>
-                    <div className='text-sm text-neutral-300 font-medium mb-3'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-zinc-700'>
+                    <div className='text-sm text-neutral-300 font-medium mb-2 md:mb-3'>
                         Webhook Configuration
                     </div>
                     <div className='space-y-2'>
@@ -294,17 +294,20 @@ const APIIntegrationMockup = () => {
                 </div>
 
                 {/* Integration Status */}
-                <div className='bg-zinc-800/50 rounded p-3 border border-zinc-700'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-zinc-700'>
                     <div className='text-sm text-neutral-300 font-medium mb-2'>
                         Integration Status
                     </div>
-                    <div className='grid grid-cols-3 gap-2'>
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-2'>
                         {[
                             { name: 'Splunk', status: 'Connected', requests: '1.2K/day' },
                             { name: 'Slack', status: 'Connected', requests: '45/day' },
                             { name: 'Teams', status: 'Setup', requests: '0/day' },
                         ].map((integration, i) => (
-                            <div key={i} className='bg-zinc-800/30 rounded p-2 text-center'>
+                            <div
+                                key={i}
+                                className='bg-zinc-800/30 rounded p-2 text-center sm:text-center'
+                            >
                                 <div className='text-xs text-neutral-300 font-medium'>
                                     {integration.name}
                                 </div>
@@ -331,27 +334,27 @@ const APIIntegrationMockup = () => {
 
 const ReportingMockup = () => {
     return (
-        <div className='w-full h-80 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg p-4 relative overflow-hidden'>
+        <div className='w-full h-96 md:h-80 bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-lg p-3 md:p-4 relative overflow-hidden'>
             {/* Header */}
             <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center gap-2'>
                     <IconChartBar className='w-4 h-4 text-emerald-400' />
                     <span className='text-sm text-emerald-400 font-medium'>Security Analytics</span>
                 </div>
-                <div className='flex gap-2'>
-                    <button className='text-xs bg-zinc-700 text-neutral-300 px-2 py-1 rounded'>
+                <div className='flex gap-1 md:gap-2'>
+                    <button className='text-xs bg-zinc-700 text-neutral-300 px-1.5 md:px-2 py-1 rounded'>
                         Weekly
                     </button>
-                    <button className='text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30'>
+                    <button className='text-xs bg-emerald-500/20 text-emerald-400 px-1.5 md:px-2 py-1 rounded border border-emerald-500/30'>
                         Monthly
                     </button>
                 </div>
             </div>
 
             {/* Chart Area */}
-            <div className='bg-zinc-800/30 rounded p-3 border border-zinc-700 mb-4'>
+            <div className='bg-zinc-800/30 rounded p-2 md:p-3 border border-zinc-700 mb-3 md:mb-4'>
                 <div className='text-xs text-neutral-400 mb-2'>Threat Trends (Last 30 Days)</div>
-                <div className='flex items-end justify-between h-20 gap-1'>
+                <div className='flex items-end justify-between h-16 md:h-20 gap-1'>
                     {Array.from({ length: 12 }).map((_, i) => (
                         <motion.div
                             key={i}
@@ -365,14 +368,14 @@ const ReportingMockup = () => {
             </div>
 
             {/* Report Summary */}
-            <div className='grid grid-cols-2 gap-3'>
-                <div className='bg-zinc-800/50 rounded p-3 border border-zinc-700'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-zinc-700'>
                     <div className='text-xs text-neutral-400 mb-1'>Executive Summary</div>
                     <div className='text-sm text-neutral-300'>
                         Security posture improved by 23% this month
                     </div>
                 </div>
-                <div className='bg-zinc-800/50 rounded p-3 border border-zinc-700'>
+                <div className='bg-zinc-800/50 rounded p-2 md:p-3 border border-zinc-700'>
                     <div className='text-xs text-neutral-400 mb-1'>Compliance Status</div>
                     <div className='text-sm text-emerald-400'>✓ SOC 2, GDPR, HIPAA</div>
                 </div>

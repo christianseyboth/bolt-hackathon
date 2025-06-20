@@ -24,9 +24,10 @@ import { createClient } from '@/utils/supabase/client';
 interface SidebarProps {
     className?: string;
     onNavigate?: () => void;
+    isMobile?: boolean;
 }
 
-export function Sidebar({ className, onNavigate }: SidebarProps) {
+export function Sidebar({ className, onNavigate, isMobile = false }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { toast } = useToast();
@@ -131,15 +132,19 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
     return (
         <div
             className={cn(
-                'w-64 border-r border-neutral-800 h-screen py-6 px-4 flex flex-col bg-neutral-950',
+                'w-64 border-r border-neutral-800 flex flex-col bg-neutral-950',
+                isMobile ? 'h-full py-4 px-3' : 'h-screen py-6 px-4',
                 className
             )}
         >
-            <div className='px-2 mb-8'>
-                <Logo />
-            </div>
+            {/* Only show header on desktop */}
+            {!isMobile && (
+                <div className='px-2 mb-8'>
+                    <Logo />
+                </div>
+            )}
 
-            <nav className='flex-1 space-y-1'>
+            <nav className={cn('flex-1 space-y-1', isMobile && 'mt-4')}>
                 <SidebarItem
                     href='/dashboard'
                     icon={<IconDashboard className='h-5 w-5' />}
@@ -212,7 +217,12 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
                 </SidebarItem>
             </nav>
 
-            <div className='space-y-1 pt-6 mt-6 border-t border-neutral-800'>
+            <div
+                className={cn(
+                    'space-y-1 border-t border-neutral-800',
+                    isMobile ? 'pt-4 mt-4 pb-4' : 'pt-6 mt-6'
+                )}
+            >
                 <SidebarItem
                     href='/dashboard/profile'
                     icon={<IconSettings className='h-5 w-5' />}

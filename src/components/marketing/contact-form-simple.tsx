@@ -134,7 +134,6 @@ export const ContactFormSimple = () => {
                         </div>
                         <div>
                             <p className='text-sm font-medium text-neutral-200'>Phone Support</p>
-                            <p className='text-sm text-neutral-400'>+1 (555) 123-7890</p>
                             <p className='text-xs text-neutral-500 mt-1'>
                                 Available for Team & Enterprise plans
                             </p>
@@ -162,7 +161,7 @@ export const ContactFormSimple = () => {
                         </div>
                         <div>
                             <p className='text-sm font-medium text-neutral-200'>Headquarters</p>
-                            <p className='text-sm text-neutral-400'>San Francisco, CA</p>
+                            <p className='text-sm text-neutral-400'>Berlin, Germany</p>
                             <p className='text-xs text-neutral-500 mt-1'>
                                 Serving customers globally
                             </p>

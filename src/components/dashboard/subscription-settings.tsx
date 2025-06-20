@@ -109,7 +109,11 @@ export function SubscriptionSettings({
 
                             <div className='flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0'>
                                 <p className='text-sm text-neutral-400'>
-                                    Your plan {currentSubscription.status === 'cancelled' || currentSubscription.cancel_at_period_end ? 'ends on' : 'renews on'}{' '}
+                                    Your plan{' '}
+                                    {currentSubscription.status === 'cancelled' ||
+                                    currentSubscription.cancel_at_period_end
+                                        ? 'ends on'
+                                        : 'renews on'}{' '}
                                     <span className='text-neutral-200'>
                                         {date.toLocaleDateString()}
                                     </span>
@@ -301,7 +305,10 @@ export function SubscriptionSettings({
 
                     <div className='mt-8'>
                         <h3 className='font-medium mb-4'>Compare All Features</h3>
-                        <div className='overflow-x-auto'>
+                        <div
+                            className='overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                            style={{ scrollbarWidth: 'thin', scrollbarColor: '#525252 #262626' }}
+                        >
                             <Table>
                                 <TableHeader>
                                     <TableRow>

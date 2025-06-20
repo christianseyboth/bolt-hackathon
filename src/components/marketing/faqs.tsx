@@ -130,12 +130,12 @@ export const FAQs = () => {
                         protection for your business size and industry requirements.
                     </p>
                     <div className='flex flex-col sm:flex-row gap-3 justify-center items-center'>
-                        <a
-                            href='mailto:support@secpilot.com'
+                        <Link
+                            href='contact'
                             className='px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors duration-200'
                         >
                             Get Security Consultation
-                        </a>
+                        </Link>
                         <Link
                             href='/contact'
                             className='px-6 py-2 border border-neutral-700 hover:border-emerald-500/50 text-neutral-300 hover:text-white rounded-lg text-sm font-medium transition-all duration-200'

@@ -1,5 +1,6 @@
 'use client';
 import { Link } from 'next-view-transitions';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 const SvgComponent = (props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>) => (
@@ -77,10 +78,19 @@ const SvgComponent = (props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGS
     </svg>
 );
 
-export const Logo = () => {
+interface LogoProps {
+    href?: string;
+}
+
+export const Logo = ({ href }: LogoProps) => {
+    const pathname = usePathname();
+
+    // Determine the destination URL
+    const destination = href || (pathname?.startsWith('/dashboard') ? '/dashboard' : '/');
+
     return (
         <Link
-            href='/'
+            href={destination}
             className='font-normal flex space-x-2 items-center text-sm mr-4  text-black px-2 py-1  relative z-20 rounded-full'
         >
             <SvgComponent />

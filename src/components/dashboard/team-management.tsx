@@ -505,7 +505,10 @@ export function TeamManagement({
                             <p className='mt-2 text-neutral-400'>Loading team members...</p>
                         </div>
                     ) : initialMembers.length > 0 ? (
-                        <div className='overflow-x-auto'>
+                        <div
+                            className='overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                            style={{ scrollbarWidth: 'thin', scrollbarColor: '#525252 #262626' }}
+                        >
                             <Table>
                                 <TableHeader>
                                     <TableRow>

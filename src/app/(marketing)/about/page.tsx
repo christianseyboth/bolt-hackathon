@@ -1,6 +1,15 @@
 import { Metadata } from 'next';
 import { BackgroundEffects } from '@/components/background-effects';
-import { IconShieldCheck, IconMail, IconBolt, IconUsers, IconGlobe } from '@tabler/icons-react';
+import {
+    IconShieldCheck,
+    IconMail,
+    IconBolt,
+    IconUsers,
+    IconGlobe,
+    IconArrowRight,
+} from '@tabler/icons-react';
+import { Button } from '@/components/button';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
     title: 'About SecPilot | AI-Powered Email Security Company',
@@ -29,12 +38,12 @@ export default function AboutPage() {
         },
         {
             value: '10,000+',
-            label: 'Businesses Protected',
+            label: 'Individuals Protected',
             icon: <IconUsers className='h-8 w-8 text-blue-400' />,
         },
         {
-            value: '50M+',
-            label: 'Emails Analyzed Daily',
+            value: '5M+',
+            label: 'Emails Analyzed Yearly',
             icon: <IconMail className='h-8 w-8 text-purple-400' />,
         },
         {
@@ -72,7 +81,7 @@ export default function AboutPage() {
     ];
 
     return (
-        <main className='relative min-h-screen bg-neutral-950'>
+        <main className='relative min-h-screen bg-neutral-950 mt-24'>
             <BackgroundEffects />
 
             <div className='relative z-10'>
@@ -287,7 +296,7 @@ export default function AboutPage() {
                             </div>
                             <div className='space-y-3'>
                                 <div className='text-2xl font-bold text-purple-400'>SOC 2</div>
-                                <div className='text-neutral-300'>Type II Certified</div>
+                                <div className='text-neutral-300'>Type II Ready</div>
                             </div>
                         </div>
                     </div>
@@ -303,18 +312,17 @@ export default function AboutPage() {
                         critical communications.
                     </p>
                     <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-                        <a
-                            href='/pricing'
-                            className='bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200'
-                        >
-                            Start Free Trial
-                        </a>
-                        <a
-                            href='/contact'
-                            className='border border-neutral-600 hover:border-neutral-500 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200'
-                        >
-                            Contact Sales
-                        </a>
+                        <Link href='/register'>
+                            <Button variant='primary' size='sm' className='flex items-center group'>
+                                <span>Start Free Trial</span>
+                                <IconArrowRight className='h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-200' />
+                            </Button>
+                        </Link>
+                        <Link href='/contact'>
+                            <Button variant='muted' size='sm'>
+                                Contact Sales
+                            </Button>
+                        </Link>
                     </div>
                 </section>
             </div>

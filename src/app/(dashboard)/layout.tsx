@@ -50,7 +50,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
                         <MobileHeader />
                     </div>
 
-                    <main className='flex-1 flex flex-col space-y-4 pt-4 pb-12 overflow-y-auto'>
+                    <main
+                        className='flex-1 flex flex-col space-y-4 pt-4 pb-12 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                        style={{ scrollbarWidth: 'thin', scrollbarColor: '#525252 #262626' }}
+                    >
                         <div className='px-4 [@media(min-width:1025px)]:px-8 min-w-0'>
                             {children}
                         </div>
