@@ -296,10 +296,18 @@ export function DeleteAccountSection() {
                     description: 'Your account has been deleted successfully.',
                 });
 
-                // Redirect to home page after a brief delay
+                // Sign out and redirect to home page
+                try {
+                    const supabase = createClient();
+                    await supabase.auth.signOut({ scope: 'global' });
+                } catch (signOutError) {
+                    console.error('Error signing out:', signOutError);
+                }
+
+                // Force redirect to home page
                 setTimeout(() => {
-                    router.push('/');
-                }, 2000);
+                    window.location.href = '/';
+                }, 1500);
             } else {
                 toast({
                     title: 'Deletion failed',

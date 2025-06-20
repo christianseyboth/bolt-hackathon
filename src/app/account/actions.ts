@@ -187,9 +187,7 @@ export async function deleteAccount(confirmationText: string): Promise<DeleteAcc
             console.log('Auth user deletion failed, but account data was cleaned up');
         }
 
-        // 5. Sign out the user
-        await supabase.auth.signOut();
-
+        // Account deletion successful - client will handle signout
         return { success: true };
 
     } catch (error) {

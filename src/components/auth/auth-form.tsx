@@ -110,6 +110,20 @@ export function AuthForm({ mode, className }: AuthFormProps) {
                         return;
                     }
                     result = await signUp(formData);
+
+                    // Handle successful registration
+                    if (result?.success) {
+                        toast({
+                            title: 'Account created successfully!',
+                            description:
+                                'Please check your email to activate your account before signing in.',
+                        });
+                        // Redirect to login page after showing toast
+                        setTimeout(() => {
+                            window.location.href = '/login';
+                        }, 2000);
+                        return;
+                    }
                 } else if (isResetMode) {
                     result = await resetPassword(formData);
                     if (!result?.error) {

@@ -86,8 +86,8 @@ export async function signUp(formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/dashboard');
+  // Return success instead of redirecting
+  return { success: true };
 }
 
 // OAuth Sign In (Google, GitHub, etc.)
