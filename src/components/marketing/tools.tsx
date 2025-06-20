@@ -1,3 +1,4 @@
+'use client';
 import { motion } from 'motion/react';
 import React from 'react';
 import { FeatureIconContainer } from '@/components/features/feature-icon-container';

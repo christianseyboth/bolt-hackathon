@@ -15,7 +15,8 @@ export function BackgroundEffects() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // Generate particles only on client side
+        setMounted(true);
+        // Generate particles only on client side after mount
         const generatedParticles: Particle[] = Array.from({ length: 12 }, (_, i) => ({
             id: i,
             left: Math.random() * 100,
@@ -25,7 +26,6 @@ export function BackgroundEffects() {
         }));
 
         setParticles(generatedParticles);
-        setMounted(true);
     }, []);
 
     return (
@@ -39,9 +39,11 @@ export function BackgroundEffects() {
                 className='absolute bottom-32 left-20 w-24 h-24 bg-blue-500/8 rounded-full blur-2xl animate-pulse'
                 style={{ animationDelay: '2s' }}
             />
-            {mounted && (
-                <div className='absolute inset-0'>
-                    {particles.map((particle) => (
+
+            {/* Only render particles after component is mounted */}
+            <div className='absolute inset-0' suppressHydrationWarning>
+                {mounted &&
+                    particles.map((particle) => (
                         <div
                             key={particle.id}
                             className='absolute w-1 h-1 bg-emerald-400/20 rounded-full animate-pulse'
@@ -53,8 +55,8 @@ export function BackgroundEffects() {
                             }}
                         />
                     ))}
-                </div>
-            )}
+            </div>
+
             <div className='absolute inset-0 opacity-[0.08] animate-grid-flow bg-grid-pattern' />
             <div className='absolute inset-0 opacity-[0.04] animate-diagonal-flow bg-diagonal-pattern' />
             <div className='absolute w-96 h-96 rounded-full opacity-30 animate-floating-glow bg-glow-pattern' />

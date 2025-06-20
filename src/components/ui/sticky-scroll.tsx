@@ -40,9 +40,16 @@ export const ScrollContent = ({
     index: number;
 }) => {
     const [isVisible, setIsVisible] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!mounted || typeof window === 'undefined') return;
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 setIsVisible(entry.isIntersecting);
@@ -55,17 +62,18 @@ export const ScrollContent = ({
         }
 
         return () => observer.disconnect();
-    }, []);
+    }, [mounted]);
 
     return (
         <div
             ref={ref}
             className={`my-40 relative grid grid-cols-3 gap-8 transition-all duration-700 ${
-                isVisible
+                mounted && isVisible
                     ? 'opacity-100 transform translate-y-0'
                     : 'opacity-50 transform translate-y-10'
             }`}
             style={{ position: 'relative' }}
+            suppressHydrationWarning
         >
             <div className='w-full'>
                 <div className=''>
