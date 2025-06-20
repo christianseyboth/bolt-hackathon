@@ -131,8 +131,14 @@
         @apply border-border outline-ring/50;
     }
 
+    html {
+        @apply bg-black;
+    }
+
     body {
         @apply bg-background text-foreground font-['Spinnaker'];
+        /* Ensure black background from the start */
+        background-color: black !important;
     }
 
     /* Ensure proper positioning for scroll calculations */

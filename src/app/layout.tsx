@@ -117,7 +117,7 @@ type Props = {
 
 export default async function RootLayout({ children }: Props) {
     return (
-        <html className='dark' lang='en'>
+        <html className='dark' lang='en' style={{ backgroundColor: 'black' }}>
             <head>
                 <meta
                     name='viewport'
@@ -241,7 +241,7 @@ export default async function RootLayout({ children }: Props) {
                     }}
                 />
             </head>
-            <body>
+            <body style={{ backgroundColor: 'black' }}>
                 <ClientProviders>{children}</ClientProviders>
             </body>
         </html>

@@ -114,7 +114,7 @@ export const MobileNavbar = ({ navItems, user }: any) => {
                                     as={Link}
                                     href='/dashboard'
                                     onClick={() => setOpen(false)}
-                                    className='w-full bg-white text-black hover:bg-gray-200'
+                                    className='w-full text-white hover:bg-gray-200'
                                     size='lg'
                                 >
                                     Dashboard
