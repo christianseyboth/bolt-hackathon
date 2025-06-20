@@ -7,10 +7,10 @@ import Image from 'next/image';
 import { Container } from '@/components/container';
 import { Heading } from '@/components/heading';
 import { Subheading } from '@/components/subheading';
-import { VideoModal } from '@/components/video-modal';
 import { FeaturedImages } from '@/components/featured-images';
 import Beam from '@/components/beam';
 import Link from 'next/link';
+import { LazyVideoModal } from '@/components/LazyComponents';
 
 export const Hero = () => {
     const containerRef = useRef<any>(null);
@@ -101,6 +101,10 @@ export const Hero = () => {
                                 className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full md:object-left-top'
                                 draggable={false}
                                 priority
+                                quality={85}
+                                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1400px'
+                                placeholder='blur'
+                                blurDataURL='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAhEQABAgIDAQAAAAAAAAAAAAABABECIRIxkUFRkaGx/9oADAMBAAIRAxEAPwCdMSjQE2a8YZsGdmzNWOOOOOOOUKdOXzlP/9k='
                             />
                         </Card>
                     ) : (
@@ -115,6 +119,10 @@ export const Hero = () => {
                                     className='mx-auto rounded-md object-cover object-left-top h-full md:object-left-top'
                                     draggable={false}
                                     priority
+                                    quality={85}
+                                    sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1400px'
+                                    placeholder='blur'
+                                    blurDataURL='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAhEQABAgIDAQAAAAAAAAAAAAABABECIRIxkUFRkaGx/9oADAMBAAIRAxEAPwCdMSjQE2a8YZsGdmzNWOOOOOOOUKdOXzlP/9k='
                                 />
                             </div>
                         </div>
@@ -160,7 +168,7 @@ export const Card = ({
                 whileHover={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
                 transition={{ duration: 0.2 }}
             >
-                <VideoModal />
+                <LazyVideoModal />
             </motion.div>
             <div
                 className=' h-full w-full overflow-hidden rounded-2xl md:rounded-2xl md:p-4'

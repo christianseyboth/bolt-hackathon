@@ -27,21 +27,19 @@ const trustIndicators: TrustIndicator[] = [
     {
         icon: <IconBriefcase className='h-5 w-5' />,
         label: 'Small Businesses',
-        stat: '1,200+',
-        description: 'Teams under 50 people',
+        stat: '2,300+',
+        description: 'Enterprise-grade protection',
     },
 ];
 
 export const FeaturedImages = ({
+    className: containerClassName,
     textClassName,
-    className,
     showStars = false,
-    containerClassName,
 }: {
-    textClassName?: string;
     className?: string;
+    textClassName?: string;
     showStars?: boolean;
-    containerClassName?: string;
 }) => {
     const [mounted, setMounted] = useState(false);
 
@@ -60,7 +58,11 @@ export const FeaturedImages = ({
                                 key={indicator.label}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1, duration: 0.5 }}
+                                transition={{
+                                    delay: index * 0.1,
+                                    duration: 0.4,
+                                    ease: 'easeOut',
+                                }}
                                 className='group bg-neutral-900/30 border border-neutral-800 rounded-lg p-3 min-w-[140px] hover:border-emerald-500/30 transition-all duration-200'
                             >
                                 <div className='flex items-center gap-2 mb-1'>
@@ -105,20 +107,43 @@ export const FeaturedImages = ({
             </div>
 
             {/* Simple value proposition */}
-            <p
-                className={cn(
-                    'text-neutral-400 text-sm text-center max-w-xl mx-auto relative z-40',
-                    textClassName
-                )}
-            >
-                <span className='text-emerald-400 font-medium'>Trusted by 25,000+ users</span> who
-                need reliable email protection.
-                <br />
-                <span className='text-xs mt-1 block text-neutral-500'>
-                    Perfect for freelancers, remote workers, and small teams who can't afford email
-                    security breaches.
-                </span>
-            </p>
+            {showStars && (
+                <div className='flex flex-col items-center mb-4' suppressHydrationWarning>
+                    {mounted ? (
+                        <motion.div
+                            className='flex items-center gap-1 mb-2'
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.5, duration: 0.3 }}
+                        >
+                            {[...Array(5)].map((_, i) => (
+                                <span key={i} className='text-yellow-400 text-lg'>
+                                    ★
+                                </span>
+                            ))}
+                        </motion.div>
+                    ) : (
+                        <div className='flex items-center gap-1 mb-2'>
+                            {[...Array(5)].map((_, i) => (
+                                <span key={i} className='text-yellow-400 text-lg'>
+                                    ★
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                    <p
+                        className={cn(
+                            'text-neutral-400 text-sm text-center max-w-xl mx-auto relative z-40',
+                            textClassName
+                        )}
+                    >
+                        Trusted by security professionals worldwide
+                        <span className='text-xs mt-1 block text-neutral-500'>
+                            4.9/5 stars from verified customers
+                        </span>
+                    </p>
+                </div>
+            )}
         </div>
     );
 };

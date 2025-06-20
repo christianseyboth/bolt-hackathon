@@ -6,6 +6,9 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "analyze": "cross-env ANALYZE=true next build",
+        "analyze:server": "cross-env BUNDLE_ANALYZE=server next build",
+        "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build",
         "start": "next start",
         "lint": "next lint"
     },
@@ -72,11 +75,13 @@
         "stripe": "^17.5.0",
         "tailwind-merge": "^3.3.0",
         "tailwindcss": "^4.1.7",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "web-vitals": "^5.0.3"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
         "@netlify/functions": "^4.1.6",
+        "@next/bundle-analyzer": "^15.3.4",
         "@types/imap-simple": "^4.2.10",
         "@types/node": "^20",
         "@types/react": "^19.1.0",

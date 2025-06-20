@@ -2,13 +2,12 @@ import { CTA } from '@/components/marketing/cta';
 import { FAQs } from '@/components/marketing/faqs';
 import { Features } from '@/components/features';
 import { Hero } from '@/components/marketing/hero';
-import { Testimonials } from '@/components/testimonials';
 import { Tools } from '@/components/marketing/tools';
 import { NavBar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
-import { BackgroundEffects } from '@/components/background-effects';
 import { Metadata } from 'next';
+import { LazyTestimonialsSlider, LazyBackgroundEffects } from '@/components/LazyComponents';
 
 export const metadata: Metadata = {
     title: 'SecPilot - Advanced Email Security Software | AI-Powered Phishing Protection',
@@ -52,6 +51,13 @@ export const metadata: Metadata = {
         canonical: 'https://secpilot.com',
     },
 };
+
+// Lazy load the Testimonials component since it's below the fold
+const LazyTestimonials = () => (
+    <section aria-label='Customer testimonials'>
+        <LazyTestimonialsSlider />
+    </section>
+);
 
 export default function Home() {
     return (
@@ -214,26 +220,72 @@ export default function Home() {
                 }}
             />
 
-            <NavBar />
-            <main className='relative min-h-screen bg-neutral-950' style={{ position: 'relative' }}>
-                <BackgroundEffects />
+            {/* Organization Structured Data */}
+            <script
+                type='application/ld+json'
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        '@context': 'https://schema.org',
+                        '@type': 'Organization',
+                        name: 'SecPilot',
+                        alternateName: 'SecPilot Email Security',
+                        url: 'https://secpilot.com',
+                        logo: 'https://secpilot.com/logo.png',
+                        description:
+                            'AI-powered email security software that protects businesses from phishing, malware, and ransomware attacks',
+                        foundingDate: '2024',
+                        founders: [
+                            {
+                                '@type': 'Person',
+                                name: 'SecPilot Team',
+                            },
+                        ],
+                        contactPoint: {
+                            '@type': 'ContactPoint',
+                            telephone: '+1-555-123-4567',
+                            contactType: 'customer service',
+                            email: 'support@secpilot.com',
+                            availableLanguage: ['English'],
+                        },
+                        sameAs: [
+                            'https://twitter.com/secpilot',
+                            'https://linkedin.com/company/secpilot',
+                            'https://github.com/secpilot',
+                        ],
+                        address: {
+                            '@type': 'PostalAddress',
+                            streetAddress: '123 Security Street',
+                            addressLocality: 'San Francisco',
+                            addressRegion: 'CA',
+                            postalCode: '94102',
+                            addressCountry: 'US',
+                        },
+                    }),
+                }}
+            />
 
+            <NavBar />
+            <main className='bg-black text-white overflow-hidden'>
+                <LazyBackgroundEffects />
                 <div className='relative z-10'>
                     <header>
                         <Hero />
                     </header>
+
                     <section aria-label='Email security features'>
                         <Features />
                     </section>
+
                     <section aria-label='SecPilot platform overview'>
                         <Tools />
                     </section>
-                    <section aria-label='Customer testimonials'>
-                        <Testimonials />
-                    </section>
+
+                    <LazyTestimonials />
+
                     <section aria-label='Frequently asked questions'>
                         <FAQs />
                     </section>
+
                     <section aria-label='Get started with SecPilot'>
                         <CTA />
                     </section>
