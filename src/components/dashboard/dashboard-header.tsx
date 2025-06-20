@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import { IconBell, IconSettings } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { AvatarMenu } from '@/components/ui/avatar-menu';
+import { NotificationBell } from './NotificationBell';
 
 interface DashboardHeaderProps {
     heading: string;
@@ -31,6 +32,7 @@ export function DashboardHeader({
                 className='hidden [@media(min-width:1025px)]:flex items-center mt-4 [@media(min-width:1025px)]:mt-0 space-x-2'
                 data-tour-header-actions='true'
             >
+                <NotificationBell />
                 <AvatarMenu />
             </div>
             {children}

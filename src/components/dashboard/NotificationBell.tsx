@@ -27,6 +27,78 @@ interface Notification {
     mailEventId: string;
 }
 
+// Global subscription manager to prevent multiple subscriptions
+class RealtimeSubscriptionManager {
+    private static instance: RealtimeSubscriptionManager;
+    private channel: any = null;
+    private subscribers: Set<(event: any, type: 'new' | 'update') => void> = new Set();
+    private supabase = createClient();
+    private currentAccountId: string | null = null;
+
+    static getInstance(): RealtimeSubscriptionManager {
+        if (!RealtimeSubscriptionManager.instance) {
+            RealtimeSubscriptionManager.instance = new RealtimeSubscriptionManager();
+        }
+        return RealtimeSubscriptionManager.instance;
+    }
+
+    subscribe(accountId: string, callback: (event: any, type: 'new' | 'update') => void) {
+        this.subscribers.add(callback);
+
+        // If we need to change account or start fresh subscription
+        if (this.currentAccountId !== accountId) {
+            this.cleanup();
+            this.currentAccountId = accountId;
+            this.setupSubscription(accountId);
+        }
+
+        return () => {
+            this.subscribers.delete(callback);
+            if (this.subscribers.size === 0) {
+                this.cleanup();
+            }
+        };
+    }
+
+    private setupSubscription(accountId: string) {
+        if (this.channel) return; // Already subscribed
+
+        console.log('Setting up global realtime subscription for accountId:', accountId);
+
+        this.channel = this.supabase
+            .channel(`mail-events-${accountId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'mail_events',
+                    filter: `account_id=eq.${accountId}`,
+                },
+                (payload) => {
+                    console.log('Global subscription - Change received!', payload);
+
+                    const eventType = payload.eventType === 'INSERT' ? 'new' : 'update';
+                    this.subscribers.forEach((callback) => {
+                        callback(payload.new, eventType);
+                    });
+                }
+            )
+            .subscribe((status) => {
+                console.log('Global subscription status:', status);
+            });
+    }
+
+    private cleanup() {
+        if (this.channel) {
+            console.log('Cleaning up global realtime subscription');
+            this.supabase.removeChannel(this.channel);
+            this.channel = null;
+        }
+        this.currentAccountId = null;
+    }
+}
+
 export const NotificationBell = () => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -40,7 +112,7 @@ export const NotificationBell = () => {
     const { accountId } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
-    const channelRef = useRef<any>(null);
+    const subscriptionManager = RealtimeSubscriptionManager.getInstance();
 
     useEffect(() => {
         if (!accountId) {
@@ -51,97 +123,19 @@ export const NotificationBell = () => {
         console.log('NotificationBell: Setting up with accountId:', accountId);
         loadNotifications();
 
-        // Set up real-time subscription following Supabase API docs pattern
-        const setupRealtimeSubscription = async () => {
-            try {
-                setConnectionStatus('connecting');
-
-                // Clean up any existing subscription first
-                if (channelRef.current) {
-                    console.log('Cleaning up existing subscription');
-                    await supabase.removeChannel(channelRef.current);
-                    channelRef.current = null;
-                }
-
-                console.log('Setting up realtime subscription for accountId:', accountId);
-
-                // Create channel following API docs pattern
-                const channel = supabase
-                    .channel(`mail-events-${accountId}`)
-                    .on(
-                        'postgres_changes',
-                        {
-                            event: '*',
-                            schema: 'public',
-                            table: 'mail_events',
-                            filter: `account_id=eq.${accountId}`,
-                        },
-                        (payload) => {
-                            console.log('Change received!', payload);
-
-                            if (payload.eventType === 'INSERT') {
-                                handleNewThreatDetected(payload.new);
-                            } else if (payload.eventType === 'UPDATE') {
-                                handleThreatUpdated(payload.new);
-                            }
-                        }
-                    )
-                    .subscribe((status) => {
-                        console.log('Subscription status:', status);
-
-                        if (status === 'SUBSCRIBED') {
-                            console.log('Successfully subscribed to realtime updates');
-                            setConnectionStatus('connected');
-                        } else if (status === 'CHANNEL_ERROR') {
-                            console.error('Realtime subscription error');
-                            setConnectionStatus('error');
-                            toast({
-                                title: 'Connection Error',
-                                description:
-                                    'Unable to connect to real-time updates. Please check if mail_events table is enabled for realtime.',
-                                variant: 'destructive',
-                            });
-                        } else if (status === 'TIMED_OUT') {
-                            console.error('Realtime subscription timed out');
-                            setConnectionStatus('error');
-                            toast({
-                                title: 'Connection Timeout',
-                                description:
-                                    'Real-time connection timed out. Please refresh the page.',
-                                variant: 'destructive',
-                            });
-                        } else if (status === 'CLOSED') {
-                            console.log('Realtime subscription closed');
-                            setConnectionStatus('disconnected');
-                        }
-                    });
-
-                channelRef.current = channel;
-            } catch (error) {
-                console.error('Error setting up realtime subscription:', error);
-                setConnectionStatus('error');
-                toast({
-                    title: 'Connection Error',
-                    description: `Failed to connect to real-time updates: ${
-                        error instanceof Error ? error.message : 'Unknown error'
-                    }`,
-                    variant: 'destructive',
-                });
+        // Subscribe to global realtime updates
+        const unsubscribe = subscriptionManager.subscribe(accountId, (event, type) => {
+            if (type === 'new') {
+                handleNewThreatDetected(event);
+            } else if (type === 'update') {
+                handleThreatUpdated(event);
             }
-        };
+        });
 
-        setupRealtimeSubscription();
+        setConnectionStatus('connected');
 
-        // Cleanup subscription on unmount or accountId change
-        return () => {
-            if (channelRef.current) {
-                console.log('Cleaning up realtime subscription');
-                supabase.removeChannel(channelRef.current);
-                channelRef.current = null;
-                setConnectionStatus('disconnected');
-            }
-        };
-    }, [accountId, supabase, toast]);
+        return unsubscribe;
+    }, [accountId]);
 
     const handleNewThreatDetected = (newEvent: any) => {
         const newNotification: Notification = {
