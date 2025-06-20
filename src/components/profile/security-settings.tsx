@@ -744,11 +744,23 @@ export function SecuritySettings() {
                         </Button>
                         <Button
                             onClick={() => {
-                                if (mfaDisableResolver && mfaDisableCode.length === 6) {
-                                    mfaDisableResolver(mfaDisableCode);
-                                    setMfaDisableResolver(null);
-                                    setMfaDisableCode('');
-                                    setShowMfaDisableDialog(false);
+                                console.log('MFA Disable button clicked', {
+                                    mfaDisableCode,
+                                    codeLength: mfaDisableCode.length,
+                                    hasResolver: !!mfaDisableResolver,
+                                });
+
+                                if (mfaDisableCode.length === 6 && mfaDisableResolver) {
+                                    try {
+                                        mfaDisableResolver(mfaDisableCode);
+                                        setMfaDisableResolver(null);
+                                        setMfaDisableCode('');
+                                        setShowMfaDisableDialog(false);
+                                    } catch (error) {
+                                        console.error('Error in MFA disable resolver:', error);
+                                    }
+                                } else {
+                                    console.log('Button click ignored - invalid conditions');
                                 }
                             }}
                             disabled={mfaDisableCode.length !== 6}

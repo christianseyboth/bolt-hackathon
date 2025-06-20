@@ -5,6 +5,9 @@ import { createClient } from '@/utils/supabase/server'
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
     const code = searchParams.get('code')
+    const error = searchParams.get('error')
+    const error_description = searchParams.get('error_description')
+
     // Redirect all authenticated users to dashboard
     let next = '/dashboard'
 
@@ -14,10 +17,40 @@ export async function GET(request: Request) {
         next = nextParam
     }
 
+    // Handle OAuth errors from the provider
+    if (error) {
+        console.error('OAuth error from provider:', { error, error_description });
+        const errorParams = new URLSearchParams({
+            error: error,
+            error_description: error_description || 'OAuth authentication failed'
+        });
+        return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams}`);
+    }
+
     if (code) {
         const supabase = await createClient()
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-        if (!error && data.user) {
+
+        try {
+            const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+
+            if (exchangeError) {
+                console.error('Code exchange error:', exchangeError);
+                const errorParams = new URLSearchParams({
+                    error: exchangeError.name || 'SessionExchangeError',
+                    error_description: exchangeError.message || 'Failed to exchange code for session'
+                });
+                return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams}`);
+            }
+
+            if (!data.user) {
+                console.error('No user data after successful code exchange');
+                const errorParams = new URLSearchParams({
+                    error: 'NoUserData',
+                    error_description: 'Authentication succeeded but no user data was returned'
+                });
+                return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams}`);
+            }
+
             // Check if user has MFA enabled
             try {
                 const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
@@ -31,6 +64,7 @@ export async function GET(request: Request) {
 
                 if (factorsError) {
                     console.error('Error listing MFA factors in OAuth callback:', factorsError);
+                    // Don't fail the auth flow for MFA check errors, just log and continue
                 }
 
                 // Check for verified TOTP factors
@@ -46,7 +80,7 @@ export async function GET(request: Request) {
 
                 if (hasVerifiedTotp) {
                     console.log('OAuth MFA required - redirecting to challenge');
-                    // Don't sign out - instead redirect to MFA challenge
+                    // Don't sign out - redirect to MFA challenge with OAuth flag
                     const email = data.user.email;
                     if (email) {
                         return NextResponse.redirect(`${origin}/auth/mfa-challenge?email=${encodeURIComponent(email)}&oauth=true`);
@@ -54,7 +88,7 @@ export async function GET(request: Request) {
                 }
             } catch (mfaError) {
                 console.error('OAuth MFA check error:', mfaError);
-                // Continue with normal login if MFA check fails
+                // Continue with normal login if MFA check fails - don't break the auth flow
             }
 
             const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
@@ -67,9 +101,21 @@ export async function GET(request: Request) {
             } else {
                 return NextResponse.redirect(`${origin}${next}`)
             }
+        } catch (callbackError) {
+            console.error('Unexpected error in auth callback:', callbackError);
+            const errorParams = new URLSearchParams({
+                error: 'CallbackError',
+                error_description: 'An unexpected error occurred during authentication callback'
+            });
+            return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams}`);
         }
     }
 
-    // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+    // No code parameter - this shouldn't happen in normal OAuth flow
+    console.error('Auth callback called without code parameter');
+    const errorParams = new URLSearchParams({
+        error: 'MissingCode',
+        error_description: 'No authorization code was provided'
+    });
+    return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams}`);
 }

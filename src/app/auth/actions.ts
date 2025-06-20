@@ -46,8 +46,10 @@ export async function signIn(formData: FormData) {
       // Only require MFA for verified factors
       if (hasVerifiedTotp) {
         console.log('MFA required - redirecting to challenge');
-        // Sign out the user since they need to complete MFA
-        await supabase.auth.signOut();
+
+        // Don't sign out the user - instead mark this as temporary session
+        // This prevents race conditions and allows smoother MFA flow
+
         // Redirect to MFA challenge with credentials
         redirect(`/auth/mfa-challenge?email=${encodeURIComponent(email)}&temp=true`);
       }
@@ -177,30 +179,62 @@ export async function verifyMFA(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const code = formData.get('code') as string;
+  const isTemp = formData.get('temp') === 'true';
 
-  console.log('Email/Password MFA Verification Started:', { email, code: code?.replace(/\s/g, '') });
+  console.log('Email/Password MFA Verification Started:', { email, code: code?.replace(/\s/g, ''), isTemp });
 
-  if (!email || !password || !code) {
-    return { error: 'Email, password, and code are required' };
+  if (!email || !code) {
+    return { error: 'Email and code are required' };
   }
 
-  // First, sign in with email/password
-  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
+  // For temporary sessions (user already signed in), we don't need password
+  // For fresh MFA challenges, we need password
+  if (!isTemp && !password) {
+    return { error: 'Password is required for fresh MFA verification' };
+  }
 
-  if (signInError) {
-    console.error('Email/Password sign-in failed during MFA:', signInError);
+  let signInData;
 
-    // Handle specific auth errors
-    if (signInError.message.includes('Invalid login credentials')) {
-      return { error: 'Invalid email or password. Please try again.' };
-    } else if (signInError.message.includes('Email not confirmed')) {
-      return { error: 'Please confirm your email address before signing in.' };
+  if (isTemp) {
+    // User is already signed in from the login flow, just get current session
+    const { data: sessionData, error: sessionError } = await supabase.auth.getUser();
+
+    if (sessionError || !sessionData.user) {
+      console.error('Temporary session not found during MFA:', sessionError);
+      return {
+        error: 'Your session has expired. Please sign in again.',
+        shouldRedirectToLogin: true
+      };
     }
 
-    return { error: signInError.message };
+    // Verify email matches to prevent session hijacking
+    if (sessionData.user.email !== email) {
+      console.error('Email mismatch in temporary MFA verification');
+      return { error: 'Session validation failed. Please sign in again.' };
+    }
+
+    signInData = { user: sessionData.user };
+  } else {
+    // Fresh MFA verification - sign in with email/password first
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (signInError) {
+      console.error('Email/Password sign-in failed during MFA:', signInError);
+
+      // Handle specific auth errors
+      if (signInError.message.includes('Invalid login credentials')) {
+        return { error: 'Invalid email or password. Please try again.' };
+      } else if (signInError.message.includes('Email not confirmed')) {
+        return { error: 'Please confirm your email address before signing in.' };
+      }
+
+      return { error: signInError.message };
+    }
+
+    signInData = data;
   }
 
   if (!signInData.user) {
@@ -226,19 +260,11 @@ export async function verifyMFA(formData: FormData) {
     return { error: 'Failed to create MFA challenge: ' + challengeError.message };
   }
 
-  // Verify the code
+  // Verify the challenge
   const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
     factorId: totpFactor.id,
     challengeId: challengeData.id,
-    code: code.replace(/\s/g, '') // Remove any spaces
-  });
-
-  console.log('Email/Password MFA Verification Result:', {
-    verifyData,
-    verifyError,
-    code: code.replace(/\s/g, ''),
-    factorId: totpFactor.id,
-    challengeId: challengeData.id
+    code: code.replace(/\s/g, '')
   });
 
   if (verifyError) {
@@ -246,16 +272,17 @@ export async function verifyMFA(formData: FormData) {
 
     // Handle specific MFA errors
     if (verifyError.message.includes('Invalid TOTP code')) {
-      return { error: 'Invalid code. Please check your authenticator app and try again.' };
+      return { error: 'Invalid authenticator code. Please try again.' };
     } else if (verifyError.message.includes('Challenge expired')) {
-      return { error: 'Code expired. Please refresh the page and try again.' };
+      return { error: 'Challenge expired. Please refresh and try again.' };
     }
 
-    return { error: 'Invalid code. Please try again.' };
+    return { error: verifyError.message };
   }
 
-  console.log('Email/Password MFA verification successful, redirecting to dashboard');
-  // Success - redirect to dashboard
+  console.log('Email/Password MFA verification successful');
+
+  // Revalidate and redirect to dashboard
   revalidatePath('/', 'layout');
   redirect('/dashboard');
 }
