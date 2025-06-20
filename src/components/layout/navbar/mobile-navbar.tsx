@@ -2,16 +2,23 @@
 import { cn } from '@/lib/utils';
 import { Link } from 'next-view-transitions';
 import { useState } from 'react';
-import { IoIosMenu } from 'react-icons/io';
-import { IoIosClose } from 'react-icons/io';
+import { IoIosMenu, IoIosClose } from 'react-icons/io';
 import { Button } from '@/components/button';
 import { Logo } from '@/components/logo';
 import { useMotionValueEvent, useScroll, motion } from 'motion/react';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+    SheetClose,
+} from '@/components/ui/sheet';
 
 export const MobileNavbar = ({ navItems, user }: any) => {
     const [open, setOpen] = useState(false);
     const { scrollY } = useScroll();
-
     const [showBackground, setShowBackground] = useState(false);
 
     useMotionValueEvent(scrollY, 'change', (value) => {
@@ -24,7 +31,7 @@ export const MobileNavbar = ({ navItems, user }: any) => {
 
     return (
         <motion.div
-            className={cn('flex justify-between items-center w-full rounded-md px-2.5 py-1.5')}
+            className='flex justify-between items-center w-full rounded-md px-2.5 py-1.5'
             initial={{ backgroundColor: 'rgba(0, 0, 0, 0)' }}
             animate={{
                 backgroundColor: showBackground ? 'rgb(23, 23, 23)' : 'rgba(0, 0, 0, 0)',
@@ -37,60 +44,78 @@ export const MobileNavbar = ({ navItems, user }: any) => {
             }}
         >
             <Logo />
-            <IoIosMenu className='text-white h-6 w-6' onClick={() => setOpen(!open)} />
-            {open && (
-                <div className='fixed inset-0 bg-black z-50 flex flex-col items-start justify-start space-y-10  pt-5  text-xl text-zinc-600  transition duration-200 hover:text-zinc-800'>
-                    <div className='flex items-center justify-between w-full px-5'>
-                        <Logo />
-                        <div className='flex items-center space-x-2'>
-                            <IoIosClose
-                                className='h-8 w-8 text-white'
-                                onClick={() => setOpen(!open)}
-                            />
+            <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild>
+                    <button className='p-2 text-white hover:text-gray-300 hover:bg-white/10 rounded-md transition-colors'>
+                        <IoIosMenu className='h-6 w-6' />
+                    </button>
+                </SheetTrigger>
+
+                <SheetContent
+                    side='left'
+                    className='w-full bg-black border-none p-0 flex flex-col z-999 [&>button]:hidden'
+                >
+                    <SheetHeader className='px-6 pt-6 pb-4 border-b border-gray-800'>
+                        <div className='flex items-center justify-between'>
+                            <Logo />
+                            <SheetClose asChild>
+                                <button className='p-2 text-white hover:text-gray-300 hover:bg-white/10 rounded-md transition-colors'>
+                                    <IoIosClose className='h-6 w-6' />
+                                </button>
+                            </SheetClose>
                         </div>
-                    </div>
-                    <div className='flex flex-col items-start justify-start gap-[14px] px-8'>
-                        {navItems.map((navItem: any, idx: number) => (
-                            <>
-                                {navItem.children && navItem.children.length > 0 ? (
-                                    <>
-                                        {navItem.children.map((childNavItem: any, idx: number) => (
-                                            <Link
-                                                key={`link=${idx}`}
-                                                href={childNavItem.link}
-                                                onClick={() => setOpen(false)}
-                                                className='relative max-w-[15rem] text-left text-2xl'
-                                            >
-                                                <span className='block text-white'>
-                                                    {childNavItem.title}
-                                                </span>
-                                            </Link>
-                                        ))}
-                                    </>
-                                ) : (
-                                    <Link
-                                        key={`link=${idx}`}
-                                        href={navItem.link}
-                                        onClick={() => setOpen(false)}
-                                        className='relative'
-                                    >
-                                        <span className='block text-[26px] text-white'>
+                        <SheetTitle className='sr-only'>Navigation Menu</SheetTitle>
+                        <SheetDescription className='sr-only'>
+                            Main navigation menu for mobile devices
+                        </SheetDescription>
+                    </SheetHeader>
+
+                    {/* Navigation Links */}
+                    <div className='flex-1 overflow-y-auto px-6 py-6'>
+                        <nav className='space-y-6'>
+                            {navItems.map((navItem: any, idx: number) => (
+                                <div key={`nav-item-${idx}`}>
+                                    {navItem.children && navItem.children.length > 0 ? (
+                                        <div className='space-y-3'>
+                                            {navItem.children.map(
+                                                (childNavItem: any, childIdx: number) => (
+                                                    <Link
+                                                        key={`child-link-${idx}-${childIdx}`}
+                                                        href={childNavItem.link}
+                                                        onClick={() => setOpen(false)}
+                                                        className='block text-white text-xl font-medium hover:text-gray-300 transition-colors py-2'
+                                                    >
+                                                        {childNavItem.title}
+                                                    </Link>
+                                                )
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <Link
+                                            key={`parent-link-${idx}`}
+                                            href={navItem.link}
+                                            onClick={() => setOpen(false)}
+                                            className='block text-white text-2xl font-medium hover:text-gray-300 transition-colors py-2'
+                                        >
                                             {navItem.title}
-                                        </span>
-                                    </Link>
-                                )}
-                            </>
-                        ))}
+                                        </Link>
+                                    )}
+                                </div>
+                            ))}
+                        </nav>
                     </div>
-                    <div className='flex flex-col w-full items-start gap-4 px-8 py-4'>
-                        <div className='flex flex-row gap-2.5'>
+
+                    {/* Bottom Action Buttons */}
+                    <div className='px-6 py-6 border-t border-gray-800 bg-black'>
+                        <div className='flex flex-col gap-3'>
                             {user ? (
                                 <Button
+                                    variant='primary'
                                     as={Link}
                                     href='/dashboard'
-                                    onClick={() => {
-                                        setOpen(false);
-                                    }}
+                                    onClick={() => setOpen(false)}
+                                    className='w-full bg-white text-black hover:bg-gray-200'
+                                    size='lg'
                                 >
                                     Dashboard
                                 </Button>
@@ -99,19 +124,19 @@ export const MobileNavbar = ({ navItems, user }: any) => {
                                     <Button
                                         as={Link}
                                         href='/login'
-                                        onClick={() => {
-                                            setOpen(false);
-                                        }}
+                                        onClick={() => setOpen(false)}
+                                        className='w-full bg-white text-black hover:bg-gray-200'
+                                        size='lg'
                                     >
                                         Login
                                     </Button>
                                     <Button
-                                        variant='simple'
+                                        variant='primary'
                                         as={Link}
                                         href='/register'
-                                        onClick={() => {
-                                            setOpen(false);
-                                        }}
+                                        onClick={() => setOpen(false)}
+                                        className='w-full  text-white hover:bg-white hover:text-black'
+                                        size='lg'
                                     >
                                         Register
                                     </Button>
@@ -119,8 +144,8 @@ export const MobileNavbar = ({ navItems, user }: any) => {
                             )}
                         </div>
                     </div>
-                </div>
-            )}
+                </SheetContent>
+            </Sheet>
         </motion.div>
     );
 };
