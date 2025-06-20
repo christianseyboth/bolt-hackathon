@@ -1,7 +1,7 @@
-# n8n Email Deletion API (POP3)
+# n8n Email Deletion API (IMAP)
 
-This API endpoint allows you to **permanently delete** emails from your mailbox after analysis in
-n8n workflows using POP3 protocol.
+This API endpoint allows you to **delete** emails from your mailbox after analysis in n8n workflows
+using IMAP protocol.
 
 ## Endpoint
 
@@ -60,7 +60,7 @@ Add an **HTTP Request** node to your n8n workflow after email analysis:
         "host": "mail.yourdomain.com",
         "user": "your-email@yourdomain.com",
         "password": "your-email-password",
-        "port": 110
+        "port": 993
     }
 }
 ```
@@ -70,7 +70,7 @@ Add an **HTTP Request** node to your n8n workflow after email analysis:
 For netcup hosted mailboxes, use these typical settings:
 
 -   **Host**: `mail.yourdomain.com` or `imap.yourdomain.com`
--   **Port**: `110` (POP3 non-SSL) or `995` (POP3 SSL)
+-   **Port**: `143` (IMAP non-SSL) or `993` (IMAP SSL)
 -   **User**: Your full email address
 -   **Password**: Your email password
 
@@ -144,20 +144,20 @@ This will return API documentation and example usage.
 -   ✅ **Simple Validation**: Direct string comparison for fast authentication
 -   ✅ **Audit Logging**: All operations logged with `[n8n-pop3]` prefix
 -   ✅ **Input Validation**: All required fields are validated
--   ✅ **Permanent Deletion**: Uses POP3 for true email removal
+-   ✅ **Email Deletion**: Uses IMAP for reliable email removal
 
-## Advantages of POP3 Implementation
+## Advantages of IMAP Implementation
 
-1. **True Deletion**: Emails are permanently removed from the server
-2. **No Trash Folder**: No need to worry about emails moving to trash
-3. **Immediate Effect**: Deletion happens instantly
-4. **Simpler Protocol**: POP3 is more straightforward than IMAP
-5. **No Expunge Needed**: Direct deletion without additional steps
+1. **Reliable Deletion**: IMAP marks emails for deletion and expunges them
+2. **Folder Support**: Can work with different mailbox folders
+3. **Search Capabilities**: Efficient Message-ID based searching
+4. **Stable Protocol**: Well-supported and tested
+5. **Better Error Handling**: More detailed connection feedback
 
-## POP3 Ports
+## IMAP Ports
 
--   **Port 110**: POP3 (non-SSL) - Standard POP3
--   **Port 995**: POP3 (SSL) - Secure POP3
+-   **Port 143**: IMAP (non-SSL) - Standard IMAP
+-   **Port 993**: IMAP (SSL) - Secure IMAP
 
 ## How It Works
 
@@ -201,7 +201,8 @@ N8N_API_KEY=your-generated-api-key
 
 ## Important Notes
 
-⚠️ **WARNING**: This API permanently deletes emails using POP3. Deleted emails cannot be recovered!
+⚠️ **WARNING**: This API deletes emails using IMAP. Deleted emails are moved to trash or permanently
+removed depending on server configuration!
 
 -   Emails are permanently removed from the server
 -   No backup or trash folder is used

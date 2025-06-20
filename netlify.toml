@@ -23,7 +23,7 @@ external_node_modules = [
     "@netlify/functions",
     "mailgun.js",
     "form-data",
-    "poplib",
+    "imap-simple",
 ]
 
 # Explicitly exclude heavy directories from all function bundles
@@ -50,7 +50,7 @@ external_node_modules = [
     "@netlify/functions",
     "mailgun.js",
     "form-data",
-    "poplib",
+    "imap-simple",
 ]
 excluded_files = [
     "emails/**",

@@ -16,17 +16,17 @@ export async function POST(request: NextRequest) {
         const n8nApiKey = process.env.N8N_API_KEY;
 
         if (!n8nApiKey) {
-            console.error('[n8n-pop3] N8N_API_KEY environment variable not configured');
+            console.error('[n8n-imap] N8N_API_KEY environment variable not configured');
             return createApiError('N8N_API_KEY environment variable not configured', 500);
         }
 
         // Validate against environment variable
         if (apiKey !== n8nApiKey) {
-            console.error('[n8n-pop3] Invalid API key provided. Expected length:', n8nApiKey.length, 'Received length:', apiKey.length);
+            console.error('[n8n-imap] Invalid API key provided. Expected length:', n8nApiKey.length, 'Received length:', apiKey.length);
             return createApiError('Invalid API key provided', 401);
         }
 
-        const { messageId, host, user, password, port = 110 } = await request.json();
+        const { messageId, host, user, password, port = 993 } = await request.json();
 
         // Validate required fields
         if (!messageId || !host || !user || !password) {
@@ -34,144 +34,66 @@ export async function POST(request: NextRequest) {
             return createApiError('Missing required fields: messageId, host, user, and password are required');
         }
 
-        console.log(`[n8n-pop3] Attempting to delete email with Message-ID: ${messageId} from ${host}:${port}`);
+        console.log(`[n8n-imap] Attempting to delete email with Message-ID: ${messageId} from ${host}:${port}`);
 
-        // Dynamic import of poplib
-        let POP3Client: any;
+        // Dynamic import with error handling
+        let imaps: any;
         try {
-            const poplibModule = await import('poplib');
-            POP3Client = poplibModule.default;
+            const imapModule = await import('imap-simple');
+            imaps = imapModule.default;
         } catch (importError: any) {
-            console.error('[n8n-pop3] Failed to import poplib:', importError);
-            return createApiError(`POP3 library import failed: ${importError?.message || 'Unknown import error'}`, 500);
+            console.error('[n8n-imap] Failed to import imap-simple:', importError);
+            return createApiError(`IMAP library import failed: ${importError?.message || 'Unknown import error'}`, 500);
         }
 
-        // Determine if we should use SSL based on port
-        const useSSL = port === 995;
-        console.log(`[n8n-pop3] Using ${useSSL ? 'SSL' : 'plain'} connection on port ${port}`);
+        // Determine SSL settings based on port
+        const useSSL = port === 993 || port === 995;
+        console.log(`[n8n-imap] Using ${useSSL ? 'SSL' : 'plain'} connection on port ${port}`);
 
-        // Create POP3 connection
-        const client = new POP3Client(port, host, {
-            tlserr: false,
-            enabletls: useSSL,
-            debug: false
+        const connection = await imaps.connect({
+            imap: {
+                user,
+                password,
+                host,
+                port,
+                tls: useSSL,
+                authTimeout: 10000,
+                connTimeout: 10000
+            }
         });
 
+        console.log(`[n8n-imap] IMAP connection established successfully`);
+
+        await connection.openBox('INBOX');
+        console.log(`[n8n-imap] INBOX opened successfully`);
+
+        // Search for email by Message-ID
+        const results = await connection.search([['HEADER', 'MESSAGE-ID', messageId]]);
+        console.log(`[n8n-imap] Found ${results.length} emails matching Message-ID: ${messageId}`);
+
         let deleted = false;
-        let emailsFound = 0;
+        if (results.length > 0) {
+            const uids = results.map((res: any) => res.attributes.uid);
+            console.log(`[n8n-imap] Marking emails with UIDs ${uids.join(', ')} for deletion`);
 
-        try {
-            // Connect and authenticate
-            await new Promise<void>((resolve, reject) => {
-                client.on('connect', () => {
-                    console.log(`[n8n-pop3] Connected to ${host}:${port}`);
-                    client.login(user, password);
-                });
+            await connection.addFlags(uids, ['\\Deleted']);
+            await connection.imap.expunge();
+            deleted = true;
 
-                client.on('login', (status: boolean, data: string) => {
-                    if (status) {
-                        console.log(`[n8n-pop3] Authentication successful`);
-                        resolve();
-                    } else {
-                        reject(new Error(`Authentication failed: ${data}`));
-                    }
-                });
-
-                client.on('error', (err: Error) => {
-                    reject(err);
-                });
-
-                // Set connection timeout
-                setTimeout(() => {
-                    reject(new Error('Connection timeout'));
-                }, 15000);
-            });
-
-            // Get message list
-            const messageList = await new Promise<any[]>((resolve, reject) => {
-                client.list((status: boolean, msgnum: number, data: any, rawdata: string) => {
-                    if (status === false) {
-                        resolve([]);
-                    } else {
-                        const messages = rawdata.split('\r\n')
-                            .filter(line => line.match(/^\d+/))
-                            .map(line => {
-                                const parts = line.trim().split(' ');
-                                return {
-                                    number: parseInt(parts[0]),
-                                    size: parseInt(parts[1])
-                                };
-                            });
-                        resolve(messages);
-                    }
-                });
-            });
-
-            console.log(`[n8n-pop3] Found ${messageList.length} messages in mailbox`);
-
-            // Search through messages for matching Message-ID
-            for (const message of messageList) {
-                const headers = await new Promise<string>((resolve, reject) => {
-                    client.top(message.number, 0, (status: boolean, msgnum: number, data: string) => {
-                        if (status) {
-                            resolve(data);
-                        } else {
-                            reject(new Error(`Failed to retrieve headers for message ${message.number}`));
-                        }
-                    });
-                });
-
-                // Check if this message has the matching Message-ID
-                const messageIdMatch = headers.match(/^Message-ID:\s*(.+)$/im);
-                if (messageIdMatch) {
-                    const foundMessageId = messageIdMatch[1].trim();
-                    console.log(`[n8n-pop3] Message ${message.number} has Message-ID: ${foundMessageId}`);
-
-                    if (foundMessageId === messageId) {
-                        console.log(`[n8n-pop3] Found matching message ${message.number}, deleting...`);
-
-                        // Delete the message
-                        await new Promise<void>((resolve, reject) => {
-                            client.dele(message.number, (status: boolean, msgnum: number, data: string) => {
-                                if (status) {
-                                    console.log(`[n8n-pop3] Successfully deleted message ${message.number}`);
-                                    deleted = true;
-                                    emailsFound++;
-                                    resolve();
-                                } else {
-                                    reject(new Error(`Failed to delete message ${message.number}: ${data}`));
-                                }
-                            });
-                        });
-                        break; // Found and deleted, exit loop
-                    }
-                }
-            }
-
-            // Quit connection
-            await new Promise<void>((resolve) => {
-                client.quit();
-                setTimeout(resolve, 1000); // Give time for quit to complete
-            });
-
-        } catch (error) {
-            // Ensure connection is closed on error
-            try {
-                client.quit();
-            } catch (quitError) {
-                console.error('[n8n-pop3] Error during quit:', quitError);
-            }
-            throw error;
+            console.log(`[n8n-imap] Successfully deleted ${results.length} email(s)`);
+        } else {
+            console.log(`[n8n-imap] No emails found with the specified Message-ID`);
         }
 
-        console.log(`[n8n-pop3] Operation completed. Deleted: ${deleted}, Emails found: ${emailsFound}`);
+        await connection.end();
+        console.log(`[n8n-imap] IMAP connection closed`);
 
         return createApiResponse({
             success: true,
             deleted,
             messageId,
-            emailsFound,
-            protocol: 'POP3',
+            emailsFound: results.length,
+            protocol: 'IMAP',
             ssl: useSSL,
             port,
             timestamp: new Date().toISOString(),
@@ -179,7 +101,7 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error: any) {
-        console.error('[n8n-pop3] Email deletion error:', error);
+        console.error('[n8n-imap] Email deletion error:', error);
 
         // Provide more detailed error information
         const errorMessage = error?.message || 'Unknown error occurred';
@@ -190,9 +112,9 @@ export async function POST(request: NextRequest) {
             stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined
         };
 
-        console.error('[n8n-pop3] Detailed error:', errorDetails);
+        console.error('[n8n-imap] Detailed error:', errorDetails);
 
-        return createApiError(`POP3 Error: ${errorMessage}`, 500);
+        return createApiError(`IMAP Error: ${errorMessage}`, 500);
     }
 }
 
@@ -220,21 +142,21 @@ export async function GET(request: NextRequest) {
             message: 'n8n Email Deletion API is running',
             endpoint: '/api/delete-email',
             method: 'POST',
-            protocol: 'POP3',
+            protocol: 'IMAP',
             requiredFields: ['messageId', 'host', 'user', 'password'],
-            optionalFields: ['port (default: 110)'],
+            optionalFields: ['port (default: 993)'],
             authentication: 'Bearer N8N_API_KEY required',
             permissions: 'Dedicated n8n access only',
             ports: {
-                110: 'POP3 (plain text)',
-                995: 'POP3S (SSL/TLS)'
+                143: 'IMAP (plain text)',
+                993: 'IMAPS (SSL/TLS)'
             },
             example: {
                 messageId: '<example@domain.com>',
                 host: 'mx2fcf.netcup.net',
                 user: 'check@secpilot.io',
                 password: 'your-password',
-                port: 110
+                port: 993
             }
         });
     } catch (error: any) {
