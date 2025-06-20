@@ -180,6 +180,10 @@ export async function verifyMFA(formData: FormData) {
 
   console.log('Email/Password MFA Verification Started:', { email, code: code?.replace(/\s/g, '') });
 
+  if (!email || !password || !code) {
+    return { error: 'Email, password, and code are required' };
+  }
+
   // First, sign in with email/password
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
     email,
@@ -188,7 +192,19 @@ export async function verifyMFA(formData: FormData) {
 
   if (signInError) {
     console.error('Email/Password sign-in failed during MFA:', signInError);
+
+    // Handle specific auth errors
+    if (signInError.message.includes('Invalid login credentials')) {
+      return { error: 'Invalid email or password. Please try again.' };
+    } else if (signInError.message.includes('Email not confirmed')) {
+      return { error: 'Please confirm your email address before signing in.' };
+    }
+
     return { error: signInError.message };
+  }
+
+  if (!signInData.user) {
+    return { error: 'Authentication failed. Please try again.' };
   }
 
   // Get the user's MFA factors
@@ -227,6 +243,14 @@ export async function verifyMFA(formData: FormData) {
 
   if (verifyError) {
     console.error('Email/Password MFA verification failed:', verifyError);
+
+    // Handle specific MFA errors
+    if (verifyError.message.includes('Invalid TOTP code')) {
+      return { error: 'Invalid code. Please check your authenticator app and try again.' };
+    } else if (verifyError.message.includes('Challenge expired')) {
+      return { error: 'Code expired. Please refresh the page and try again.' };
+    }
+
     return { error: 'Invalid code. Please try again.' };
   }
 
@@ -259,7 +283,25 @@ export async function verifyOAuthMFA(formData: FormData) {
 
   if (userError || !user) {
     console.error('OAuth user not found during MFA verification:', userError);
-    return { error: 'Please sign in again to complete MFA verification' };
+
+    // Clear any stale auth state and redirect to login
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (signOutError) {
+      console.error('Error clearing stale auth state:', signOutError);
+    }
+
+    // Return a more user-friendly error and clear the MFA challenge
+    return {
+      error: 'Your session has expired. Please sign in again.',
+      shouldRedirectToLogin: true
+    };
+  }
+
+  // Verify the email matches to prevent session hijacking
+  if (user.email !== email) {
+    console.error('Email mismatch in OAuth MFA verification');
+    return { error: 'Session validation failed. Please sign in again.' };
   }
 
   // Get the user's MFA factors

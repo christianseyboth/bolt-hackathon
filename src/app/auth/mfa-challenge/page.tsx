@@ -58,6 +58,13 @@ function MFAChallengeContent() {
                 setError(result.error);
                 setCode('');
                 setIsLoading(false);
+
+                // Check if we should redirect to login (session expired)
+                if ('shouldRedirectToLogin' in result && result.shouldRedirectToLogin) {
+                    setTimeout(() => {
+                        router.push('/login');
+                    }, 2000); // Give user time to read the error message
+                }
                 return;
             }
 

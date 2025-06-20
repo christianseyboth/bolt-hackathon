@@ -68,6 +68,11 @@ export function SecuritySettings() {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showMfaDisableDialog, setShowMfaDisableDialog] = useState(false);
+    const [mfaDisableCode, setMfaDisableCode] = useState('');
+    const [mfaDisableResolver, setMfaDisableResolver] = useState<
+        ((value: string | null) => void) | null
+    >(null);
     const supabase = createClient();
     const { toast } = useToast();
 
@@ -208,29 +213,76 @@ export function SecuritySettings() {
 
     const handleDisableMfa = async () => {
         try {
+            // First, we need to complete an MFA challenge to meet AAL2 requirements
             const { data: factors } = await supabase.auth.mfa.listFactors();
-            if ((factors?.totp?.length ?? 0) > 0 && factors?.totp) {
-                const { error } = await supabase.auth.mfa.unenroll({
-                    factorId: factors.totp[0].id,
-                });
+            const totpFactor = factors?.totp?.find((factor) => factor.status === 'verified');
 
-                if (error) throw error;
-
-                toast({
-                    title: 'Success',
-                    description: 'Two-factor authentication disabled',
-                });
-
-                await fetchUserSecurityInfo();
+            if (!totpFactor) {
+                throw new Error('No verified MFA factor found');
             }
+
+            // Create an MFA challenge first
+            const { data: challengeData, error: challengeError } =
+                await supabase.auth.mfa.challenge({
+                    factorId: totpFactor.id,
+                });
+
+            if (challengeError) {
+                throw new Error(`Failed to create MFA challenge: ${challengeError.message}`);
+            }
+
+            // Show dialog to get verification code from user
+            const verificationCode = await showMfaVerificationDialog();
+
+            if (!verificationCode) {
+                return; // User cancelled
+            }
+
+            // Verify the MFA challenge
+            const { data: verifyData, error: verifyError } = await supabase.auth.mfa.verify({
+                factorId: totpFactor.id,
+                challengeId: challengeData.id,
+                code: verificationCode,
+            });
+
+            if (verifyError) {
+                throw new Error('Invalid verification code');
+            }
+
+            // Now we can safely unenroll the factor
+            const { error: unenrollError } = await supabase.auth.mfa.unenroll({
+                factorId: totpFactor.id,
+            });
+
+            if (unenrollError) {
+                throw new Error(`Failed to disable MFA: ${unenrollError.message}`);
+            }
+
+            toast({
+                title: 'Success',
+                description: 'Two-factor authentication disabled successfully',
+            });
+
+            await fetchUserSecurityInfo();
         } catch (error) {
             console.error('Error disabling MFA:', error);
             toast({
                 title: 'Error',
-                description: 'Failed to disable two-factor authentication',
+                description:
+                    error instanceof Error
+                        ? error.message
+                        : 'Failed to disable two-factor authentication',
                 variant: 'destructive',
             });
         }
+    };
+
+    // Helper function to show MFA verification dialog
+    const showMfaVerificationDialog = (): Promise<string | null> => {
+        return new Promise((resolve) => {
+            setShowMfaDisableDialog(true);
+            setMfaDisableResolver(resolve);
+        });
     };
 
     const handlePasswordChange = async () => {
@@ -632,6 +684,77 @@ export function SecuritySettings() {
                         </Button>
                         <Button onClick={handleVerifyMfa} disabled={verificationCode.length !== 6}>
                             Verify & Enable
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* MFA Disable Verification Dialog */}
+            <Dialog
+                open={showMfaDisableDialog}
+                onOpenChange={(open) => {
+                    setShowMfaDisableDialog(open);
+                    if (!open && mfaDisableResolver) {
+                        mfaDisableResolver(null); // User cancelled
+                        setMfaDisableResolver(null);
+                        setMfaDisableCode('');
+                    }
+                }}
+            >
+                <DialogContent className='bg-neutral-900 border-neutral-800 max-w-md'>
+                    <DialogHeader>
+                        <DialogTitle className='flex items-center gap-2'>
+                            <IconShield className='h-5 w-5' />
+                            Verify to Disable MFA
+                        </DialogTitle>
+                        <DialogDescription>
+                            For security, please enter your authenticator code to disable two-factor
+                            authentication.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className='space-y-4'>
+                        <div>
+                            <Label htmlFor='mfaDisableCode'>Authenticator Code</Label>
+                            <Input
+                                id='mfaDisableCode'
+                                value={mfaDisableCode}
+                                onChange={(e) =>
+                                    setMfaDisableCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                                }
+                                placeholder='Enter 6-digit code'
+                                maxLength={6}
+                                className='mt-1 text-center text-lg tracking-widest'
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            variant='outline'
+                            onClick={() => {
+                                setShowMfaDisableDialog(false);
+                                if (mfaDisableResolver) {
+                                    mfaDisableResolver(null);
+                                    setMfaDisableResolver(null);
+                                    setMfaDisableCode('');
+                                }
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                if (mfaDisableResolver && mfaDisableCode.length === 6) {
+                                    mfaDisableResolver(mfaDisableCode);
+                                    setMfaDisableResolver(null);
+                                    setMfaDisableCode('');
+                                    setShowMfaDisableDialog(false);
+                                }
+                            }}
+                            disabled={mfaDisableCode.length !== 6}
+                            className='bg-red-600 hover:bg-red-700'
+                        >
+                            Verify & Disable MFA
                         </Button>
                     </DialogFooter>
                 </DialogContent>
