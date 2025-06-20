@@ -4,8 +4,7 @@ import { FeatureIconContainer } from '../features/feature-icon-container';
 import { Heading } from '../heading';
 import { Subheading } from '../subheading';
 import { TbLocationBolt } from 'react-icons/tb';
-import { cn } from '@/lib/utils';
-import { testimonials } from '@/constants/page-testimonials';
+
 
 const TrustIndicators = () => {
     const stats = [

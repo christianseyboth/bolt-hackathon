@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+'use client';
+import React, { useRef, useState, useEffect } from 'react';
 import { MotionValue, motion, useScroll, useTransform } from 'motion/react';
 import { Button } from '@/components/button';
 import { HiArrowRight } from 'react-icons/hi2';
@@ -16,9 +17,11 @@ export const Hero = () => {
     const { scrollYProgress } = useScroll({
         target: containerRef,
     });
-    const [isMobile, setIsMobile] = React.useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+    const [isClient, setIsClient] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
+        setIsClient(true);
         const checkMobile = () => {
             setIsMobile(window.innerWidth <= 768);
         };
@@ -80,17 +83,34 @@ export const Hero = () => {
                         position: 'relative',
                     }}
                 >
-                    <Card rotate={rotate} translate={translate} scale={scale}>
-                        <Image
-                            src={`/hero-screenshot.avif`}
-                            alt='SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface'
-                            height={720}
-                            width={1400}
-                            className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full md:object-left-top'
-                            draggable={false}
-                            priority
-                        />
-                    </Card>
+                    {isClient ? (
+                        <Card rotate={rotate} translate={translate} scale={scale}>
+                            <Image
+                                src={`/hero-screenshot.avif`}
+                                alt='SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface'
+                                height={720}
+                                width={1400}
+                                className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full md:object-left-top'
+                                draggable={false}
+                                priority
+                            />
+                        </Card>
+                    ) : (
+                        // Server-rendered version - static image visible to crawlers
+                        <div className='max-w-6xl z-40 group -mt-12 mx-auto isolate group h-[20rem] md:h-[50rem] w-full border-4 border-neutral-900 p-2 md:p-2 rounded-[30px] shadow-2xl relative bg-[#0a0a0a]'>
+                            <div className='h-full w-full overflow-hidden rounded-2xl md:rounded-2xl md:p-4'>
+                                <Image
+                                    src={`/hero-screenshot.avif`}
+                                    alt='SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface'
+                                    height={720}
+                                    width={1400}
+                                    className='mx-auto rounded-md object-cover object-left-top h-full md:object-left-top'
+                                    draggable={false}
+                                    priority
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

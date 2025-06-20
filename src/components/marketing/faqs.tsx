@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import Accordion from '@/components/accordion';
 import { Heading } from '@/components/heading';
 import { Subheading } from '@/components/subheading';
@@ -83,7 +84,13 @@ const questions = [
 ];
 
 export const FAQs = () => {
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpanded] = useState<number | false>(false);
+    const [isClient, setIsClient] = useState(false);
+
+    // Only enable interactivity on client-side
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     return (
         <div className='relative py-20'>
@@ -106,17 +113,34 @@ export const FAQs = () => {
                 </div>
 
                 {/* FAQ Grid */}
-                <div className='grid gap-4'>
-                    {questions.map((item, i) => (
-                        <Accordion
-                            key={i}
-                            i={i}
-                            expanded={expanded}
-                            setExpanded={setExpanded}
-                            title={item.title}
-                            description={item.description}
-                        />
-                    ))}
+                <div className='space-y-4'>
+                    {questions.map((item, i) =>
+                        isClient ? (
+                            <Accordion
+                                key={i}
+                                i={i}
+                                expanded={expanded}
+                                setExpanded={setExpanded}
+                                title={item.title}
+                                description={item.description}
+                            />
+                        ) : (
+                            // Server-rendered version - all content visible for crawlers
+                            <div
+                                key={i}
+                                className='border border-neutral-800 rounded-xl bg-neutral-900/30 overflow-hidden transition-all duration-300 hover:border-emerald-500/30'
+                            >
+                                <div className='p-6'>
+                                    <h3 className='text-white text-base font-semibold mb-4 pr-4'>
+                                        {item.title}
+                                    </h3>
+                                    <p className='text-sm font-normal text-neutral-400 leading-relaxed'>
+                                        {item.description}
+                                    </p>
+                                </div>
+                            </div>
+                        )
+                    )}
                 </div>
 
                 {/* Contact CTA */}
