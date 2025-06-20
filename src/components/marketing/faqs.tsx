@@ -1,4 +1,3 @@
-'use client';
 import React, { useState } from 'react';
 import Accordion from '@/components/accordion';
 import { Heading } from '@/components/heading';

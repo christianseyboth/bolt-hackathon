@@ -1,4 +1,3 @@
-'use client';
 import React from 'react';
 import { TestimonialsSlider } from './slider';
 import { FeatureIconContainer } from '../features/feature-icon-container';

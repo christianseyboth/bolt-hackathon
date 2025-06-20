@@ -1,4 +1,3 @@
-'use client';
 import React, { useRef } from 'react';
 import { MotionValue, motion, useScroll, useTransform } from 'motion/react';
 import { Button } from '@/components/button';
