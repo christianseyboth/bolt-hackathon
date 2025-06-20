@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,50 +32,95 @@ export const NotificationBell = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const [hasNewNotification, setHasNewNotification] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const supabase = createClient();
     const { accountId } = useAccount();
     const router = useRouter();
     const { toast } = useToast();
+    const channelRef = useRef<any>(null);
 
     useEffect(() => {
         if (!accountId) return;
 
         loadNotifications();
 
-        // Set up real-time subscription
-        const channel = supabase
-            .channel('mail_events')
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'mail_events',
-                    filter: `account_id=eq.${accountId}`,
-                },
-                (payload) => {
-                    handleNewThreatDetected(payload.new);
+        // Set up real-time subscription with better error handling
+        const setupRealtimeSubscription = async () => {
+            try {
+                // Clean up any existing subscription first
+                if (channelRef.current) {
+                    console.log('Cleaning up existing subscription');
+                    supabase.removeChannel(channelRef.current);
+                    channelRef.current = null;
                 }
-            )
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'mail_events',
-                    filter: `account_id=eq.${accountId}`,
-                },
-                (payload) => {
-                    handleThreatUpdated(payload.new);
-                }
-            )
-            .subscribe();
 
-        // Cleanup subscription on unmount
-        return () => {
-            supabase.removeChannel(channel);
+                console.log('Setting up realtime subscription for accountId:', accountId);
+
+                const channel = supabase
+                    .channel(`mail_events_${accountId}`) // Make channel name unique per account
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'INSERT',
+                            schema: 'public',
+                            table: 'mail_events',
+                            filter: `account_id=eq.${accountId}`,
+                        },
+                        (payload) => {
+                            console.log('New threat detected via realtime:', payload.new);
+                            handleNewThreatDetected(payload.new);
+                        }
+                    )
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'mail_events',
+                            filter: `account_id=eq.${accountId}`,
+                        },
+                        (payload) => {
+                            console.log('Threat updated via realtime:', payload.new);
+                            handleThreatUpdated(payload.new);
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log('Realtime subscription status:', status);
+                        if (status === 'SUBSCRIBED') {
+                            console.log('Successfully subscribed to realtime updates');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('Realtime subscription error');
+                            toast({
+                                title: 'Connection Error',
+                                description:
+                                    'Unable to connect to real-time updates. Please refresh the page.',
+                                variant: 'destructive',
+                            });
+                        }
+                    });
+
+                channelRef.current = channel;
+            } catch (error) {
+                console.error('Error setting up realtime subscription:', error);
+                toast({
+                    title: 'Connection Error',
+                    description: 'Failed to connect to real-time updates.',
+                    variant: 'destructive',
+                });
+            }
         };
-    }, [accountId]);
+
+        setupRealtimeSubscription();
+
+        // Cleanup subscription on unmount or accountId change
+        return () => {
+            if (channelRef.current) {
+                console.log('Cleaning up realtime subscription');
+                supabase.removeChannel(channelRef.current);
+                channelRef.current = null;
+            }
+        };
+    }, [accountId, supabase, toast]);
 
     const handleNewThreatDetected = (newEvent: any) => {
         const newNotification: Notification = {
@@ -168,6 +213,7 @@ export const NotificationBell = () => {
     const loadNotifications = async () => {
         if (!accountId) return;
 
+        setIsLoading(true);
         try {
             const { data: mailEvents, error } = await supabase
                 .from('mail_events')
@@ -178,6 +224,11 @@ export const NotificationBell = () => {
 
             if (error) {
                 console.error('Error loading notifications:', error);
+                toast({
+                    title: 'Error',
+                    description: 'Failed to load notifications.',
+                    variant: 'destructive',
+                });
                 return;
             }
 
@@ -202,9 +253,14 @@ export const NotificationBell = () => {
             setNotifications(formattedNotifications);
             setUnreadCount(formattedNotifications.filter((n) => !n.is_read).length);
         } catch (error) {
-            console.error('Error:', error);
-            setNotifications([]);
-            setUnreadCount(0);
+            console.error('Error loading notifications:', error);
+            toast({
+                title: 'Error',
+                description: 'Failed to load notifications.',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 

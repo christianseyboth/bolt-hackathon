@@ -2,7 +2,6 @@ import { SecurityScore } from './security-score';
 import { EmailSetupCard } from './EmailSetupCard';
 import { ThreatAlertsCard } from './ThreatAlertsCard';
 import { RecentThreatsTable } from './RecentThreatsTable';
-import { NotificationBell } from './NotificationBell';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -73,10 +72,6 @@ export const DashboardOverview = () => {
 
             <div data-tour='email-forwarding'>
                 <EmailSetupCard />
-            </div>
-
-            <div className='flex justify-end'>
-                <NotificationBell />
             </div>
 
             <div data-tour='recent-threats'>
