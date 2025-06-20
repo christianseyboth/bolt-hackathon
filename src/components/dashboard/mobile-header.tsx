@@ -66,6 +66,8 @@ export function MobileHeader() {
     const handleSignOut = async () => {
         try {
             await authSignOut();
+            // Use hard redirect to prevent 500 errors
+            window.location.href = '/';
         } catch (error) {
             console.error('Error signing out:', error);
         }

@@ -117,8 +117,8 @@ export function Sidebar({ className, onNavigate, isMobile = false }: SidebarProp
             await authSignOut();
             // Close mobile sidebar if open
             if (onNavigate) onNavigate();
-            // Redirect to home page
-            router.push('/');
+            // Use hard redirect to prevent 500 errors
+            window.location.href = '/';
         } catch (error) {
             console.error('Logout error:', error);
             toast({

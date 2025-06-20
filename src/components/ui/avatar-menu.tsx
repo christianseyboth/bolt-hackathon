@@ -57,7 +57,8 @@ export function AvatarMenu() {
     const handleSignOut = async () => {
         try {
             await authSignOut();
-            router.push('/');
+            // Use hard redirect to prevent 500 errors
+            window.location.href = '/';
         } catch (error) {
             console.error('Error signing out:', error);
         }

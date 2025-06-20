@@ -163,12 +163,11 @@ export async function signOut() {
     // Clear cache and revalidate
     revalidatePath('/', 'layout');
 
-    // Redirect to home page
-    redirect('/');
+    // Return success - client will handle redirect
+    return { success: true };
   } catch (error) {
     console.error('Signout exception:', error);
-    // Even if there's an error, try to redirect
-    redirect('/');
+    return { error: 'An error occurred during signout' };
   }
 }
 
