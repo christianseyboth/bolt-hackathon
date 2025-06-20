@@ -59,11 +59,14 @@ export const TestimonialsSlider = () => {
     }, [mounted]);
 
     return (
-        <section>
+        <section aria-label='Customer testimonials'>
             <div className='max-w-4xl mx-auto relative z-40 px-6'>
                 <div className='relative pb-8 md:pb-12'>
                     {/* Subtle particles animation */}
-                    <div className='absolute left-1/2 -translate-x-1/2 -top-2 -z-10 w-96 h-32 -mt-6'>
+                    <div
+                        className='absolute left-1/2 -translate-x-1/2 -top-2 -z-10 w-96 h-32 -mt-6'
+                        aria-hidden='true'
+                    >
                         <SparklesCore
                             id='testimonials-particles'
                             background='transparent'
@@ -78,7 +81,7 @@ export const TestimonialsSlider = () => {
                     {/* Carousel */}
                     <div className='text-center'>
                         {/* Testimonial image */}
-                        <div className='relative h-28 mb-6'>
+                        <div className='relative h-28 mb-6' aria-hidden='true'>
                             <div className='absolute -top-10 left-1/2 -translate-x-1/2 w-30 h-30 -z-10 pointer-events-none rounded-full bg-gradient-to-b from-emerald-500/20 to-transparent p-1'>
                                 {testimonials.map((item, index) => (
                                     <Transition
@@ -98,7 +101,7 @@ export const TestimonialsSlider = () => {
                                                 src={item.src}
                                                 width={72}
                                                 height={72}
-                                                alt={item.name}
+                                                alt={`${item.name} - ${item.designation}`}
                                             />
                                         </div>
                                     </Transition>
@@ -110,6 +113,9 @@ export const TestimonialsSlider = () => {
                             <div
                                 className='relative flex flex-col min-h-[120px]'
                                 ref={testimonialsRef}
+                                role='region'
+                                aria-live='polite'
+                                aria-label='Testimonial content'
                             >
                                 {testimonials.map((item, index) => (
                                     <Transition
@@ -131,14 +137,22 @@ export const TestimonialsSlider = () => {
                             </div>
                         </div>
                         {/* Navigation */}
-                        <div className='flex flex-col sm:flex-row items-center justify-center gap-4 px-4 sm:px-6'>
+                        <div
+                            className='flex flex-col sm:flex-row items-center justify-center gap-4 px-4 sm:px-6'
+                            role='tablist'
+                            aria-label='Select testimonial'
+                        >
                             {testimonials.map((item, index) => (
                                 <button
+                                    role='tab'
+                                    aria-selected={active === index}
+                                    aria-controls={`testimonial-${index}`}
+                                    aria-label={`View testimonial from ${item.name}, ${item.designation}`}
                                     className={cn(
                                         'px-4 py-3 rounded-lg border transition-all duration-200 text-left w-full sm:w-auto',
                                         active === index
                                             ? 'border-emerald-500/50 bg-emerald-500/10 text-neutral-200'
-                                            : 'border-zinc-700 bg-zinc-800/30 text-neutral-400 hover:border-emerald-500/30 hover:bg-emerald-500/5'
+                                            : 'border-zinc-700 bg-zinc-800/30 text-neutral-300 hover:border-emerald-500/30 hover:bg-emerald-500/5'
                                     )}
                                     key={index}
                                     onClick={() => {

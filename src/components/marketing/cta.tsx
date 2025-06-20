@@ -22,7 +22,7 @@ export const CTA = () => {
                         <h2 className='text-white text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight'>
                             Protect Your Business from Email Threats
                         </h2>
-                        <p className='text-lg md:text-xl text-neutral-400 mb-8 max-w-3xl mx-auto leading-relaxed'>
+                        <p className='text-lg md:text-xl text-neutral-300 mb-8 max-w-3xl mx-auto leading-relaxed'>
                             Stop phishing, malware, and ransomware attacks before they reach your
                             inbox. Join thousands of businesses protecting their communications with
                             AI-powered security.
@@ -44,7 +44,7 @@ export const CTA = () => {
                             <div className='text-2xl md:text-3xl font-bold text-white mb-1'>
                                 99.9%
                             </div>
-                            <div className='text-sm text-neutral-400'>Threat Detection Rate</div>
+                            <div className='text-sm text-neutral-300'>Threat Detection Rate</div>
                         </div>
                         <div className='flex flex-col items-center p-4'>
                             <div className='flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full mb-3'>
@@ -53,7 +53,7 @@ export const CTA = () => {
                             <div className='text-2xl md:text-3xl font-bold text-white mb-1'>
                                 10,000+
                             </div>
-                            <div className='text-sm text-neutral-400'>Protected Individuals</div>
+                            <div className='text-sm text-neutral-300'>Protected Individuals</div>
                         </div>
                         <div className='flex flex-col items-center p-4'>
                             <div className='flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-full mb-3'>
@@ -62,7 +62,7 @@ export const CTA = () => {
                             <div className='text-2xl md:text-3xl font-bold text-white mb-1'>
                                 5M+
                             </div>
-                            <div className='text-sm text-neutral-400'>Emails Secured Yearly</div>
+                            <div className='text-sm text-neutral-300'>Emails Secured Yearly</div>
                         </div>
                     </motion.div>
 
@@ -121,20 +121,20 @@ export const CTA = () => {
                         viewport={{ once: true }}
                         className='text-center'
                     >
-                        <p className='text-sm text-neutral-500 mb-2'>
+                        <p className='text-sm text-neutral-400 mb-2'>
                             Trusted by businesses worldwide
                         </p>
                         <div className='flex flex-wrap justify-center items-center gap-6 opacity-60'>
-                            <div className='text-xs text-neutral-600 bg-neutral-800/30 px-3 py-1 rounded-full'>
+                            <div className='text-xs text-neutral-400 bg-neutral-800/30 px-3 py-1 rounded-full'>
                                 SOC 2 Compliant
                             </div>
-                            <div className='text-xs text-neutral-600 bg-neutral-800/30 px-3 py-1 rounded-full'>
+                            <div className='text-xs text-neutral-400 bg-neutral-800/30 px-3 py-1 rounded-full'>
                                 GDPR Ready
                             </div>
-                            <div className='text-xs text-neutral-600 bg-neutral-800/30 px-3 py-1 rounded-full'>
+                            <div className='text-xs text-neutral-400 bg-neutral-800/30 px-3 py-1 rounded-full'>
                                 ISO 27001
                             </div>
-                            <div className='text-xs text-neutral-600 bg-neutral-800/30 px-3 py-1 rounded-full'>
+                            <div className='text-xs text-neutral-400 bg-neutral-800/30 px-3 py-1 rounded-full'>
                                 HIPAA Compatible
                             </div>
                         </div>
@@ -143,7 +143,10 @@ export const CTA = () => {
             </Container>
 
             {/* Background Elements */}
-            <div className='absolute inset-0 overflow-hidden pointer-events-none'>
+            <div
+                className='absolute inset-0 overflow-hidden pointer-events-none'
+                aria-hidden='true'
+            >
                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl' />
                 <div className='absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl' />
             </div>

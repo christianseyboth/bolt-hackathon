@@ -41,13 +41,15 @@ export const Hero = () => {
     const translate = useTransform(scrollYProgress, [0, 1], [0, 100]);
 
     return (
-        <div
+        <section
             ref={containerRef}
             className='flex flex-col min-h-[70rem] md:min-h-[100rem] pt-20 md:pt-40 relative overflow-hidden'
+            aria-labelledby='hero-heading'
         >
             <Container className='flex flex-col items-center justify-center'>
                 <Heading
                     as='h1'
+                    id='hero-heading'
                     className='text-4xl md:text-4xl lg:text-8xl font-semibold max-w-6xl mx-auto text-center mt-6 relative z-10 py-6'
                 >
                     Never Lose Money to Email Attacks Again
@@ -64,10 +66,13 @@ export const Hero = () => {
                     showStars
                 />
                 <div className='flex items-center gap-4 justify-center my-10 relative z-10'>
-                    <Link href='/dashboard'>
+                    <Link href='/dashboard' aria-label='Start your free email security trial'>
                         <Button className='flex space-x-2 items-center group !text-lg'>
                             <span>Start Free Email Security Trial</span>{' '}
-                            <HiArrowRight className='text-white group-hover:translate-x-1 stroke-[1px] h-3 w-3 mt-0.5 transition-transform duration-200' />
+                            <HiArrowRight
+                                className='text-white group-hover:translate-x-1 stroke-[1px] h-3 w-3 mt-0.5 transition-transform duration-200'
+                                aria-hidden='true'
+                            />
                         </Button>
                     </Link>
                 </div>
@@ -76,6 +81,8 @@ export const Hero = () => {
                 className='flex items-center justify-center relative p-2 md:p-20 cursor-pointer md:-mt-20'
                 style={{ position: 'relative' }}
                 suppressHydrationWarning
+                role='img'
+                aria-label='SecPilot dashboard preview'
             >
                 <div
                     className='w-full relative'
@@ -88,7 +95,7 @@ export const Hero = () => {
                         <Card rotate={rotate} translate={translate} scale={scale}>
                             <Image
                                 src={`/hero-screenshot.avif`}
-                                alt='SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface'
+                                alt='SecPilot email security dashboard interface showing real-time threat detection analytics, phishing protection status, and malware scanning results with comprehensive security metrics'
                                 height={720}
                                 width={1400}
                                 className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full md:object-left-top'
@@ -102,7 +109,7 @@ export const Hero = () => {
                             <div className='h-full w-full overflow-hidden rounded-2xl md:rounded-2xl md:p-4'>
                                 <Image
                                     src={`/hero-screenshot.avif`}
-                                    alt='SecPilot email security dashboard showing real-time threat detection, phishing protection, and malware scanning interface'
+                                    alt='SecPilot email security dashboard interface showing real-time threat detection analytics, phishing protection status, and malware scanning results with comprehensive security metrics'
                                     height={720}
                                     width={1400}
                                     className='mx-auto rounded-md object-cover object-left-top h-full md:object-left-top'
@@ -114,7 +121,7 @@ export const Hero = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </section>
     );
 };
 
@@ -145,6 +152,7 @@ export const Card = ({
             <div
                 className='absolute h-40 w-full bottom-0 md:-bottom-10 inset-x-0 scale-[1.2] z-20 pointer-events-none [mask-image:linear-gradient(to_top,white_30%,transparent)]'
                 style={{ backgroundColor: '#0a0a0a' }}
+                aria-hidden='true'
             />
             <motion.div
                 className='absolute inset-0 z-20 group-hover:bg-black/0 flex items-center justify-center'

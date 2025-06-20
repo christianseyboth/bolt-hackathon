@@ -12,7 +12,11 @@ export const StickyScroll = ({
     }[];
 }) => {
     return (
-        <div className='py-4 md:py-20' style={{ position: 'relative' }}>
+        <section
+            className='py-4 md:py-20'
+            style={{ position: 'relative' }}
+            aria-label='Platform features'
+        >
             <div className='hidden lg:flex h-full flex-col max-w-7xl mx-auto justify-between relative p-10'>
                 {content.map((item, index) => (
                     <ScrollContent key={item.title + index} item={item} index={index} />
@@ -23,7 +27,7 @@ export const StickyScroll = ({
                     <ScrollContentMobile key={item.title + index} item={item} index={index} />
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 
@@ -65,7 +69,7 @@ export const ScrollContent = ({
     }, [mounted]);
 
     return (
-        <div
+        <article
             ref={ref}
             className={`my-40 relative grid grid-cols-3 gap-8 transition-all duration-700 ${
                 mounted && isVisible
@@ -74,14 +78,15 @@ export const ScrollContent = ({
             }`}
             style={{ position: 'relative' }}
             suppressHydrationWarning
+            id={`feature-${index}`}
         >
             <div className='w-full'>
                 <div className=''>
                     <div>{item.icon}</div>
-                    <h2 className='mt-2 font-bold text-2xl lg:text-4xl inline-block bg-clip-text text-left text-transparent bg-gradient-to-b from-white to-white'>
+                    <h3 className='mt-2 font-bold text-2xl lg:text-4xl inline-block bg-clip-text text-left text-transparent bg-gradient-to-b from-white to-white'>
                         {item.title}
-                    </h2>
-                    <p className='text-lg text-neutral-500 font-bold max-w-sm mt-2'>
+                    </h3>
+                    <p className='text-lg text-neutral-300 font-bold max-w-sm mt-2'>
                         {item.description}
                     </p>
                 </div>
@@ -90,7 +95,7 @@ export const ScrollContent = ({
             <div className='h-full w-full rounded-md self-start col-span-2'>
                 {item.content && item.content}
             </div>
-        </div>
+        </article>
     );
 };
 
@@ -107,23 +112,24 @@ export const ScrollContentMobile = ({
     index: number;
 }) => {
     return (
-        <div
+        <article
             className='my-10 relative flex flex-col md:flex-row md:space-x-4'
             style={{ position: 'relative' }}
+            id={`feature-mobile-${index}`}
         >
             <div className='w-full'>
                 <div className='mb-6'>
                     <div>{item.icon}</div>
-                    <h2 className='mt-2 font-bold text-2xl lg:text-4xl inline-block bg-clip-text text-left text-transparent bg-gradient-to-b from-white to-white'>
+                    <h3 className='mt-2 font-bold text-2xl lg:text-4xl inline-block bg-clip-text text-left text-transparent bg-gradient-to-b from-white to-white'>
                         {item.title}
-                    </h2>
-                    <p className='text-sm md:text-base text-neutral-500 font-bold max-w-sm mt-2'>
+                    </h3>
+                    <p className='text-sm md:text-base text-neutral-300 font-bold max-w-sm mt-2'>
                         {item.description}
                     </p>
                 </div>
             </div>
 
             <div className='w-full rounded-md self-start'>{item.content && item.content}</div>
-        </div>
+        </article>
     );
 };
