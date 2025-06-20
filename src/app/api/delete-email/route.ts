@@ -16,14 +16,14 @@ export async function POST(request: NextRequest) {
         const n8nApiKey = process.env.N8N_API_KEY;
 
         if (!n8nApiKey) {
-            console.error('N8N_API_KEY environment variable not configured');
-            return createApiError('API not configured', 500);
+            console.error('[n8n-pop3] N8N_API_KEY environment variable not configured');
+            return createApiError('N8N_API_KEY environment variable not configured', 500);
         }
 
         // Validate against environment variable
         if (apiKey !== n8nApiKey) {
-            console.error('Invalid API key provided');
-            return createApiError('Invalid API key', 401);
+            console.error('[n8n-pop3] Invalid API key provided. Expected length:', n8nApiKey.length, 'Received length:', apiKey.length);
+            return createApiError('Invalid API key provided', 401);
         }
 
         const { messageId, host, user, password, port = 110 } = await request.json();
@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
         try {
             const poplibModule = await import('poplib');
             POP3Client = poplibModule.default;
-        } catch (importError) {
-            console.error('Failed to import poplib:', importError);
-            return createApiError('POP3 library not available', 500);
+        } catch (importError: any) {
+            console.error('[n8n-pop3] Failed to import poplib:', importError);
+            return createApiError(`POP3 library import failed: ${importError?.message || 'Unknown import error'}`, 500);
         }
 
         // Determine if we should use SSL based on port
@@ -180,7 +180,19 @@ export async function POST(request: NextRequest) {
 
     } catch (error: any) {
         console.error('[n8n-pop3] Email deletion error:', error);
-        return createApiError(error.message || 'Unknown error occurred', 500);
+
+        // Provide more detailed error information
+        const errorMessage = error?.message || 'Unknown error occurred';
+        const errorDetails = {
+            message: errorMessage,
+            name: error?.name || 'Error',
+            code: error?.code || 'UNKNOWN',
+            stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+        };
+
+        console.error('[n8n-pop3] Detailed error:', errorDetails);
+
+        return createApiError(`POP3 Error: ${errorMessage}`, 500);
     }
 }
 
