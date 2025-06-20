@@ -1,6 +1,7 @@
-# n8n Email Deletion API
+# n8n Email Deletion API (POP3)
 
-This API endpoint allows you to delete emails from your mailbox after analysis in n8n workflows.
+This API endpoint allows you to **permanently delete** emails from your mailbox after analysis in
+n8n workflows using POP3 protocol.
 
 ## Endpoint
 
@@ -59,7 +60,7 @@ Add an **HTTP Request** node to your n8n workflow after email analysis:
         "host": "mail.yourdomain.com",
         "user": "your-email@yourdomain.com",
         "password": "your-email-password",
-        "port": 993
+        "port": 110
     }
 }
 ```
@@ -69,7 +70,7 @@ Add an **HTTP Request** node to your n8n workflow after email analysis:
 For netcup hosted mailboxes, use these typical settings:
 
 -   **Host**: `mail.yourdomain.com` or `imap.yourdomain.com`
--   **Port**: `993` (SSL) or `143` (non-SSL)
+-   **Port**: `110` (POP3 non-SSL) or `995` (POP3 SSL)
 -   **User**: Your full email address
 -   **Password**: Your email password
 
@@ -83,8 +84,9 @@ For netcup hosted mailboxes, use these typical settings:
     "deleted": true,
     "messageId": "<example@domain.com>",
     "emailsFound": 1,
+    "message": "Email permanently deleted",
     "timestamp": "2024-01-15T10:30:00.000Z",
-    "source": "n8n"
+    "source": "n8n-pop3"
 }
 ```
 
@@ -140,16 +142,31 @@ This will return API documentation and example usage.
 -   ✅ **Dedicated Access**: Only accessible to your n8n workflows
 -   ✅ **No Account Dependencies**: No need for user accounts or database lookups
 -   ✅ **Simple Validation**: Direct string comparison for fast authentication
--   ✅ **Audit Logging**: All operations logged with `[n8n]` prefix
+-   ✅ **Audit Logging**: All operations logged with `[n8n-pop3]` prefix
 -   ✅ **Input Validation**: All required fields are validated
+-   ✅ **Permanent Deletion**: Uses POP3 for true email removal
 
-## Advantages of This Approach
+## Advantages of POP3 Implementation
 
-1. **Simpler**: No database lookups or account management
-2. **Faster**: Direct environment variable check
-3. **More Secure**: API key not stored in database
-4. **Dedicated**: Only for n8n, not exposed to users
-5. **Easy to Rotate**: Just change the environment variable
+1. **True Deletion**: Emails are permanently removed from the server
+2. **No Trash Folder**: No need to worry about emails moving to trash
+3. **Immediate Effect**: Deletion happens instantly
+4. **Simpler Protocol**: POP3 is more straightforward than IMAP
+5. **No Expunge Needed**: Direct deletion without additional steps
+
+## POP3 Ports
+
+-   **Port 110**: POP3 (non-SSL) - Standard POP3
+-   **Port 995**: POP3 (SSL) - Secure POP3
+
+## How It Works
+
+1. **Connect**: Establishes POP3 connection to your mail server
+2. **Authenticate**: Logs in with your credentials
+3. **Search**: Scans through all emails to find matching Message-ID
+4. **Delete**: Permanently removes the email using POP3 DELE command
+5. **Verify**: Confirms deletion was successful
+6. **Disconnect**: Safely closes the connection
 
 ## Troubleshooting
 
@@ -181,3 +198,12 @@ For local testing, add to your `.env.local`:
 ```
 N8N_API_KEY=your-generated-api-key
 ```
+
+## Important Notes
+
+⚠️ **WARNING**: This API permanently deletes emails using POP3. Deleted emails cannot be recovered!
+
+-   Emails are permanently removed from the server
+-   No backup or trash folder is used
+-   Make sure you have proper backups if needed
+-   Test with non-critical emails first
