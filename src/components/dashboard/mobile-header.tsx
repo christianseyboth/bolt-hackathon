@@ -109,7 +109,7 @@ export function MobileHeader() {
             <Logo />
             <div className='flex items-center gap-2'>
                 <NotificationBell />
-                <div className='hidden [@media(min-width:1025px)]:flex items-center mt-4 [@media(min-width:1025px)]:mt-0 space-x-2'>
+                <div className='flex items-center space-x-2'>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant='ghost' size='icon' className='rounded-full'>
