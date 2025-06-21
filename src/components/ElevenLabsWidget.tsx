@@ -11,11 +11,13 @@ export const ElevenLabsWidget = ({ agentId }: ElevenLabsWidgetProps) => {
     const loadedRef = useRef(false);
     const pathname = usePathname();
 
-    // Don't load widget on auth pages (login, register, auth routes)
+    // Don't load widget on auth pages (login, register, reset password, auth routes)
     const isAuthPage =
         pathname?.startsWith('/login') ||
         pathname?.startsWith('/register') ||
-        pathname?.startsWith('/auth/');
+        pathname?.startsWith('/reset-password') ||
+        pathname?.startsWith('/auth/') ||
+        pathname?.includes('/auth');
 
     useEffect(() => {
         // Skip loading on auth pages
