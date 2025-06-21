@@ -1,6 +1,4 @@
 import { cn } from '@/lib/utils';
-import { IconBell, IconSettings } from '@tabler/icons-react';
-import { Button } from '@/components/ui/button';
 import { AvatarMenu } from '@/components/ui/avatar-menu';
 import { NotificationBell } from './NotificationBell';
 

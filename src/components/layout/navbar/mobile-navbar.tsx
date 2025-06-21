@@ -1,5 +1,4 @@
 'use client';
-import { cn } from '@/lib/utils';
 import { Link } from 'next-view-transitions';
 import { useState } from 'react';
 import { IoIosMenu, IoIosClose } from 'react-icons/io';
@@ -53,7 +52,8 @@ export const MobileNavbar = ({ navItems, user }: any) => {
 
                 <SheetContent
                     side='left'
-                    className='w-full bg-black border-none p-0 flex flex-col z-999 [&>button]:hidden'
+                    className='w-full bg-black border-none p-0 flex flex-col [&>button]:hidden'
+                    style={{ zIndex: 99999 }}
                 >
                     <SheetHeader className='px-6 pt-6 pb-4 border-b border-gray-800'>
                         <div className='flex items-center justify-between'>

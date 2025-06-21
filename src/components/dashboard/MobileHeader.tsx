@@ -74,10 +74,11 @@ export function MobileHeader() {
     };
 
     return (
-        <div className='flex items-center justify-between px-4 py-2 border-b border-neutral-800'>
+        <div className='flex items-center justify-between px-4 py-3 border-b border-neutral-800 bg-neutral-950 relative'>
+            {/* Left: Burger Menu */}
             <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
-                    <Button variant='ghost' size='icon'>
+                    <Button variant='ghost' size='icon' className='shrink-0'>
                         <IconMenu2 className='h-5 w-5' />
                     </Button>
                 </SheetTrigger>
@@ -108,43 +109,47 @@ export function MobileHeader() {
                     </div>
                 </SheetContent>
             </Sheet>
-            <Logo />
-            <div className='flex items-center gap-2'>
+
+            {/* Perfectly Centered Logo */}
+            <div className='absolute left-1/2 transform -translate-x-1/2'>
+                <Logo />
+            </div>
+
+            {/* Right: User Actions */}
+            <div className='flex items-center gap-2 shrink-0'>
                 <NotificationBell />
-                <div className='flex items-center space-x-2'>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant='ghost' size='icon' className='rounded-full'>
-                                <Avatar>
-                                    <AvatarImage
-                                        src={account?.avatar_url ?? undefined}
-                                        alt={account?.full_name ?? 'User'}
-                                    />
-                                    <AvatarFallback>
-                                        {account ? (
-                                            account.full_name?.[0]?.toUpperCase() ??
-                                            account.billing_email?.[0]?.toUpperCase() ??
-                                            'U'
-                                        ) : (
-                                            <IconDeviceLaptop className='h-5 w-5' />
-                                        )}
-                                    </AvatarFallback>
-                                </Avatar>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                            <div className='px-2 py-1.5 text-sm font-medium'>
-                                {account?.full_name || account?.billing_email || 'User'}
-                            </div>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href='/dashboard/profile'>Profile</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant='ghost' size='icon' className='rounded-full'>
+                            <Avatar className='h-8 w-8'>
+                                <AvatarImage
+                                    src={account?.avatar_url ?? undefined}
+                                    alt={account?.full_name ?? 'User'}
+                                />
+                                <AvatarFallback className='text-xs'>
+                                    {account ? (
+                                        account.full_name?.[0]?.toUpperCase() ??
+                                        account.billing_email?.[0]?.toUpperCase() ??
+                                        'U'
+                                    ) : (
+                                        <IconDeviceLaptop className='h-4 w-4' />
+                                    )}
+                                </AvatarFallback>
+                            </Avatar>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end' className='bg-neutral-900 border-neutral-800'>
+                        <div className='px-2 py-1.5 text-sm font-medium'>
+                            {account?.full_name || account?.billing_email || 'User'}
+                        </div>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <Link href='/dashboard/profile'>Profile</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </div>
     );

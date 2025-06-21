@@ -198,6 +198,25 @@
         border-radius: 9999px;
     }
 
+    /* Hide scrollbar */
+    .scrollbar-hide {
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
+
+    /* Ensure mobile navigation appears above chat widgets */
+    [data-state='open'] [data-radix-dialog-overlay] {
+        z-index: 99998 !important;
+    }
+
+    [data-state='open'] [data-radix-dialog-content] {
+        z-index: 99999 !important;
+    }
+
     .scrollbar-custom::-webkit-scrollbar-thumb:hover {
         background: #737373;
     }

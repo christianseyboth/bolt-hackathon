@@ -9,22 +9,7 @@ import { DeleteAccountSection } from '@/components/dashboard/delete-account-sect
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import {
-    IconUser,
-    IconShield,
-    IconMail,
-    IconKey,
-    IconEye,
-    IconAlertTriangle,
-    IconCopy,
-} from '@tabler/icons-react';
+import { IconUser, IconShield, IconMail, IconKey, IconCopy } from '@tabler/icons-react';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/auth-context';
@@ -82,35 +67,92 @@ export default function ProfilePage() {
 
             <div className='mt-6'>
                 <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-                    <TabsList className='grid w-full grid-cols-2 md:grid-cols-4 bg-neutral-800/50 '>
+                    {/* Mobile: Horizontal scrollable tabs */}
+                    <div className='md:hidden mb-6'>
+                        <div className='flex overflow-x-auto scrollbar-hide bg-neutral-800/50 rounded-lg p-1 gap-1'>
+                            <button
+                                onClick={() => setActiveTab('account')}
+                                className={`
+                                    flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 whitespace-nowrap min-w-fit
+                                    ${
+                                        activeTab === 'account'
+                                            ? 'bg-white text-neutral-900 shadow-sm'
+                                            : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50'
+                                    }
+                                `}
+                            >
+                                <IconUser className='h-4 w-4' />
+                                <span>Account</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('security')}
+                                className={`
+                                    flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 whitespace-nowrap min-w-fit
+                                    ${
+                                        activeTab === 'security'
+                                            ? 'bg-white text-neutral-900 shadow-sm'
+                                            : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50'
+                                    }
+                                `}
+                            >
+                                <IconShield className='h-4 w-4' />
+                                <span>Security</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('email')}
+                                className={`
+                                    flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 whitespace-nowrap min-w-fit
+                                    ${
+                                        activeTab === 'email'
+                                            ? 'bg-white text-neutral-900 shadow-sm'
+                                            : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50'
+                                    }
+                                `}
+                            >
+                                <IconMail className='h-4 w-4' />
+                                <span>Email</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('api')}
+                                className={`
+                                    flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 whitespace-nowrap min-w-fit
+                                    ${
+                                        activeTab === 'api'
+                                            ? 'bg-white text-neutral-900 shadow-sm'
+                                            : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-700/50'
+                                    }
+                                `}
+                            >
+                                <IconKey className='h-4 w-4' />
+                                <span>API</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Desktop: Grid layout */}
+                    <TabsList className='hidden md:grid w-full grid-cols-4 bg-neutral-800/50 mb-6'>
                         <TabsTrigger
                             value='account'
-                            className='cursor-pointer flex items-center gap-1 md:gap-2'
+                            className='cursor-pointer flex items-center gap-2 '
                         >
                             <IconUser className='h-4 w-4' />
-                            <span className='hidden sm:inline'>Account</span>
-                            <span className='sm:hidden'>Acc</span>
+                            <span>Account</span>
                         </TabsTrigger>
                         <TabsTrigger
                             value='security'
-                            className='cursor-pointer flex items-center gap-1 md:gap-2'
+                            className='cursor-pointer flex items-center gap-2'
                         >
                             <IconShield className='h-4 w-4' />
-                            <span className='hidden sm:inline'>Security</span>
-                            <span className='sm:hidden'>Sec</span>
+                            <span>Security</span>
                         </TabsTrigger>
                         <TabsTrigger
                             value='email'
-                            className='cursor-pointer flex items-center gap-1 md:gap-2'
+                            className='cursor-pointer flex items-center gap-2'
                         >
                             <IconMail className='h-4 w-4' />
-                            <span className='hidden sm:inline'>Email</span>
-                            <span className='sm:hidden'>Mail</span>
+                            <span>Email</span>
                         </TabsTrigger>
-                        <TabsTrigger
-                            value='api'
-                            className='cursor-pointer flex items-center gap-1 md:gap-2'
-                        >
+                        <TabsTrigger value='api' className='cursor-pointer flex items-center gap-2'>
                             <IconKey className='h-4 w-4' />
                             <span>API</span>
                         </TabsTrigger>

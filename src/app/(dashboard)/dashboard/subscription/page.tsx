@@ -1,7 +1,6 @@
 import React from 'react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { SubscriptionBilling } from '@/components/dashboard/subscription-billing';
-import { InvoiceSection } from '@/components/dashboard/invoice-section';
 import { getCurrentActiveSubscription } from '@/lib/subscription-utils';
 
 import { redirect } from 'next/navigation';
@@ -102,8 +101,6 @@ export default async function SettingsPage() {
                     shouldAutoSync={shouldAutoSync}
                     autoSyncReason={autoSyncReason}
                 />
-
-                <InvoiceSection accountId={account.id} />
             </div>
         </>
     );

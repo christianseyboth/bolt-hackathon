@@ -14,6 +14,7 @@ import {
     IconUsers,
     IconShield,
     IconLoader,
+    IconCreditCard,
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { getPlanFeatures } from '@/lib/feature-matrix';
@@ -193,7 +194,7 @@ export function PricingSection() {
                     >
                         <span>Yearly</span>
                         <Badge className='bg-emerald-500/20 text-emerald-400 text-xs'>
-                            Save 20%
+                            Save 16%
                         </Badge>
                     </button>
                 </div>
@@ -317,12 +318,49 @@ export function PricingSection() {
                                 </Link>
 
                                 <p className='text-xs text-neutral-500 text-center mt-3'>
-                                    Free Trial( 5 Analyses ) • No credit card required
+                                    Free Trial ( 5 Analyses ) • No credit card required
                                 </p>
                             </CardContent>
                         </Card>
                     );
                 })}
+            </div>
+
+            {/* Payment Methods Section */}
+            <div className='mt-16 mb-8'>
+                <div className='max-w-md mx-auto text-center'>
+                    <p className='text-sm text-neutral-400 mb-4'>Secure payments processed by</p>
+                    <div className='flex justify-center items-center space-x-3 flex-wrap gap-2'>
+                        <Badge
+                            variant='secondary'
+                            className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                        >
+                            <IconCreditCard className='h-4 w-4 mr-2' />
+                            Stripe
+                        </Badge>
+                        <Badge
+                            variant='secondary'
+                            className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                        >
+                            <IconCreditCard className='h-4 w-4 mr-2' />
+                            Visa
+                        </Badge>
+                        <Badge
+                            variant='secondary'
+                            className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                        >
+                            <IconCreditCard className='h-4 w-4 mr-2' />
+                            Mastercard
+                        </Badge>
+                        <Badge
+                            variant='secondary'
+                            className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                        >
+                            <IconCreditCard className='h-4 w-4 mr-2' />
+                            Amex
+                        </Badge>
+                    </div>
+                </div>
             </div>
 
             {/* Enterprise Option */}
@@ -347,7 +385,7 @@ export function PricingSection() {
                                 </Button>
                             </Link>
                             <span className='text-sm text-neutral-500'>
-                                SOC2 • HIPAA • Custom SLA
+                                SOC2 Ready • HIPAA Ready • Custom SLA
                             </span>
                         </div>
                     </CardContent>

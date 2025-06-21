@@ -440,7 +440,7 @@ export function SecuritySettings() {
                     <div className='p-4 bg-neutral-800/50 rounded-lg'>
                         <div className='flex items-center justify-between mb-2'>
                             <Label className='text-base'>Authentication Method</Label>
-                            <Badge variant='secondary' className='flex items-center gap-1'>
+                            <Badge className='flex items-center gap-1 bg-neutral-700 text-neutral-200 border-neutral-600'>
                                 {getProviderIcon(user.provider)}
                                 {getProviderName(user.provider)}
                             </Badge>
@@ -450,12 +450,12 @@ export function SecuritySettings() {
                             <div className='flex items-center gap-2'>
                                 Status:
                                 {user.emailVerified ? (
-                                    <Badge variant='default' className='text-xs bg-emerald-600'>
+                                    <Badge className='text-xs bg-emerald-600 text-white border-emerald-500'>
                                         <IconCheck className='h-3 w-3 mr-1' />
                                         Verified
                                     </Badge>
                                 ) : (
-                                    <Badge variant='destructive' className='text-xs'>
+                                    <Badge className='text-xs bg-red-600 text-white border-red-500'>
                                         <IconX className='h-3 w-3 mr-1' />
                                         Unverified
                                     </Badge>
@@ -476,7 +476,7 @@ export function SecuritySettings() {
                                 authenticator app
                             </p>
                             {user.mfaEnabled && (
-                                <Badge variant='default' className='text-xs bg-emerald-600 mt-2'>
+                                <Badge className='text-xs bg-emerald-600 text-white border-emerald-500 mt-2'>
                                     <IconCheck className='h-3 w-3 mr-1' />
                                     Enabled
                                 </Badge>

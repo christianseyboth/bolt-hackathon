@@ -16,6 +16,9 @@ import {
     IconBolt,
     IconUsers,
     IconClock,
+    IconReceipt,
+    IconDownload,
+    IconExternalLink,
 } from '@tabler/icons-react';
 import { RefreshCw, Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -23,6 +26,7 @@ import { SubscriptionUpgradeModal } from './subscription-upgrade-modal';
 import { SubscriptionCancelModal } from './subscription-cancel-modal';
 import { getPlanFeatures } from '@/lib/feature-matrix';
 import { cn } from '@/lib/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -38,6 +42,22 @@ interface Plan {
         interval: string | null;
         interval_count: number | null;
     }[];
+}
+
+interface Invoice {
+    id: string;
+    number: string | null;
+    amount_paid: number;
+    amount_due: number;
+    currency: string;
+    status: string;
+    created: number;
+    due_date: number | null;
+    hosted_invoice_url: string | null;
+    invoice_pdf: string | null;
+    period_start: number | null;
+    period_end: number | null;
+    description: string;
 }
 
 interface SubscriptionBillingProps {
@@ -59,6 +79,14 @@ export function SubscriptionBilling({
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
     const [hasAutoSynced, setHasAutoSynced] = useState(false);
     const [lastAutoSyncTime, setLastAutoSyncTime] = useState<string>('Never');
+
+    // Invoice state
+    const [invoices, setInvoices] = useState<Invoice[]>([]);
+    const [invoicesLoading, setInvoicesLoading] = useState(true);
+    const [invoicesError, setInvoicesError] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
+
     const { toast } = useToast();
     const [isAutoSyncing, setIsAutoSyncing] = useState(false);
 
@@ -97,6 +125,62 @@ export function SubscriptionBilling({
 
         fetchProducts();
     }, []);
+
+    // Fetch invoices
+    useEffect(() => {
+        fetchInvoices();
+    }, [account.id]);
+
+    // Calculate pagination for invoices
+    const totalPages = Math.ceil(invoices.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentInvoices = invoices.slice(startIndex, endIndex);
+    const hasMoreInvoices = currentPage < totalPages;
+
+    const fetchInvoices = async () => {
+        try {
+            setInvoicesLoading(true);
+            setInvoicesError(null);
+
+            const response = await fetch('/api/stripe/invoices', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ accountId: account.id }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to fetch invoices');
+            }
+
+            setInvoices(data.invoices || []);
+        } catch (error) {
+            console.error('Error fetching invoices:', error);
+
+            const errorMessage =
+                error instanceof Error ? error.message : 'Failed to fetch invoices';
+
+            if (
+                !errorMessage.includes('No Stripe customer') &&
+                !errorMessage.includes('No subscription found')
+            ) {
+                setInvoicesError(errorMessage);
+            } else {
+                setInvoices([]);
+                setInvoicesError(null);
+            }
+        } finally {
+            setInvoicesLoading(false);
+        }
+    };
+
+    const loadMoreInvoices = () => {
+        setCurrentPage((prev) => prev + 1);
+    };
 
     // Use client-side products if available, fallback to server products
     const actualProducts = clientProducts.length > 0 ? clientProducts : products;
@@ -477,6 +561,58 @@ export function SubscriptionBilling({
         } finally {
             setIsAutoSyncing(false);
         }
+    };
+
+    // Invoice helper functions
+    const formatDate = (timestamp: number) => {
+        return new Date(timestamp * 1000).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'paid':
+                return (
+                    <Badge className='bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'>
+                        Paid
+                    </Badge>
+                );
+            case 'open':
+                return (
+                    <Badge className='bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'>
+                        Open
+                    </Badge>
+                );
+            case 'void':
+                return (
+                    <Badge className='bg-neutral-500/20 text-neutral-400 hover:bg-neutral-500/30'>
+                        Void
+                    </Badge>
+                );
+            case 'uncollectible':
+                return (
+                    <Badge className='bg-red-500/20 text-red-400 hover:bg-red-500/30'>
+                        Uncollectible
+                    </Badge>
+                );
+            default:
+                return (
+                    <Badge className='bg-neutral-500/20 text-neutral-400 hover:bg-neutral-500/30'>
+                        {status}
+                    </Badge>
+                );
+        }
+    };
+
+    const handleViewInvoice = (url: string) => {
+        window.open(url, '_blank');
+    };
+
+    const handleDownloadInvoice = (url: string) => {
+        window.open(url, '_blank');
     };
 
     return (
@@ -923,6 +1059,149 @@ export function SubscriptionBilling({
                 </Card>
             )}
 
+            {/* Invoice History Section */}
+            <Card className='border-neutral-800 bg-neutral-900'>
+                <CardHeader>
+                    <div className='flex items-center justify-between'>
+                        <div className='flex items-center space-x-2'>
+                            <IconReceipt className='h-5 w-5 text-blue-400' />
+                            <div>
+                                <CardTitle>Invoice History</CardTitle>
+                                <CardDescription>Your billing and payment history</CardDescription>
+                            </div>
+                        </div>
+                        <Button variant='outline' size='sm' onClick={fetchInvoices}>
+                            Refresh
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {invoicesLoading ? (
+                        <div className='flex items-center justify-center py-8'>
+                            <IconLoader className='h-6 w-6 animate-spin text-neutral-400' />
+                            <span className='ml-2 text-neutral-400'>Loading invoices...</span>
+                        </div>
+                    ) : invoicesError ? (
+                        <div className='text-center py-8'>
+                            <p className='text-red-400 mb-4'>{invoicesError}</p>
+                            <Button variant='outline' onClick={fetchInvoices}>
+                                Try Again
+                            </Button>
+                        </div>
+                    ) : invoices.length === 0 ? (
+                        <div className='text-center py-8 text-neutral-400'>
+                            <IconReceipt className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                            <p>No invoices found</p>
+                            <p className='text-sm mt-2'>
+                                Invoices will appear here after you subscribe to a plan and make
+                                your first payment
+                            </p>
+                        </div>
+                    ) : (
+                        <div className='overflow-auto'>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Invoice</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className='text-right'>Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {currentInvoices.map((invoice) => (
+                                        <TableRow key={invoice.id}>
+                                            <TableCell className='font-medium'>
+                                                {invoice.number || invoice.id.slice(-8)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <p className='text-sm'>{invoice.description}</p>
+                                                    {invoice.period_start && invoice.period_end && (
+                                                        <p className='text-xs text-neutral-400'>
+                                                            {formatDate(invoice.period_start)} -{' '}
+                                                            {formatDate(invoice.period_end)}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {formatPrice(
+                                                    invoice.amount_paid || invoice.amount_due,
+                                                    invoice.currency
+                                                )}
+                                            </TableCell>
+                                            <TableCell>{formatDate(invoice.created)}</TableCell>
+                                            <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                                            <TableCell className='text-right'>
+                                                <div className='flex justify-end space-x-2'>
+                                                    {invoice.hosted_invoice_url && (
+                                                        <Button
+                                                            variant='ghost'
+                                                            size='sm'
+                                                            onClick={() =>
+                                                                handleViewInvoice(
+                                                                    invoice.hosted_invoice_url!
+                                                                )
+                                                            }
+                                                        >
+                                                            <IconExternalLink className='h-4 w-4' />
+                                                        </Button>
+                                                    )}
+                                                    {invoice.invoice_pdf && (
+                                                        <Button
+                                                            variant='ghost'
+                                                            size='sm'
+                                                            onClick={() =>
+                                                                handleDownloadInvoice(
+                                                                    invoice.invoice_pdf!
+                                                                )
+                                                            }
+                                                        >
+                                                            <IconDownload className='h-4 w-4' />
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                            {invoices.length > itemsPerPage && (
+                                <div className='text-center py-4 border-t border-neutral-800 mt-4'>
+                                    {hasMoreInvoices ? (
+                                        <div className='flex items-center justify-center space-x-4'>
+                                            <Button variant='outline' onClick={loadMoreInvoices}>
+                                                Load More ({itemsPerPage} more)
+                                            </Button>
+                                            <span className='text-sm text-neutral-500'>
+                                                Showing {currentInvoices.length} of{' '}
+                                                {invoices.length}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className='flex items-center justify-center space-x-4'>
+                                            <Button
+                                                variant='outline'
+                                                onClick={() => setCurrentPage(1)}
+                                                disabled={currentPage === 1}
+                                            >
+                                                Show Latest {itemsPerPage}
+                                            </Button>
+                                            <span className='text-sm text-neutral-500'>
+                                                Showing all {invoices.length} invoices
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
             {/* Available Plans */}
             <div className='mt-12'>
                 <div className='text-center mb-8'>
@@ -954,7 +1233,7 @@ export function SubscriptionBilling({
                             >
                                 Yearly
                                 <span className='ml-2 text-xs text-emerald-500 font-bold'>
-                                    Save 20%
+                                    Save 16%
                                 </span>
                             </button>
                         </div>
@@ -1123,6 +1402,41 @@ export function SubscriptionBilling({
                             );
                         })
                     )}
+                </div>
+            </div>
+
+            {/* Payment Methods */}
+            <div className='mt-6 mb-10 flex flex-col items-center justify-center'>
+                <p className='text-sm text-neutral-500 mb-3'>Secure payments processed by</p>
+                <div className='flex justify-center items-center space-x-3 flex-wrap gap-2'>
+                    <Badge
+                        variant='secondary'
+                        className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                    >
+                        <IconCreditCard className='h-4 w-4 mr-2' />
+                        Stripe
+                    </Badge>
+                    <Badge
+                        variant='secondary'
+                        className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                    >
+                        <IconCreditCard className='h-4 w-4 mr-2' />
+                        Visa
+                    </Badge>
+                    <Badge
+                        variant='secondary'
+                        className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                    >
+                        <IconCreditCard className='h-4 w-4 mr-2' />
+                        Mastercard
+                    </Badge>
+                    <Badge
+                        variant='secondary'
+                        className='bg-neutral-800 text-neutral-300 px-3 py-2'
+                    >
+                        <IconCreditCard className='h-4 w-4 mr-2' />
+                        Amex
+                    </Badge>
                 </div>
             </div>
 

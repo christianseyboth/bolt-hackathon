@@ -98,8 +98,8 @@ export default function ContactPage() {
             {/* Page content with proper z-index */}
             <div className='relative z-10'>
                 {/* Header Section */}
-                <section className='py-20 sm:py-40'>
-                    <Container className='max-w-4xl mx-auto text-center'>
+                <section className='py-20 sm:py-40 '>
+                    <Container className='max-w-4xl mx-auto text-center mt-5'>
                         <FeatureIconContainer className='flex justify-center items-center overflow-hidden mx-auto'>
                             <div className='relative'>
                                 <IconMail className='h-6 w-6 text-emerald-800' />
@@ -117,8 +117,8 @@ export default function ContactPage() {
                 </section>
 
                 {/* Contact Options */}
-                <section className='py-12'>
-                    <Container className='max-w-6xl mx-auto'>
+                <section className='py-12 -mt-16 '>
+                    <Container className='max-w-6xl mx-auto '>
                         <div className='grid grid-cols-1 md:grid-cols-3 gap-8 mb-16'>
                             {/* Sales */}
                             <div className='text-center p-6 bg-neutral-900/30 border border-neutral-800 rounded-xl hover:border-emerald-500/30 transition-all duration-200'>
@@ -166,12 +166,12 @@ export default function ContactPage() {
                 </section>
 
                 {/* Contact Form */}
-                <section aria-label='Contact form'>
+                <section aria-label='Contact form' className='-mt-16'>
                     <ContactFormSimple />
                 </section>
 
                 {/* Response Time Guarantee */}
-                <section className='py-16'>
+                <section className='py-16 -mt-16'>
                     <Container className='max-w-4xl mx-auto text-center'>
                         <div className='bg-neutral-900/30 border border-neutral-800 rounded-xl p-8'>
                             <h3 className='text-xl font-semibold mb-4'>

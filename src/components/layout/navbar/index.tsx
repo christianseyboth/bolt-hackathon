@@ -14,6 +14,10 @@ const navItems = [
         title: 'Contact',
         link: '/contact',
     },
+    {
+        title: 'About',
+        link: '/about',
+    },
 ];
 
 export function NavBar() {

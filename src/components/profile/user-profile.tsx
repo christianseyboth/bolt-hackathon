@@ -137,34 +137,87 @@ export function UserProfile({ initialUser }: UserProfileProps) {
     return (
         <div className='space-y-6'>
             {/* Profile Header */}
-            <div className='flex items-center space-x-4'>
-                <Avatar className='h-16 w-16'>
-                    <AvatarImage src={profile.avatar_url || undefined} alt={profile.full_name} />
-                    <AvatarFallback className='text-lg'>
-                        {profile.full_name?.[0]?.toUpperCase() || profile.email[0].toUpperCase()}
-                    </AvatarFallback>
-                </Avatar>
-                <div className='flex-1'>
-                    <div className='flex items-center gap-2'>
-                        <h2 className='text-xl font-semibold'>{profile.full_name}</h2>
-                        <Badge variant='secondary' className='text-xs'>
+            <div className='space-y-4'>
+                {/* Mobile Layout */}
+                <div className='block sm:hidden'>
+                    <div className='flex items-center space-x-4 mb-4'>
+                        <Avatar className='h-16 w-16'>
+                            <AvatarImage
+                                src={profile.avatar_url || undefined}
+                                alt={profile.full_name}
+                            />
+                            <AvatarFallback className='text-lg'>
+                                {profile.full_name?.[0]?.toUpperCase() ||
+                                    profile.email[0].toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className='flex-1 min-w-0'>
+                            <h2 className='text-xl font-semibold truncate'>{profile.full_name}</h2>
+                            <p className='text-neutral-400 text-sm truncate'>{profile.email}</p>
+                        </div>
+                        {!isEditing && (
+                            <Button
+                                variant='outline'
+                                size='sm'
+                                onClick={() => setIsEditing(true)}
+                                className='shrink-0'
+                            >
+                                <IconEdit className='h-4 w-4 mr-2' />
+                                Edit
+                            </Button>
+                        )}
+                    </div>
+
+                    {/* Mobile Badges */}
+                    <div className='flex flex-wrap gap-2'>
+                        <Badge className='text-xs bg-neutral-700 text-neutral-200 border-neutral-600'>
                             {profile.provider === 'email' ? 'Email' : `OAuth (${profile.provider})`}
                         </Badge>
                         {profile.avatar_url && (
-                            <Badge variant='default' className='text-xs bg-emerald-600'>
+                            <Badge className='text-xs bg-emerald-600 text-white border-emerald-500'>
                                 <IconCheck className='h-3 w-3 mr-1' />
                                 Avatar
                             </Badge>
                         )}
                     </div>
-                    <p className='text-neutral-400'>{profile.email}</p>
                 </div>
-                {!isEditing && (
-                    <Button variant='outline' size='sm' onClick={() => setIsEditing(true)}>
-                        <IconEdit className='h-4 w-4 mr-2' />
-                        Edit
-                    </Button>
-                )}
+
+                {/* Desktop Layout */}
+                <div className='hidden sm:flex items-center space-x-4'>
+                    <Avatar className='h-16 w-16'>
+                        <AvatarImage
+                            src={profile.avatar_url || undefined}
+                            alt={profile.full_name}
+                        />
+                        <AvatarFallback className='text-lg'>
+                            {profile.full_name?.[0]?.toUpperCase() ||
+                                profile.email[0].toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className='flex-1'>
+                        <div className='flex items-center gap-2'>
+                            <h2 className='text-xl font-semibold'>{profile.full_name}</h2>
+                            <Badge className='text-xs bg-neutral-700 text-neutral-200 border-neutral-600'>
+                                {profile.provider === 'email'
+                                    ? 'Email'
+                                    : `OAuth (${profile.provider})`}
+                            </Badge>
+                            {profile.avatar_url && (
+                                <Badge className='text-xs bg-emerald-600 text-white border-emerald-500'>
+                                    <IconCheck className='h-3 w-3 mr-1' />
+                                    Avatar
+                                </Badge>
+                            )}
+                        </div>
+                        <p className='text-neutral-400'>{profile.email}</p>
+                    </div>
+                    {!isEditing && (
+                        <Button variant='outline' size='sm' onClick={() => setIsEditing(true)}>
+                            <IconEdit className='h-4 w-4 mr-2' />
+                            Edit
+                        </Button>
+                    )}
+                </div>
             </div>
 
             {/* Profile Form */}
@@ -219,7 +272,39 @@ export function UserProfile({ initialUser }: UserProfileProps) {
                     </div>
                 )}
 
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 text-sm'>
+                {/* Edit Actions */}
+                {isEditing && (
+                    <div className='flex flex-col sm:flex-row gap-2 pt-4'>
+                        <Button
+                            onClick={handleSave}
+                            disabled={updating}
+                            className='w-full sm:w-auto'
+                        >
+                            {updating ? (
+                                <>
+                                    <div className='h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white'></div>
+                                    Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <IconCheck className='h-4 w-4 mr-2' />
+                                    Save Changes
+                                </>
+                            )}
+                        </Button>
+                        <Button
+                            variant='outline'
+                            onClick={handleCancel}
+                            disabled={updating}
+                            className='w-full sm:w-auto'
+                        >
+                            <IconX className='h-4 w-4 mr-2' />
+                            Cancel
+                        </Button>
+                    </div>
+                )}
+
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm'>
                     <div>
                         <Label className='text-neutral-400'>Account Created</Label>
                         <p>{new Date(profile.created_at).toLocaleDateString()}</p>
@@ -233,29 +318,6 @@ export function UserProfile({ initialUser }: UserProfileProps) {
                         <p className='capitalize'>{profile.provider}</p>
                     </div>
                 </div>
-
-                {/* Edit Actions */}
-                {isEditing && (
-                    <div className='flex gap-2 pt-4'>
-                        <Button onClick={handleSave} disabled={updating}>
-                            {updating ? (
-                                <>
-                                    <div className='h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white'></div>
-                                    Saving...
-                                </>
-                            ) : (
-                                <>
-                                    <IconCheck className='h-4 w-4 mr-2' />
-                                    Save Changes
-                                </>
-                            )}
-                        </Button>
-                        <Button variant='outline' onClick={handleCancel} disabled={updating}>
-                            <IconX className='h-4 w-4 mr-2' />
-                            Cancel
-                        </Button>
-                    </div>
-                )}
             </div>
         </div>
     );

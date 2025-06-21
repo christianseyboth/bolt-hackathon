@@ -395,23 +395,23 @@ export function AccountProfile() {
     };
 
     const getPlanColor = (plan?: string) => {
-        if (!plan) return 'bg-gray-600';
+        if (!plan) return 'bg-neutral-600 text-white';
 
         switch (plan.toLowerCase()) {
             case 'free':
-                return 'bg-gray-600';
+                return 'bg-neutral-600 text-white';
             case 'solo':
-                return 'bg-blue-600';
+                return 'bg-blue-600 text-white';
             case 'entrepreneur':
-                return 'bg-purple-600';
+                return 'bg-purple-600 text-white';
             case 'team':
-                return 'bg-emerald-600';
+                return 'bg-emerald-600 text-white';
             case 'pro':
-                return 'bg-blue-600';
+                return 'bg-blue-600 text-white';
             case 'enterprise':
-                return 'bg-purple-600';
+                return 'bg-purple-600 text-white';
             default:
-                return 'bg-gray-600';
+                return 'bg-neutral-600 text-white';
         }
     };
 
@@ -455,92 +455,117 @@ export function AccountProfile() {
     return (
         <div className='space-y-6'>
             {/* Profile Header */}
-            <div className='flex items-center space-x-4'>
-                <div className='relative'>
-                    <Avatar
-                        className={`h-16 w-16 ${
-                            canEditAvatar && isEditing
-                                ? 'cursor-pointer hover:opacity-80 transition-opacity'
-                                : ''
-                        }`}
-                        onClick={handleAvatarClick}
-                    >
-                        <AvatarImage
-                            src={displayAvatarUrl ?? undefined}
-                            alt={account.full_name ?? ''}
-                            onError={(e) => {
-                                console.error('❌ Avatar image failed to load:', displayAvatarUrl);
-                                console.error('Error details:', e);
-                            }}
-                            onLoad={() => {
-                                console.log(
-                                    '✅ Avatar image loaded successfully:',
-                                    displayAvatarUrl
-                                );
-                            }}
-                        />
-                        <AvatarFallback className='text-lg'>
-                            {account.full_name?.[0]?.toUpperCase() ??
-                                account.billing_email?.[0]?.toUpperCase() ??
-                                'U'}
-                        </AvatarFallback>
-                    </Avatar>
+            <div className='space-y-4'>
+                {/* Mobile Layout */}
+                <div className='block sm:hidden'>
+                    <div className='flex items-center space-x-4 mb-4'>
+                        <div className='relative'>
+                            <Avatar
+                                className={`h-16 w-16 ${
+                                    canEditAvatar && isEditing
+                                        ? 'cursor-pointer hover:opacity-80 transition-opacity'
+                                        : ''
+                                }`}
+                                onClick={handleAvatarClick}
+                            >
+                                <AvatarImage
+                                    src={displayAvatarUrl ?? undefined}
+                                    alt={account.full_name ?? ''}
+                                    onError={(e) => {
+                                        console.error(
+                                            '❌ Avatar image failed to load:',
+                                            displayAvatarUrl
+                                        );
+                                        console.error('Error details:', e);
+                                    }}
+                                    onLoad={() => {
+                                        console.log(
+                                            '✅ Avatar image loaded successfully:',
+                                            displayAvatarUrl
+                                        );
+                                    }}
+                                />
+                                <AvatarFallback className='text-lg'>
+                                    {account.full_name?.[0]?.toUpperCase() ??
+                                        account.billing_email?.[0]?.toUpperCase() ??
+                                        'U'}
+                                </AvatarFallback>
+                            </Avatar>
 
-                    {canEditAvatar && isEditing && (
-                        <div
-                            className='absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity'
-                            onClick={handleAvatarClick}
-                        >
-                            <IconCamera className='h-4 w-4 text-white' />
+                            {canEditAvatar && isEditing && (
+                                <div
+                                    className='absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity'
+                                    onClick={handleAvatarClick}
+                                >
+                                    <IconCamera className='h-4 w-4 text-white' />
+                                </div>
+                            )}
+
+                            <input
+                                ref={fileInputRef}
+                                type='file'
+                                accept='image/png,image/jpg,image/jpeg'
+                                onChange={handleAvatarFileChange}
+                                className='hidden'
+                            />
                         </div>
-                    )}
+                        <div className='flex-1 min-w-0'>
+                            <h2 className='text-xl font-semibold truncate'>
+                                {account.full_name || 'Anonymous User'}
+                            </h2>
+                            <p className='text-neutral-400 text-sm truncate'>
+                                {account.billing_email || 'No email'}
+                            </p>
+                        </div>
+                        {!isEditing && (
+                            <Button
+                                variant='outline'
+                                size='sm'
+                                onClick={() => setIsEditing(true)}
+                                className='shrink-0'
+                            >
+                                <IconEdit className='h-4 w-4 mr-2' />
+                                Edit
+                            </Button>
+                        )}
+                    </div>
 
-                    <input
-                        ref={fileInputRef}
-                        type='file'
-                        accept='image/png,image/jpg,image/jpeg'
-                        onChange={handleAvatarFileChange}
-                        className='hidden'
-                    />
-                </div>
-                <div className='flex-1'>
-                    <div className='flex items-center gap-2 mb-1'>
-                        <h2 className='text-xl font-semibold'>
-                            {account.full_name || 'Anonymous User'}
-                        </h2>
-                        <Badge variant='secondary' className='text-xs'>
+                    {/* Mobile Badges */}
+                    <div className='flex flex-wrap gap-2 mb-2'>
+                        <Badge className='text-xs bg-neutral-700 text-neutral-200 border-neutral-600'>
                             {account.provider === 'email' ? 'Email' : `OAuth (${account.provider})`}
                         </Badge>
                         {displayAvatarUrl && (
-                            <Badge variant='default' className='text-xs bg-emerald-600'>
+                            <Badge className='text-xs bg-emerald-600 text-white border-emerald-500'>
                                 <IconCheck className='h-3 w-3 mr-1' />
                                 Avatar
                             </Badge>
                         )}
-                    </div>
-                    <p className='text-neutral-400 mb-2'>{account.billing_email || 'No email'}</p>
-                    <div className='flex items-center gap-2'>
-                        <Badge className={`text-xs ${getPlanColor(account.plan_name)}`}>
+                        <Badge className={`text-xs border-0 ${getPlanColor(account.plan_name)}`}>
                             {account.plan_name !== 'Free' && <IconCrown className='h-3 w-3 mr-1' />}
                             {(account.plan_name || 'Free').toUpperCase()}
                         </Badge>
-                        <span className='text-xs text-neutral-500'>
-                            {account.emails_left || 0} emails left
-                        </span>
                     </div>
+
+                    <div className='text-xs text-neutral-500 mb-2'>
+                        {account.emails_left || 0} emails left
+                    </div>
+
                     {canEditAvatar && (
-                        <p className='text-xs text-neutral-400 mt-1'>
+                        <p className='text-xs text-neutral-400 mb-2'>
                             {isEditing
                                 ? 'Click avatar to upload new photo (PNG/JPG/JPEG, max 1MB)'
                                 : 'Click Edit to change avatar'}
                         </p>
                     )}
+
                     {canEditAvatar && isEditing && (
-                        <div className='flex gap-2 mt-2'>
+                        <div className='flex flex-col gap-2'>
                             <Button
                                 variant='outline'
                                 size='sm'
                                 onClick={() => fileInputRef.current?.click()}
+                                className='w-full'
                             >
                                 <IconCamera className='h-3 w-3 mr-1' />
                                 Upload Photo
@@ -551,6 +576,7 @@ export function AccountProfile() {
                                     size='sm'
                                     onClick={handleDeleteAvatar}
                                     disabled={updating}
+                                    className='w-full'
                                 >
                                     <IconX className='h-3 w-3 mr-1' />
                                     Remove
@@ -559,12 +585,132 @@ export function AccountProfile() {
                         </div>
                     )}
                 </div>
-                {!isEditing && (
-                    <Button variant='outline' size='sm' onClick={() => setIsEditing(true)}>
-                        <IconEdit className='h-4 w-4 mr-2' />
-                        Edit
-                    </Button>
-                )}
+
+                {/* Desktop Layout */}
+                <div className='hidden sm:flex items-center space-x-4'>
+                    <div className='relative'>
+                        <Avatar
+                            className={`h-16 w-16 ${
+                                canEditAvatar && isEditing
+                                    ? 'cursor-pointer hover:opacity-80 transition-opacity'
+                                    : ''
+                            }`}
+                            onClick={handleAvatarClick}
+                        >
+                            <AvatarImage
+                                src={displayAvatarUrl ?? undefined}
+                                alt={account.full_name ?? ''}
+                                onError={(e) => {
+                                    console.error(
+                                        '❌ Avatar image failed to load:',
+                                        displayAvatarUrl
+                                    );
+                                    console.error('Error details:', e);
+                                }}
+                                onLoad={() => {
+                                    console.log(
+                                        '✅ Avatar image loaded successfully:',
+                                        displayAvatarUrl
+                                    );
+                                }}
+                            />
+                            <AvatarFallback className='text-lg'>
+                                {account.full_name?.[0]?.toUpperCase() ??
+                                    account.billing_email?.[0]?.toUpperCase() ??
+                                    'U'}
+                            </AvatarFallback>
+                        </Avatar>
+
+                        {canEditAvatar && isEditing && (
+                            <div
+                                className='absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity'
+                                onClick={handleAvatarClick}
+                            >
+                                <IconCamera className='h-4 w-4 text-white' />
+                            </div>
+                        )}
+
+                        <input
+                            ref={fileInputRef}
+                            type='file'
+                            accept='image/png,image/jpg,image/jpeg'
+                            onChange={handleAvatarFileChange}
+                            className='hidden'
+                        />
+                    </div>
+                    <div className='flex-1'>
+                        <div className='flex items-center gap-2 mb-1'>
+                            <h2 className='text-xl font-semibold'>
+                                {account.full_name || 'Anonymous User'}
+                            </h2>
+                            <Badge className='text-xs bg-neutral-700 text-neutral-200 border-neutral-600'>
+                                {account.provider === 'email'
+                                    ? 'Email'
+                                    : `OAuth (${account.provider})`}
+                            </Badge>
+                            {displayAvatarUrl && (
+                                <Badge className='text-xs bg-emerald-600 text-white border-emerald-500'>
+                                    <IconCheck className='h-3 w-3 mr-1' />
+                                    Avatar
+                                </Badge>
+                            )}
+                        </div>
+                        <p className='text-neutral-400 mb-2'>
+                            {account.billing_email || 'No email'}
+                        </p>
+                        <div className='flex items-center gap-2'>
+                            <Badge
+                                className={`text-xs border-0 ${getPlanColor(account.plan_name)}`}
+                            >
+                                {account.plan_name !== 'Free' && (
+                                    <IconCrown className='h-3 w-3 mr-1' />
+                                )}
+                                {(account.plan_name || 'Free').toUpperCase()}
+                            </Badge>
+                            <span className='text-xs text-neutral-500'>
+                                {account.emails_left || 0} emails left
+                            </span>
+                        </div>
+                        {canEditAvatar && (
+                            <p className='text-xs text-neutral-400 mt-1'>
+                                {isEditing
+                                    ? 'Click avatar to upload new photo (PNG/JPG/JPEG, max 1MB)'
+                                    : 'Click Edit to change avatar'}
+                            </p>
+                        )}
+                        {canEditAvatar && isEditing && (
+                            <div className='flex flex-col sm:flex-row gap-2 mt-2'>
+                                <Button
+                                    variant='outline'
+                                    size='sm'
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className='w-full sm:w-auto'
+                                >
+                                    <IconCamera className='h-3 w-3 mr-1' />
+                                    Upload Photo
+                                </Button>
+                                {account.avatar_url && (
+                                    <Button
+                                        variant='outline'
+                                        size='sm'
+                                        onClick={handleDeleteAvatar}
+                                        disabled={updating}
+                                        className='w-full sm:w-auto'
+                                    >
+                                        <IconX className='h-3 w-3 mr-1' />
+                                        Remove
+                                    </Button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    {!isEditing && (
+                        <Button variant='outline' size='sm' onClick={() => setIsEditing(true)}>
+                            <IconEdit className='h-4 w-4 mr-2' />
+                            Edit
+                        </Button>
+                    )}
+                </div>
             </div>
 
             {/* Profile Information Card */}
@@ -670,8 +816,12 @@ export function AccountProfile() {
 
                     {/* Edit Actions */}
                     {isEditing && (
-                        <div className='flex gap-2 pt-4'>
-                            <Button onClick={handleSave} disabled={updating || uploadingAvatar}>
+                        <div className='flex flex-col sm:flex-row gap-2 pt-4'>
+                            <Button
+                                onClick={handleSave}
+                                disabled={updating || uploadingAvatar}
+                                className='w-full sm:w-auto'
+                            >
                                 {updating || uploadingAvatar ? (
                                     <>
                                         <div className='h-4 w-4 mr-2 animate-spin rounded-full border-2 border-transparent border-t-white'></div>
@@ -688,6 +838,7 @@ export function AccountProfile() {
                                 variant='outline'
                                 onClick={handleCancel}
                                 disabled={updating || uploadingAvatar}
+                                className='w-full sm:w-auto'
                             >
                                 <IconX className='h-4 w-4 mr-2' />
                                 Cancel
@@ -1019,7 +1170,7 @@ export function AccountProfile() {
                     <CardTitle className='text-lg'>Account Information</CardTitle>
                 </CardHeader>
                 <CardContent className='pt-0'>
-                    <div className='grid grid-cols-2 md:grid-cols-4 gap-4 text-sm'>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm'>
                         <div>
                             <Label className='text-neutral-400'>Account Created</Label>
                             <p>{new Date(account.created_at).toLocaleDateString()}</p>

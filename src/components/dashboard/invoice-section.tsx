@@ -32,11 +32,28 @@ export function InvoiceSection({ accountId }: InvoiceSectionProps) {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
     const { toast } = useToast();
 
     useEffect(() => {
         fetchInvoices();
     }, [accountId]);
+
+    // Calculate pagination
+    const totalPages = Math.ceil(invoices.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentInvoices = invoices.slice(startIndex, endIndex);
+    const hasMoreInvoices = currentPage < totalPages;
+
+    const loadMoreInvoices = () => {
+        setCurrentPage((prev) => prev + 1);
+    };
+
+    const showAllInvoices = () => {
+        setCurrentPage(Math.ceil(invoices.length / itemsPerPage));
+    };
 
     const fetchInvoices = async () => {
         try {
@@ -226,7 +243,7 @@ export function InvoiceSection({ accountId }: InvoiceSectionProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {invoices.map((invoice) => (
+                                {currentInvoices.map((invoice) => (
                                     <TableRow key={invoice.id}>
                                         <TableCell className='font-medium'>
                                             {invoice.number || invoice.id.slice(-8)}
@@ -284,6 +301,33 @@ export function InvoiceSection({ accountId }: InvoiceSectionProps) {
                                 ))}
                             </TableBody>
                         </Table>
+                        {invoices.length > itemsPerPage && (
+                            <div className='text-center py-4 border-t border-neutral-800 mt-4'>
+                                {hasMoreInvoices ? (
+                                    <div className='flex items-center justify-center space-x-4'>
+                                        <Button variant='outline' onClick={loadMoreInvoices}>
+                                            Load More ({itemsPerPage} more)
+                                        </Button>
+                                        <span className='text-sm text-neutral-500'>
+                                            Showing {currentInvoices.length} of {invoices.length}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className='flex items-center justify-center space-x-4'>
+                                        <Button
+                                            variant='outline'
+                                            onClick={() => setCurrentPage(1)}
+                                            disabled={currentPage === 1}
+                                        >
+                                            Show Latest {itemsPerPage}
+                                        </Button>
+                                        <span className='text-sm text-neutral-500'>
+                                            Showing all {invoices.length} invoices
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
             </CardContent>

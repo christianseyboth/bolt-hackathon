@@ -229,24 +229,9 @@ export default function PricingPage() {
                     </section>
 
                     {/* Pricing Section with Stripe Integration */}
-                    <section aria-label='Pricing plans' className='-mt-20'>
+                    <section aria-label='Pricing plans' className='-mt-30 '>
                         <PricingSection />
                     </section>
-
-                    {/* Social Proof */}
-                    {/* <section aria-label="Customer testimonials" className="py-20">
-              <TestimonialsMarquee />
-            </section> */}
-
-                    {/* FAQ Section */}
-                    {/* <section aria-label="Pricing FAQ">
-              <FAQs />
-            </section> */}
-
-                    {/* Final CTA */}
-                    {/* <section aria-label="Get started">
-              <CTA />
-            </section> */}
                 </div>
             </main>
 

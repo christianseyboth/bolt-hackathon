@@ -84,9 +84,9 @@ export default function AboutPage() {
         <main className='relative min-h-screen bg-neutral-950 mt-24'>
             <BackgroundEffects />
 
-            <div className='relative z-10'>
+            <div className='relative z-10 py-12'>
                 {/* Hero Section */}
-                <section className='container mx-auto px-4 py-16 max-w-6xl'>
+                <section className='container mx-auto px-4 py-4 max-w-6xl '>
                     <div className='text-center space-y-6 mb-16'>
                         <h1 className='text-5xl md:text-6xl font-bold tracking-tight text-white'>
                             About SecPilot
@@ -116,7 +116,7 @@ export default function AboutPage() {
                 </section>
 
                 {/* Mission Section */}
-                <section className='container mx-auto px-4 py-16 max-w-6xl'>
+                <section className='container mx-auto px-4 max-w-6xl'>
                     <div className='grid lg:grid-cols-2 gap-12 items-center'>
                         <div className='space-y-6'>
                             <h2 className='text-4xl font-bold text-white'>Our Mission</h2>

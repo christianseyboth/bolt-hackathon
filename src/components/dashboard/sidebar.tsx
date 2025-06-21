@@ -12,7 +12,6 @@ import {
     IconUsers,
     IconSettings,
     IconLogout,
-    IconDeviceLaptop,
     IconFileText,
     IconCreditCard,
     IconLock,
@@ -133,7 +132,7 @@ export function Sidebar({ className, onNavigate, isMobile = false }: SidebarProp
         <div
             className={cn(
                 'w-64 border-r border-neutral-800 flex flex-col bg-neutral-950',
-                isMobile ? 'h-full py-4 px-3' : 'h-screen py-6 px-4',
+                isMobile ? 'h-screen py-2 px-2' : 'h-screen py-6 px-4',
                 className
             )}
         >
