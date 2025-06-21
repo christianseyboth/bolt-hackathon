@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface ElevenLabsWidgetProps {
     agentId: string;
@@ -8,8 +9,21 @@ interface ElevenLabsWidgetProps {
 
 export const ElevenLabsWidget = ({ agentId }: ElevenLabsWidgetProps) => {
     const loadedRef = useRef(false);
+    const pathname = usePathname();
+
+    // Don't load widget on auth pages (login, register, auth routes)
+    const isAuthPage =
+        pathname?.startsWith('/login') ||
+        pathname?.startsWith('/register') ||
+        pathname?.startsWith('/auth/');
 
     useEffect(() => {
+        // Skip loading on auth pages
+        if (isAuthPage) {
+            console.log('🚫 Skipping ElevenLabs widget on auth page:', pathname);
+            return;
+        }
+
         // Prevent multiple loads
         if (loadedRef.current) return;
         loadedRef.current = true;
@@ -44,7 +58,7 @@ export const ElevenLabsWidget = ({ agentId }: ElevenLabsWidgetProps) => {
         };
 
         document.head.appendChild(script);
-    }, [agentId]);
+    }, [agentId, isAuthPage, pathname]);
 
     return null;
 };

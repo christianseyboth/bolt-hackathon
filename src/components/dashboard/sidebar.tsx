@@ -132,7 +132,7 @@ export function Sidebar({ className, onNavigate, isMobile = false }: SidebarProp
         <div
             className={cn(
                 'w-64 border-r border-neutral-800 flex flex-col bg-neutral-950',
-                isMobile ? 'h-screen py-2 px-2' : 'h-screen py-6 px-4',
+                isMobile ? 'h-full max-h-screen overflow-y-auto py-2 px-2' : 'h-screen py-6 px-4',
                 className
             )}
         >
@@ -143,7 +143,7 @@ export function Sidebar({ className, onNavigate, isMobile = false }: SidebarProp
                 </div>
             )}
 
-            <nav className={cn('flex-1 space-y-1', isMobile && 'mt-4')}>
+            <nav className={cn('flex-1 space-y-1 overflow-y-auto', isMobile && 'mt-4')}>
                 <SidebarItem
                     href='/dashboard'
                     icon={<IconDashboard className='h-5 w-5' />}
@@ -218,7 +218,7 @@ export function Sidebar({ className, onNavigate, isMobile = false }: SidebarProp
 
             <div
                 className={cn(
-                    'space-y-1 border-t border-neutral-800',
+                    'space-y-1 border-t border-neutral-800 flex-shrink-0',
                     isMobile ? 'pt-4 mt-4 pb-4' : 'pt-6 mt-6'
                 )}
             >

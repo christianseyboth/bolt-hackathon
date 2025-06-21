@@ -208,6 +208,15 @@
         display: none; /* Safari and Chrome */
     }
 
+    /* Safe area utilities for mobile devices */
+    .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .pt-safe {
+        padding-top: env(safe-area-inset-top);
+    }
+
     /* Ensure mobile navigation appears above chat widgets */
     [data-state='open'] [data-radix-dialog-overlay] {
         z-index: 99998 !important;

@@ -102,7 +102,7 @@ export function MobileHeader() {
                     </div>
                     {/* Sidebar Content with Custom Mobile Layout */}
                     <div
-                        className='h-[calc(100vh-73px)] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
+                        className='h-[calc(100vh-73px)] overflow-y-auto pb-safe [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-neutral-500'
                         style={{ scrollbarWidth: 'thin', scrollbarColor: '#525252 #262626' }}
                     >
                         <Sidebar onNavigate={() => setOpen(false)} isMobile={true} />
