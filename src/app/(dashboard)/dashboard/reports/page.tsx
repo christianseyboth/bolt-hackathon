@@ -1,12 +1,12 @@
-import { createClient } from '@/utils/supabase/server';
+﻿import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { ReportsGeneration } from '@/components/dashboard/reports/reports-generation';
-import { ReportHistory } from '@/components/dashboard/reports/report-history';
-import { QuickReports } from '@/components/dashboard/reports/quick-reports';
-import { ScheduledReports } from '@/components/dashboard/reports/scheduled-reports';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { ReportsGeneration } from '@/components/dashboard/reports/ReportsGeneration';
+import { ReportHistory } from '@/components/dashboard/reports/ReportHistory';
+import { QuickReports } from '@/components/dashboard/reports/QuickReports';
+import { ScheduledReports } from '@/components/dashboard/reports/ScheduledReports';
 import { getSubscriptionAccess, getFeatureRequiredPlan } from '@/lib/subscription-access';
-import { SubscriptionAccessGate } from '@/components/dashboard/subscription-access-gate';
+import { SubscriptionAccessGate } from '@/components/dashboard/SubscriptionAccessGate';
 
 export default async function ReportsPage() {
     const supabase = await createClient();

@@ -10,8 +10,8 @@ import {
 } from '../ui/Sheet';
 import { Button } from '../ui/Button';
 import { IconDeviceLaptop, IconMenu2, IconX } from '@tabler/icons-react';
-import { Logo } from '../logo';
-import { Sidebar } from './sidebar';
+import { Logo } from '../Logo';
+import { Sidebar } from './Sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import {
     DropdownMenu,

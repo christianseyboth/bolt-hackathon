@@ -1,8 +1,8 @@
 import React from 'react';
-import { AmbientColor } from '@/components/ambient-color';
-import { Container } from '@/components/container';
-import { Logo } from '@/components/logo';
-import { Button } from '@/components/ui/button';
+import { AmbientColor } from '@/components/AmbientColor';
+import { Container } from '@/components/Container';
+import { Logo } from '@/components/Logo';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Metadata } from 'next';
 

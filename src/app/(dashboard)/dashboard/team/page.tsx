@@ -1,7 +1,7 @@
-import React from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { TeamManagement } from '@/components/dashboard/team-management';
-import { SubscriptionStatusBanner } from '@/components/dashboard/subscription-status-banner';
+﻿import React from 'react';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { TeamManagement } from '@/components/dashboard/TeamManagement';
+import { SubscriptionStatusBanner } from '@/components/dashboard/SubscriptionStatusBanner';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { enforceSubscriptionLimits } from './actions';

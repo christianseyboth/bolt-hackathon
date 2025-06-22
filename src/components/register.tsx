@@ -1,14 +1,13 @@
 'use client';
 import React, { useState, useTransition } from 'react';
-import { Container } from './container';
-import { Logo } from './logo';
+import { Container } from './Container';
+import { Logo } from './Logo';
 import {
-    IconBrandGithub,
     IconBrandGithubFilled,
     IconBrandGoogleFilled,
     IconLoader2,
 } from '@tabler/icons-react';
-import { Button } from './button';
+import { Button } from './Button';
 import { motion } from 'motion/react';
 import { signInWithOAuth } from '@/app/auth/actions';
 

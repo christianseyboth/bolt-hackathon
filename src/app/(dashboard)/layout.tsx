@@ -2,8 +2,8 @@
 
 import { createClient } from '@/utils/supabase/server';
 import '../globals.css';
-import { Sidebar } from '@/components/dashboard/sidebar';
-import { Toaster } from '@/components/ui/toaster';
+import { Sidebar } from '@/components/dashboard/Sidebar';
+import { Toaster } from '@/components/ui/Toaster';
 import { MobileHeader } from '@/components/dashboard/MobileHeader';
 import { redirect } from 'next/navigation';
 import { AccountProvider } from '@/context/account-context';

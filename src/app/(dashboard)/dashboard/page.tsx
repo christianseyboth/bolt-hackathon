@@ -1,11 +1,11 @@
-import { createClient } from '@/utils/supabase/server';
+﻿import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { EmailAnalytics } from '@/components/dashboard/email-analytics';
-import { SubscriptionInfo } from '@/components/dashboard/subscription-info';
-import { SecurityScore } from '@/components/dashboard/security-score';
-import { PhishingAttempts } from '@/components/dashboard/phishing-attempts';
-import { RecentActivity } from '@/components/dashboard/recent-activity';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { EmailAnalytics } from '@/components/dashboard/EmailAnalytics';
+import { SubscriptionInfo } from '@/components/dashboard/SubscriptionInfo';
+import { SecurityScore } from '@/components/dashboard/SecurityScore';
+import { PhishingAttempts } from '@/components/dashboard/PhishingAttempts';
+import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { getAllEmailAnalytics } from './get-email-analytics';
 import { ClientToastHandler } from '@/components/ui/ClientToaster';
 

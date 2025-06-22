@@ -1,5 +1,5 @@
 // app/dashboard/team/loading.tsx
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 
 export default function TeamLoading() {
     return (

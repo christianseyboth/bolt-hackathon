@@ -1,5 +1,5 @@
-import { Metadata } from 'next';
-import { BackgroundEffects } from '@/components/background-effects';
+﻿import { Metadata } from 'next';
+import { BackgroundEffects } from '@/components/BackgroundEffects';
 import {
     IconShieldCheck,
     IconMail,
@@ -8,7 +8,7 @@ import {
     IconGlobe,
     IconArrowRight,
 } from '@tabler/icons-react';
-import { Button } from '@/components/button';
+import { Button } from '@/components/Button';
 import Link from 'next/link';
 
 export const metadata: Metadata = {

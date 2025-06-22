@@ -1,11 +1,11 @@
-import React from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { SecurityOverview } from '@/components/dashboard/security/security-overview';
-import { RiskiestSenders } from '@/components/dashboard/security/riskiest-senders';
-import { AttackTypes } from '@/components/dashboard/security/attack-types';
-import { ThreatHistoryChart } from '@/components/dashboard/security/threat-history-chart';
-import { ThreatCategoryChart } from '@/components/dashboard/security/threat-category-chart';
-import { TopAttackTargetsChart } from '@/components/dashboard/security/top-attack-targets-chart';
+﻿import React from 'react';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { SecurityOverview } from '@/components/dashboard/security/SecurityOverview';
+import { RiskiestSenders } from '@/components/dashboard/security/RiskiestSenders';
+import { AttackTypes } from '@/components/dashboard/security/AttackTypes';
+import { ThreatHistoryChart } from '@/components/dashboard/security/ThreatHistoryChart';
+import { ThreatCategoryChart } from '@/components/dashboard/security/ThreatCategoryChart';
+import { TopAttackTargetsChart } from '@/components/dashboard/security/TopAttackTargetsChart';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import {
@@ -18,7 +18,7 @@ import { getStatistics } from './get-statistics';
 import { getAllThreatHistoryData } from './get-threat-history';
 import { getAllThreatCategoryData } from './get-threat-categories';
 import { getSubscriptionAccess, getFeatureRequiredPlan } from '@/lib/subscription-access';
-import { SubscriptionAccessGate } from '@/components/dashboard/subscription-access-gate';
+import { SubscriptionAccessGate } from '@/components/dashboard/SubscriptionAccessGate';
 
 export default async function SecurityPage() {
     const supabase = await createClient();

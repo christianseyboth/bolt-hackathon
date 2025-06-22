@@ -1,7 +1,7 @@
-import { Container } from '@/components/container';
-import { Heading } from '@/components/heading';
-import { Subheading } from '@/components/subheading';
-import { Button } from '@/components/button';
+import { Container } from '@/components/Container';
+import { Heading } from '@/components/Heading';
+import { Subheading } from '@/components/Subheading';
+import { Button } from '@/components/Button';
 import Link from 'next/link';
 import { IconCheck, IconMail, IconArrowLeft } from '@tabler/icons-react';
 import { Metadata } from 'next';

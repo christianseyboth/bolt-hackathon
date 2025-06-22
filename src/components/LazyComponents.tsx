@@ -1,16 +1,16 @@
-'use client';
+﻿'use client';
 import dynamic from 'next/dynamic';
 
 // Lazy load heavy animation components
 export const LazySparkles = dynamic(
-    () => import('@/components/ui/sparkles').then((mod) => ({ default: mod.SparklesCore })),
+    () => import('@/components/ui/Sparkles').then((mod) => ({ default: mod.SparklesCore })),
     {
         loading: () => <div className='w-full h-full opacity-20' />,
     }
 );
 
 export const LazyVideoModal = dynamic(
-    () => import('@/components/video-modal').then((mod) => ({ default: mod.VideoModal })),
+    () => import('@/components/VideoModal').then((mod) => ({ default: mod.VideoModal })),
     {
         loading: () => (
             <div className='flex items-center justify-center w-16 h-16 bg-white/10 rounded-full'>
@@ -22,7 +22,7 @@ export const LazyVideoModal = dynamic(
 
 export const LazyBackgroundEffects = dynamic(
     () =>
-        import('@/components/background-effects').then((mod) => ({
+        import('@/components/BackgroundEffects').then((mod) => ({
             default: mod.BackgroundEffects,
         })),
     {
@@ -32,7 +32,7 @@ export const LazyBackgroundEffects = dynamic(
 
 export const LazyTestimonialsSlider = dynamic(
     () =>
-        import('@/components/testimonials/slider').then((mod) => ({
+        import('@/components/testimonials/Slider').then((mod) => ({
             default: mod.TestimonialsSlider,
         })),
     {
@@ -56,7 +56,7 @@ export const LazyTestimonialsSlider = dynamic(
 );
 
 export const LazyPricingGrid = dynamic(
-    () => import('@/components/pricing-grid').then((mod) => ({ default: mod.PricingGrid })),
+    () => import('@/components/PricingGrid').then((mod) => ({ default: mod.PricingGrid })),
     {
         ssr: true, // Keep SSR for SEO
         loading: () => (

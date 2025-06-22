@@ -1,9 +1,9 @@
-import { CTA } from '@/components/marketing/cta';
-import { FAQs } from '@/components/marketing/faqs';
+import { CTA } from '@/components/marketing/Cta';
+import { FAQs } from '@/components/marketing/Faqs';
 import { Features } from '@/components/features';
-import { Hero } from '@/components/marketing/hero';
+import { Hero } from '@/components/marketing/Hero';
 import { Testimonials } from '@/components/testimonials';
-import { Tools } from '@/components/marketing/tools';
+import { Tools } from '@/components/marketing/Tools';
 
 export default function Home() {
     return (

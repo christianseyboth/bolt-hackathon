@@ -1,8 +1,8 @@
 import React from 'react';
-import { AmbientColor } from '@/components/ambient-color';
-import { Container } from '@/components/container';
-import { Logo } from '@/components/logo';
-import { AuthForm } from '@/components/auth/auth-form';
+import { AmbientColor } from '@/components/AmbientColor';
+import { Container } from '@/components/Container';
+import { Logo } from '@/components/Logo';
+import { AuthForm } from '@/components/auth/AuthForm';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

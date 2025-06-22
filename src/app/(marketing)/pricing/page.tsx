@@ -1,10 +1,10 @@
-import { FeatureIconContainer } from '@/components/features/feature-icon-container';
-import { Heading } from '@/components/heading';
-import { Subheading } from '@/components/subheading';
-import { Container } from '@/components/container';
+﻿import { FeatureIconContainer } from '@/components/features/FeatureIconContainer';
+import { Heading } from '@/components/Heading';
+import { Subheading } from '@/components/Subheading';
+import { Container } from '@/components/Container';
 import { IconReceiptFilled } from '@tabler/icons-react';
 import { Metadata } from 'next';
-import { PricingSection } from '@/components/marketing/pricing-section';
+import { PricingSection } from '@/components/marketing/PricingSection';
 import { ElevenLabsWidget } from '@/components/ElevenLabsWidget';
 
 export const metadata: Metadata = {

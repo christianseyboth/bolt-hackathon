@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { GridPattern } from './grid-pattern';
+import { GridPattern } from './GridPattern';
 
 export const Grid = ({ pattern, size }: { pattern?: number[][]; size?: number }) => {
     const [mounted, setMounted] = useState(false);

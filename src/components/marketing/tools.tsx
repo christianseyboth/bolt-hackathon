@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 import { motion } from 'motion/react';
 import React from 'react';
-import { FeatureIconContainer } from '@/components/features/feature-icon-container';
-import { Heading } from '@/components/heading';
-import { Subheading } from '@/components/subheading';
+import { FeatureIconContainer } from '@/components/features/FeatureIconContainer';
+import { Heading } from '@/components/Heading';
+import { Subheading } from '@/components/Subheading';
 import { StickyScroll } from '@/components/ui/StickyScroll';
 import { IconTerminal, IconMail, IconChartBar } from '@tabler/icons-react';
 

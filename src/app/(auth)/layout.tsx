@@ -1,6 +1,6 @@
 import React from 'react';
 import '../globals.css';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/Toaster';
 
 export default async function AuthLayout({
     children,

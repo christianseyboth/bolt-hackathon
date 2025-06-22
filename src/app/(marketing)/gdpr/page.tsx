@@ -1,5 +1,5 @@
-import { Metadata } from 'next';
-import { BackgroundEffects } from '@/components/background-effects';
+﻿import { Metadata } from 'next';
+import { BackgroundEffects } from '@/components/BackgroundEffects';
 
 export const metadata: Metadata = {
     title: 'GDPR Compliance | SecPilot',

@@ -1,21 +1,21 @@
-'use client';
+﻿'use client';
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { DeleteAccountSection } from '@/components/dashboard/delete-account-section';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DeleteAccountSection } from '@/components/dashboard/DeleteAccountSection';
+import { Label } from '@/components/ui/Label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 
 import { IconUser, IconShield, IconMail, IconKey, IconCopy } from '@tabler/icons-react';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/auth-context';
-import { AccountProfile } from '@/components/profile/account-profile';
-import { ApiKeyManagement } from '@/components/profile/api-key-management';
-import { SecuritySettings } from '@/components/profile/security-settings';
+import { AccountProfile } from '@/components/profile/AccountProfile';
+import { ApiKeyManagement } from '@/components/profile/ApiKeyManagement';
+import { SecuritySettings } from '@/components/profile/SecuritySettings';
 import { getApiBaseUrl, getApiDocumentationExample } from '@/lib/api-config';
 
 export default function ProfilePage() {

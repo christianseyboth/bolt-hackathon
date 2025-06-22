@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import Marquee from "react-fast-marquee";
-import { BlurImage } from "./blur-image";
+import { BlurImage } from "./BlurImage";
 
 export const Clients = () => {
   let [logos, setLogos] = useState([

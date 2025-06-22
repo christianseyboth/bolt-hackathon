@@ -1,7 +1,7 @@
-import React from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { EmailDetail, EmailAnalysisData } from '@/components/dashboard/email/email-detail';
-import { Button } from '@/components/ui/button';
+﻿import React from 'react';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { EmailDetail, EmailAnalysisData } from '@/components/dashboard/email/EmailDetail';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { createClient } from '@/utils/supabase/server';

@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 import React, { useState, useEffect } from 'react';
-import Accordion from '@/components/accordion';
-import { Heading } from '@/components/heading';
-import { Subheading } from '@/components/subheading';
-import { Container } from '@/components/container';
-import { FeatureIconContainer } from '@/components/features/feature-icon-container';
+import Accordion from '@/components/Accordion';
+import { Heading } from '@/components/Heading';
+import { Subheading } from '@/components/Subheading';
+import { Container } from '@/components/Container';
+import { FeatureIconContainer } from '@/components/features/FeatureIconContainer';
 import { IconHelp } from '@tabler/icons-react';
 import Link from 'next/link';
 

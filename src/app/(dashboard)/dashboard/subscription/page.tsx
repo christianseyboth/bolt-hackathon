@@ -1,6 +1,6 @@
-import React from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
-import { SubscriptionBilling } from '@/components/dashboard/subscription-billing';
+﻿import React from 'react';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { SubscriptionBilling } from '@/components/dashboard/SubscriptionBilling';
 import { getCurrentActiveSubscription } from '@/lib/subscription-utils';
 
 import { redirect } from 'next/navigation';

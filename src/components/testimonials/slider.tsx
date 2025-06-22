@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Image, { StaticImageData } from 'next/image';
 import { Transition } from '@headlessui/react';
-import { SparklesCore } from '../ui/sparkles';
+import { SparklesCore } from '../ui/Sparkles';
 import { testimonials as pageTestimonials } from '@/constants/page-testimonials';
 import { cn } from '@/lib/utils';
 // import Particles from './particles'

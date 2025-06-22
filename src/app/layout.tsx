@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { ClientProviders } from '@/components/providers/client-providers';
+import { ClientProviders } from '@/components/providers/ClientProviders';
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://secpilot.com'),

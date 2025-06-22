@@ -1,8 +1,8 @@
-import React from 'react';
-import { TestimonialsSlider } from './slider';
-import { FeatureIconContainer } from '../features/feature-icon-container';
-import { Heading } from '../heading';
-import { Subheading } from '../subheading';
+﻿import React from 'react';
+import { TestimonialsSlider } from './Slider';
+import { FeatureIconContainer } from '../features/FeatureIconContainer';
+import { Heading } from '../Heading';
+import { Subheading } from '../Subheading';
 import { TbLocationBolt } from 'react-icons/tb';
 
 

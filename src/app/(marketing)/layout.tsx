@@ -1,6 +1,6 @@
 import { NavBar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
-import { Toaster } from '@/components/ui/toaster';
+import { Footer } from '@/components/layout/Footer';
+import { Toaster } from '@/components/ui/Toaster';
 
 export default async function MarketingLayout({
     children,

@@ -1,8 +1,8 @@
-import { ContactFormSimple } from '@/components/marketing/contact-form-simple';
-import { FeatureIconContainer } from '@/components/features/feature-icon-container';
-import { Heading } from '@/components/heading';
-import { Subheading } from '@/components/subheading';
-import { Container } from '@/components/container';
+﻿import { ContactFormSimple } from '@/components/marketing/ContactFormSimple';
+import { FeatureIconContainer } from '@/components/features/FeatureIconContainer';
+import { Heading } from '@/components/Heading';
+import { Subheading } from '@/components/Subheading';
+import { Container } from '@/components/Container';
 import { IconMail, IconShieldCheck, IconHeadset, IconBuildingBank } from '@tabler/icons-react';
 import { Metadata } from 'next';
 import { ElevenLabsWidget } from '@/components/ElevenLabsWidget';

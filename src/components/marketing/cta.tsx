@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 import { motion } from 'motion/react';
-import { Button } from '@/components/button';
-import { Container } from '@/components/container';
+import { Button } from '@/components/Button';
+import { Container } from '@/components/Container';
 import { IconShield, IconCheck, IconArrowRight, IconMail, IconUsers } from '@tabler/icons-react';
 import Link from 'next/link';
 

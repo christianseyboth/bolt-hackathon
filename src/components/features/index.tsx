@@ -1,14 +1,14 @@
 import React from 'react';
-import { Container } from '../container';
-import { Heading } from '../heading';
-import { Subheading } from '../subheading';
-import { FeatureIconContainer } from './feature-icon-container';
+import { Container } from '../Container';
+import { Heading } from '../Heading';
+import { Subheading } from '../Subheading';
+import { FeatureIconContainer } from './FeatureIconContainer';
 import { IconShieldCheck } from '@tabler/icons-react';
-import { Card, CardDescription, CardSkeletonContainer, CardTitle } from './card';
-import { SkeletonOne } from './skeletons/first';
-import { SkeletonTwo } from './skeletons/second';
-import { SkeletonThree } from './skeletons/third';
-import { SkeletonFive } from './skeletons/fifth';
+import { Card, CardDescription, CardSkeletonContainer, CardTitle } from './Card';
+import { SkeletonOne } from './skeletons/First';
+import { SkeletonTwo } from './skeletons/Second';
+import { SkeletonThree } from './skeletons/Third';
+import { SkeletonFive } from './skeletons/Fifth';
 
 export const Features = () => {
     return (

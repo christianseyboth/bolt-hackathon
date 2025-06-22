@@ -1,7 +1,7 @@
 'use client';
 
-import { DesktopNavbar } from './desktop-navbar';
-import { MobileNavbar } from './mobile-navbar';
+import { DesktopNavbar } from './DesktopNavbar';
+import { MobileNavbar } from './MobileNavbar';
 import { motion } from 'motion/react';
 import { useAuth } from '@/context/auth-context';
 

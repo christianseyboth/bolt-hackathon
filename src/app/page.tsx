@@ -1,11 +1,11 @@
-import { CTA } from '@/components/marketing/cta';
-import { FAQs } from '@/components/marketing/faqs';
+import { CTA } from '@/components/marketing/Cta';
+import { FAQs } from '@/components/marketing/Faqs';
 import { Features } from '@/components/features';
-import { Hero } from '@/components/marketing/hero';
-import { Tools } from '@/components/marketing/tools';
+import { Hero } from '@/components/marketing/Hero';
+import { Tools } from '@/components/marketing/Tools';
 import { NavBar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
-import { Toaster } from '@/components/ui/toaster';
+import { Footer } from '@/components/layout/Footer';
+import { Toaster } from '@/components/ui/Toaster';
 import { Metadata } from 'next';
 import { LazyTestimonialsSlider, LazyBackgroundEffects } from '@/components/LazyComponents';
 import { ElevenLabsWidget } from '@/components/ElevenLabsWidget';
