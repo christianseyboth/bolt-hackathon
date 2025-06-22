@@ -2,11 +2,7 @@
 import React, { useState, useTransition } from 'react';
 import { Container } from './Container';
 import { Logo } from './Logo';
-import {
-    IconBrandGithubFilled,
-    IconBrandGoogleFilled,
-    IconLoader2,
-} from '@tabler/icons-react';
+import { IconBrandGithubFilled, IconBrandGoogleFilled, IconLoader2 } from '@tabler/icons-react';
 import { Button } from './Button';
 import { motion } from 'motion/react';
 import { signInWithOAuth } from '@/app/auth/actions';
