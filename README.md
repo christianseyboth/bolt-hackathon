@@ -1,24 +1,11 @@
-# SecPilot - AI-Powered Email Security Platform
+## Bolt.new Hackathon Project
 
-**📧 EMAIL CONFIGURATION:** Email functionality uses direct Mailgun integration via Next.js API
-route (`/api/email/send-report`).
+Hackathon Sponsor Tools used:
 
-Required environment variables:
-
--   `MAILGUN_API_KEY` - Your Mailgun API key
--   `MAILGUN_DOMAIN` - Your verified Mailgun domain (e.g., mg.secpilot.io)
--   `MAILGUN_HOST_REGION` - Either 'us' or 'eu' depending on your Mailgun region
-
-**Benefits of this approach:**
-
--   ✅ No bundle size issues (238B vs 250MB+)
--   ✅ Direct Mailgun API integration
--   ✅ Beautiful HTML email templates with SecPilot branding
--   ✅ Multiple recipients support
--   ✅ Comprehensive error handling
--   ✅ Works seamlessly with scheduled reports
-
-**Testing:** Use `node test-email-api.js` for local testing.
+- Bolt.new for UI / Dashboard Creation
+- IONOS Domain register
+- Sentry Monitoring
+- ElevenLabs Chat Agent (RAG)
 
 This is **SecPilot**, a modern, security-focused SaaS platform built with Next.js 15, React 18, and
 TailwindCSS 4. It leverages advanced AI agent workflows and n8n automation to scan, classify, and
