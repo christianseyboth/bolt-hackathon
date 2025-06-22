@@ -7,7 +7,7 @@ import { SecurityScore } from '@/components/dashboard/security-score';
 import { PhishingAttempts } from '@/components/dashboard/phishing-attempts';
 import { RecentActivity } from '@/components/dashboard/recent-activity';
 import { getAllEmailAnalytics } from './get-email-analytics';
-import { ClientToastHandler } from '@/components/ui/client-toaster';
+import { ClientToastHandler } from '@/components/ui/ClientToaster';
 
 export default async function DashboardPage() {
     const supabase = await createClient();

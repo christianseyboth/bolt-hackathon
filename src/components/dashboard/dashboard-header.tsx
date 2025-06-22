@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { AvatarMenu } from '@/components/ui/avatar-menu';
+import { AvatarMenu } from '@/components/ui/AvatarMenu';
 import { NotificationBell } from './NotificationBell';
 
 interface DashboardHeaderProps {

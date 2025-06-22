@@ -1,20 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Label } from '@/components/ui/Label';
+import { Switch } from '@/components/ui/Switch';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
+} from '@/components/ui/Select';
+import { DateRangePicker } from '@/components/ui/DateRangePicker';
 import { useToast } from '@/components/ui/use-toast';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/ui/Separator';
 import {
     IconSettings,
     IconDownload,

@@ -4,7 +4,7 @@ import React from 'react';
 import { FeatureIconContainer } from '@/components/features/feature-icon-container';
 import { Heading } from '@/components/heading';
 import { Subheading } from '@/components/subheading';
-import { StickyScroll } from '@/components/ui/sticky-scroll';
+import { StickyScroll } from '@/components/ui/StickyScroll';
 import { IconTerminal, IconMail, IconChartBar } from '@tabler/icons-react';
 
 export const Tools = () => {

@@ -1,15 +1,15 @@
 'use client';
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/DropdownMenu';
 import { IconFilter, IconSearch, IconCalendar } from '@tabler/icons-react';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { DateRangePicker } from '@/components/ui/DateRangePicker';
 
 export interface EmailFilterBarProps {
     searchQuery: string;

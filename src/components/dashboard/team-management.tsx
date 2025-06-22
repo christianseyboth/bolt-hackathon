@@ -1,11 +1,11 @@
 'use client';
 import React, { useRef, useTransition, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Progress } from '../ui/progress';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
+import { Progress } from '../ui/Progress';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,7 +15,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '../ui/alert-dialog';
+} from '../ui/AlertDialog';
 import {
     IconUsers,
     IconAlertCircle,
@@ -26,7 +26,7 @@ import {
     IconClock,
     IconExclamationMark,
 } from '@tabler/icons-react';
-import { Badge } from '../ui/badge';
+import { Badge } from '../ui/Badge';
 import {
     addTeamMember,
     removeTeamMember,

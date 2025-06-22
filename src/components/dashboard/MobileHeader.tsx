@@ -7,19 +7,19 @@ import {
     SheetTitle,
     SheetDescription,
     SheetClose,
-} from '../ui/sheet';
-import { Button } from '../ui/button';
+} from '../ui/Sheet';
+import { Button } from '../ui/Button';
 import { IconDeviceLaptop, IconMenu2, IconX } from '@tabler/icons-react';
 import { Logo } from '../logo';
 import { Sidebar } from './sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '../ui/DropdownMenu';
 import { useAuth } from '@/context/auth-context';
 import { createClient } from '@/utils/supabase/client';
 import { NotificationBell } from '@/components/dashboard/NotificationBell';

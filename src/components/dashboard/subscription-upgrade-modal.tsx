@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useTransition } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Badge } from '../ui/Badge';
 import { useToast } from '../ui/use-toast';
 import {
     AlertDialog,
@@ -13,7 +13,7 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '../ui/alert-dialog';
+} from '../ui/AlertDialog';
 import {
     IconCheck,
     IconClock,
