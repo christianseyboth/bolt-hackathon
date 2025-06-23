@@ -3,9 +3,12 @@
 Hackathon Sponsor Tools used:
 
 - Bolt.new for UI / Dashboard Creation
+- Supabase Backend
 - IONOS Domain register
-- Sentry Monitoring
 - ElevenLabs Chat Agent (RAG)
+- Sentry Monitoring
+- 21st.dev Components
+- Planned: Pica Workflow Orchestration
 
 This is **SecPilot**, a modern, security-focused SaaS platform built with Next.js 15, React 18, and
 TailwindCSS 4. It leverages advanced AI agent workflows and n8n automation to scan, classify, and
@@ -34,6 +37,8 @@ SecPilot aims to provide robust email security by:
 -   **Phishing Attempts**: See a list of recent phishing attempts with their risk levels.
 -   **Security Analytics**: Detailed insights into threat history, most frequent attack types,
     riskiest senders/domains, and top attack targets.
+-   **Security Reports**: Get indepth Reports.
+-   **API Access**: Team Accounts can fetch data from API for further processing.
 
 ### Email Management
 
@@ -54,7 +59,7 @@ SecPilot aims to provide robust email security by:
 ### Frontend
 
 -   **Next.js 15**: React framework for production.
--   **React 19**: For building user interfaces.
+-   **React 18**: For building user interfaces.
 -   **TailwindCSS 4**: For rapid and responsive UI development.
 -   **shadcn/ui**: For core application UI components (buttons, cards, dialogs, tables, etc.).
 -   **Aceternity UI**: For visually rich and animated marketing/landing page components.
