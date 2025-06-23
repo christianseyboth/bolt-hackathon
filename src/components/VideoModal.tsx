@@ -9,6 +9,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/Dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { useEffect, useState } from 'react';
 import { FaPlay } from 'react-icons/fa6';
 import ReactPlayer from 'react-player';
@@ -34,8 +35,11 @@ export function VideoModal() {
                 </div>
             </DialogTrigger>
             <DialogContent className='h-[50vh] w-[90vw] md:h-[90vh] md:w-[90vw]  max-w-none border-none'>
+                <VisuallyHidden>
+                    <DialogTitle>SecPilot Demo Video</DialogTitle>
+                </VisuallyHidden>
                 <ReactPlayer
-                    url='https://www.youtube.com/watch?v=dC1yHLp9bWA' // Don't talk about it.
+                    url='https://youtu.be/Tvo5-EdA8sY' // Don't talk about it.
                     width='90%'
                     height={isMobile ? '100%' : '100%'}
                     style={{
@@ -47,4 +51,3 @@ export function VideoModal() {
         </Dialog>
     );
 }
-

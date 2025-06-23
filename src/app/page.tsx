@@ -9,6 +9,7 @@ import { Toaster } from '@/components/ui/Toaster';
 import { Metadata } from 'next';
 import { LazyTestimonialsSlider, LazyBackgroundEffects } from '@/components/LazyComponents';
 import { ElevenLabsWidget } from '@/components/ElevenLabsWidget';
+import { BoltBadge } from '@/components/BoltBadge';
 
 export const metadata: Metadata = {
     title: 'SecPilot - Advanced Email Security Software | AI-Powered Phishing Protection',
@@ -297,6 +298,9 @@ export default function Home() {
 
             {/* ElevenLabs ConvAI Widget */}
             <ElevenLabsWidget agentId='agent_01jvw1s8axewkvfpz9grfdzrtz' />
+
+            {/* Bolt.new hackathon badge - only on home page */}
+            <BoltBadge />
         </>
     );
 }

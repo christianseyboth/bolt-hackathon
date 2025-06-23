@@ -65,10 +65,10 @@ export const Hero = () => {
                     className='lg:justify-start justify-center items-center'
                     showStars
                 />
-                <div className='flex items-center gap-4 justify-center my-10 relative z-10'>
-                    <Link href='/dashboard' aria-label='Start your free email security trial'>
+                <div className='flex items-center gap-4 justify-center mt-8 mb-12 relative z-10'>
+                    <Link href='/register' aria-label='Start your free email security trial'>
                         <Button className='flex space-x-2 items-center group !text-lg'>
-                            <span>Start Free Email Security Trial</span>{' '}
+                            <span>Start Free Trial</span>{' '}
                             <HiArrowRight
                                 className='text-white group-hover:translate-x-1 stroke-[1px] h-3 w-3 mt-0.5 transition-transform duration-200'
                                 aria-hidden='true'
@@ -101,7 +101,7 @@ export const Hero = () => {
                                 className='mx-auto rounded-md grayscale group-hover:grayscale-0 transition duration-200 object-cover object-left-top h-full md:object-left-top'
                                 draggable={false}
                                 priority
-                                quality={85}
+                                quality={65}
                                 sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1400px'
                                 placeholder='blur'
                                 blurDataURL='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAhEQABAgIDAQAAAAAAAAAAAAABABECIRIxkUFRkaGx/9oADAMBAAIRAxEAPwCdMSjQE2a8YZsGdmzNWOOOOOOOUKdOXzlP/9k='
@@ -119,7 +119,7 @@ export const Hero = () => {
                                     className='mx-auto rounded-md object-cover object-left-top h-full md:object-left-top'
                                     draggable={false}
                                     priority
-                                    quality={85}
+                                    quality={65}
                                     sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1400px'
                                     placeholder='blur'
                                     blurDataURL='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAhEQABAgIDAQAAAAAAAAAAAAABABECIRIxkUFRkaGx/9oADAMBAAIRAxEAPwCdMSjQE2a8YZsGdmzNWOOOOOOOUKdOXzlP/9k='
