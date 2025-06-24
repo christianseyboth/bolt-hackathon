@@ -2,13 +2,14 @@
 
 Hackathon Sponsor Tools used:
 
-- Bolt.new for UI / Dashboard Creation
-- Supabase Backend
-- IONOS Domain register
-- ElevenLabs Chat Agent (RAG)
-- Sentry Monitoring
-- 21st.dev Components
-- Planned: Pica Workflow Orchestration
+-   Bolt.new for UI / Dashboard Creation
+-   Supabase Backend
+-   IONOS Domain register
+-   ElevenLabs Chat Agent (RAG)
+-   Sentry Monitoring
+-   21st.dev Components
+-   Planned: Pica Workflow Orchestration
+-   Planned: Lingo Multi Language
 
 This is **SecPilot**, a modern, security-focused SaaS platform built with Next.js 15, React 18, and
 TailwindCSS 4. It leverages advanced AI agent workflows and n8n automation to scan, classify, and
